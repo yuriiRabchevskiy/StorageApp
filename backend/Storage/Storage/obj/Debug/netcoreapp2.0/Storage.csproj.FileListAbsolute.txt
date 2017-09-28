@@ -1,0 +1,8 @@
+F:\FellixApp\StorageApp\backend\Storage\Storage\bin\Debug\netcoreapp2.0\Storage.deps.json
+F:\FellixApp\StorageApp\backend\Storage\Storage\bin\Debug\netcoreapp2.0\Storage.runtimeconfig.json
+F:\FellixApp\StorageApp\backend\Storage\Storage\bin\Debug\netcoreapp2.0\Storage.runtimeconfig.dev.json
+F:\FellixApp\StorageApp\backend\Storage\Storage\bin\Debug\netcoreapp2.0\Storage.dll
+F:\FellixApp\StorageApp\backend\Storage\Storage\obj\Debug\netcoreapp2.0\Storage.csprojResolveAssemblyReference.cache
+F:\FellixApp\StorageApp\backend\Storage\Storage\obj\Debug\netcoreapp2.0\Storage.csproj.CoreCompileInputs.cache
+F:\FellixApp\StorageApp\backend\Storage\Storage\obj\Debug\netcoreapp2.0\Storage.AssemblyInfoInputs.cache
+F:\FellixApp\StorageApp\backend\Storage\Storage\obj\Debug\netcoreapp2.0\Storage.AssemblyInfo.cs
