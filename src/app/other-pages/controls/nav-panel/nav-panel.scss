@@ -1,0 +1,33 @@
+@import './../../../../assets/css/globals';
+.nav-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: fixed;
+    top: 0px;
+    width: 100vw;
+    height: 64px;
+    background-color: $appBackColor;
+    padding: 0px 24px;
+    box-sizing: border-box;
+}
+.section {
+    cursor: pointer;
+    display: inline-flex;
+    height: 100%;
+    align-items: center;
+    text-decoration: none;
+    min-width: 100px;
+    justify-content: center;
+    color: $CaColor;
+    font-size: $fontSize + 4;
+    border-bottom: 2px solid transparent;
+    box-sizing: border-box;
+    &:hover {
+        color: $WhiteColor;
+    }
+}
+.active-route {
+    color: $WhiteColor;
+    border-bottom: 2px solid $GreenColor;
+}

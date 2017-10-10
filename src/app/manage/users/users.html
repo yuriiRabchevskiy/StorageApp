@@ -1,0 +1,52 @@
+<!-- <div class="page-wrap flex-col">
+    <p-dataTable [value]="users" [editable]="true">
+        <p-column field="FirstName" header="Ім'я" sortable="true"></p-column>
+        <p-column field="LastName" header="Фамілія" sortable="true"></p-column>
+        <p-column field="Login" header="Логін" sortable="true" [editable]="true"></p-column>
+        <p-column field="Password" header="Пароль" sortable="true" [editable]="true"></p-column>
+        <p-column field="Role" header="Роль" sortable="true"></p-column>
+        <p-footer>
+            <div class="ui-helper-clearfix" style="width:100%">
+                <button type="button" pButton icon="fa-plus" (click)="showDialog()" style="float:left" label="Add">Add</button>
+            </div>
+        </p-footer>
+    </p-dataTable>
+    <p-dialog header="User Details" [(visible)]="displayDialog" [responsive]="true" showEffect="fade" [modal]="true">
+        <div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="user">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="fname">Ім'я</label></div>
+                <div class="ui-grid-col-8"><input pInputText id="fname" [(ngModel)]="user.FirstName" /></div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="lname">Фамілія</label></div>
+                <div class="ui-grid-col-8"><input pInputText id="lname" [(ngModel)]="user.LastName" /></div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="login">Логін</label></div>
+                <div class="ui-grid-col-8"><input pInputText id="login" [(ngModel)]="user.Login" /></div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="pass">Пароль</label></div>
+                <div class="ui-grid-col-8"><input pInputText id="pass" [(ngModel)]="user.Password" /></div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label>Роль</label></div>
+                <p-dropdown class="ui-grid-col-8" [options]="roles" [(ngModel)]="user.Role"></p-dropdown>
+            </div>
+        </div>
+        <p-footer>
+            <div class="ui-dialog-buttonpane ui-helper-clearfix">
+                <button type="button" pButton icon="fa-close" (click)="delete()" label="Delete">Delete</button>
+                <button type="button" pButton icon="fa-check" (click)="save()" label="Save">Save</button>
+            </div>
+        </p-footer>
+    </p-dialog>
+</div> -->
+
+<ul>
+    <li *ngFor="let user of users">
+    <p>Имя пользователя: {{user.FirstName}}</p>
+    <p>Возраст пользователя: {{user.LastName}}</p>
+    </li>
+</ul>
+<div>{{error}}</div>
