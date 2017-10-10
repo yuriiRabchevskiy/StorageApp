@@ -1,0 +1,25 @@
+{
+    "data": [
+        {
+            "FirstName": "Yura",
+            "LastName": "Rabchevskiy",
+            "Login": "doctorishche",
+            "Password": "+",
+            "Role": "Administrator"
+        },
+        {
+            "FirstName": "Oksana",
+            "LastName": "Rabchevskiy",
+            "Login": "ksju",
+            "Password": "+",
+            "Role": "Internal"
+        },
+        {
+            "FirstName": "Yura",
+            "LastName": "Horak",
+            "Login": "horak",
+            "Password": "+",
+            "Role": "Administrator"
+        }
+    ]
+}

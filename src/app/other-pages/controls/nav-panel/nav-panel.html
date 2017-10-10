@@ -1,0 +1,5 @@
+<nav class="nav-bar">
+    <a class="section" *ngFor="let item of menuItems; let i = index" (click)="setActive(item.route)"
+    [routerLink]="item.route" [class.active-route]="item.route == activPage">{{item.title}}</a>
+</nav>
+

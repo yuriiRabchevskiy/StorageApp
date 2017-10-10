@@ -1,40 +1,39 @@
-import { DataService } from './shared/table-service';
+import { UsersService } from './shared/services/users.service';
+import { StockService, } from './shared/services/stock.service';
+import { ApiService } from "./shared/services/api.service";
 
-
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Routes, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-
+import { AppRoutingModule } from './app.routing';
 import { AppComponent } from './app.component';
-import { ManageComponent } from './manage/manage.component';
-import { StorageComponent } from './storage/storage.component';
 
 import { ShareModule } from './shared/share.module';
-import { DataTableModule, DialogModule, SharedModule } from 'primeng/primeng';
-const routs: Routes = [
-  { path: '', component: ManageComponent},
-  { path: 'storage', component: StorageComponent},
-  { path: '**', redirectTo: '/' }
-];
+import { DataTableModule, DialogModule, InputTextModule, DropdownModule, SharedModule } from 'primeng/primeng';
+
 
 @NgModule({
   declarations: [
-    AppComponent, ManageComponent, StorageComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
-    RouterModule.forRoot(routs),
+    CommonModule,
     BrowserAnimationsModule,
     FormsModule,
     HttpModule,
+    AppRoutingModule,
     ShareModule,
     DataTableModule,
-    DialogModule, SharedModule
+    DropdownModule,
+    DialogModule,
+    InputTextModule, SharedModule
   ],
-  providers: [DataService],
+  providers: [ApiService, StockService, UsersService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
