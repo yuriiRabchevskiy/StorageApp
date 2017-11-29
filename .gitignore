@@ -40,3 +40,8 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+/backend/Storage/Storage/bin
+/backend/Storage/Storage/obj
+/backend/Storage/DataAccess/obj
+/backend/Storage/DataAccess/bin/Debug/netcoreapp2.0
+/backend/Storage/.vs/Storage/v15

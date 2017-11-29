@@ -1,0 +1,20 @@
+<div class="login-page flex-col">
+   
+    <form class="form-wrap flex-col" name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
+        <span class="ui-float-label u-ui-wrap">
+            <input id="float-input" type="text" size="30" pInputText name="username" [(ngModel)]="model.username" #username="ngModel"
+                required>
+            <label for="float-input">Username</label>
+            <div *ngIf="f.submitted && !username.valid" class="help-block">Username is required</div>
+        </span>
+        <span class="ui-float-label u-ui-wrap">
+            <input id="float-input" type="password" size="30" pInputText name="password" [(ngModel)]="model.password" #password="ngModel" required>
+            <label for="float-input">Password</label>
+            <div *ngIf="f.submitted && !password.valid" class="help-block">Password is required</div>
+        </span>
+        <div class="form-group">
+            <button pButton type="submit" label="Login" [disabled]="loading"></button>
+            <a [routerLink]="['/register']" class="btn btn-link">Register</a>
+        </div>
+    </form>
+</div>

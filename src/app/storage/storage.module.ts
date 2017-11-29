@@ -1,17 +1,16 @@
-import { StockComponent } from './stock/stock.component';
-import { StorageRoutingModule } from './storage.routing';
-import { ShareModule } from './../shared/share.module';
-import { ControlsModule } from './../controls/controls.module';
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ShareModule } from './../shared/share.module';
+
+import { StorageRoutingModule } from './storage.routing';
+import { StockComponent } from './stock/stock.component';
 
 @NgModule({
-  declarations: [StockComponent],
-  imports: [StorageRoutingModule, ControlsModule, ShareModule],
-  providers: [],
-  exports: [ControlsModule],
+  imports: [
+    CommonModule,
+    ShareModule,
+    StorageRoutingModule
+  ],
+  declarations: [StockComponent]
 })
-
-export class StorageModule {
-  constructor() {
-  }
-}
+export class StorageModule { }

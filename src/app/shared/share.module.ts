@@ -1,22 +1,26 @@
-import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
-import { DataTableModule, DialogModule, DropdownModule, InputTextModule } from 'primeng/primeng';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DataTableModule, DropdownModule, DialogModule, InputTextModule,
+         SharedModule, ButtonModule, TabViewModule } from "primeng/primeng";
 
 @NgModule({
-    imports: [ CommonModule ],
-    exports: [ 
-        CommonModule,
-        FormsModule,
-        RouterModule,
-        DataTableModule,
-        DialogModule,
-        DropdownModule,
-        InputTextModule
-    ]
+  imports: [
+    CommonModule
+  ],
+  exports: [
+    FormsModule,
+    HttpModule,
+    DataTableModule,
+    DropdownModule,
+    DialogModule,
+    InputTextModule,
+    ButtonModule,
+    TabViewModule,
+    SharedModule,
+  ],
+  declarations: [],
+  providers: []
 })
-
-export class ShareModule {
-    constructor() { }
-}
+export class ShareModule { }

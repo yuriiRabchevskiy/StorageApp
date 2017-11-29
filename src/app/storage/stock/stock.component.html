@@ -1,0 +1,63 @@
+<div class="page-wrap flex-row">
+  <div class="main-part">
+    <p-tabView>
+      <p-tabPanel header="Валізи">
+        <p-dataTable [value]="fake" selectionMode="single" [paginator]="true" rows="15" [responsive]="true">
+          <p-header class="table-head">
+
+            <!-- <button type="button" class="t-button" pButton icon="fa-plus" (click)="addNewUser()" label="Додати Юзера"></button>
+ [(selection)]="selectedUser" (onRowSelect)="onRowSelect($event)"
+            <button type="button" class="t-button" pButton icon="fa-close" (click)="deleteUser(selectedUser.id)" label="Видалити"></button> -->
+
+          </p-header>
+          <p-column field="article" header="Артикул" [sortable]="true"></p-column>
+          <p-column field="name" header="Назва" [sortable]="true"></p-column>
+          <p-column field="color" header="Колір" [sortable]="true"></p-column>
+          <p-column field="number" header="Кількість" [sortable]="true"></p-column>
+          <p-column field="brutto" header="Ціна Закупівельна" [sortable]="true"></p-column>
+          <p-column field="netto" header="Ціна Продажу" [sortable]="true"></p-column>
+          <p-column field="total" header="Тотал" [sortable]="true"></p-column>
+        </p-dataTable>
+      </p-tabPanel>
+      <p-tabPanel header="Техніка">
+        <p-dataTable [value]="fake2" selectionMode="single" [paginator]="true" rows="15" [responsive]="true">
+          <p-header class="table-head">
+
+            <!-- <button type="button" class="t-button" pButton icon="fa-plus" (click)="addNewUser()" label="Додати Юзера"></button>
+ [(selection)]="selectedUser" (onRowSelect)="onRowSelect($event)"
+            <button type="button" class="t-button" pButton icon="fa-close" (click)="deleteUser(selectedUser.id)" label="Видалити"></button> -->
+
+          </p-header>
+          <p-column field="article" header="Артикул" [sortable]="true"></p-column>
+          <p-column field="name" header="Назва" [sortable]="true"></p-column>
+          <p-column field="color" header="Колір" [sortable]="true"></p-column>
+          <p-column field="number" header="Кількість" [sortable]="true"></p-column>
+          <p-column field="brutto" header="Ціна Закупівельна" [sortable]="true"></p-column>
+          <p-column field="netto" header="Ціна Продажу" [sortable]="true"></p-column>
+          <p-column field="total" header="Тотал" [sortable]="true"></p-column>
+        </p-dataTable>
+      </p-tabPanel>
+      <p-tabPanel header="Інше">
+        <p-dataTable [value]="fake3" selectionMode="single" [paginator]="true" rows="15" [responsive]="true">
+          <p-header class="table-head">
+
+            <!-- <button type="button" class="t-button" pButton icon="fa-plus" (click)="addNewUser()" label="Додати Юзера"></button>
+ [(selection)]="selectedUser" (onRowSelect)="onRowSelect($event)"
+            <button type="button" class="t-button" pButton icon="fa-close" (click)="deleteUser(selectedUser.id)" label="Видалити"></button> -->
+
+          </p-header>
+          <p-column field="article" header="Артикул" [sortable]="true"></p-column>
+          <p-column field="name" header="Назва" [sortable]="true"></p-column>
+          <p-column field="color" header="Колір" [sortable]="true"></p-column>
+          <p-column field="number" header="Кількість" [sortable]="true"></p-column>
+          <p-column field="brutto" header="Ціна Закупівельна" [sortable]="true"></p-column>
+          <p-column field="netto" header="Ціна Продажу" [sortable]="true"></p-column>
+          <p-column field="total" header="Тотал" [sortable]="true"></p-column>
+        </p-dataTable>
+      </p-tabPanel>
+    </p-tabView>
+  </div>
+  <div class="details-part">
+
+  </div>
+</div>
