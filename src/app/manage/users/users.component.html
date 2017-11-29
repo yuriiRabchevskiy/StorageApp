@@ -1,0 +1,21 @@
+<div class="page-wrap flex-row">
+  <div class="main-part">
+    <p-dataTable [value]="users" selectionMode="single" [(selection)]="selectedUser" [paginator]="true" rows="15" [responsive]="true"
+      (onRowSelect)="onRowSelect($event)">
+      <p-header class="table-head">
+        
+          <button type="button" class="t-button" pButton icon="fa-plus" (click)="addNewUser()" label="Додати Юзера"></button>
+        
+          <button type="button" class="t-button" pButton icon="fa-close" (click)="deleteUser(selectedUser.id)" label="Видалити"></button>
+        
+      </p-header>
+      <p-column field="firstName" header="Ім'я" [sortable]="true"></p-column>
+      <p-column field="lastName" header="Фамілія" [sortable]="true"></p-column>
+      <p-column field="username" header="Логін" [sortable]="true"></p-column>
+      <p-column field="password" header="Пароль" [sortable]="true"></p-column>
+    </p-dataTable>
+  </div>
+  <div class="details-part" *ngIf="selectedUser">
+    <app-user [user]="selectedUser"></app-user>
+  </div>
+</div>

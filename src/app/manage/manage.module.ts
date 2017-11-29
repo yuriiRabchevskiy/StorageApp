@@ -1,22 +1,18 @@
-import { ManageRoutingModule } from './manage.routing';
-import { ShareModule } from './../shared/share.module';
-import { ControlsModule } from './../controls/controls.module';
-import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
+import { ShareModule } from './../shared/share.module';
+import { ManageRoutingModule } from './manage.routing';
 
 import { UsersComponent } from './users/users.component';
-
+import { UserComponent } from "./user/user.component";
 
 @NgModule({
-  declarations: [UsersComponent],
-  imports: [ManageRoutingModule, ControlsModule, ShareModule],
-  providers: [],
-  exports: [ControlsModule],
+  imports: [
+    CommonModule,
+    ManageRoutingModule,
+    ShareModule
+  ],
+  declarations: [UsersComponent, UserComponent],
+  providers: []
 })
-
-
-export class ManageModule {
-  constructor() {
-  }
-}
+export class ManageModule { }

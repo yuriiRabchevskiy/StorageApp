@@ -1,67 +1,65 @@
-import { ApiService } from './../../shared/services/api.service';
-import { SelectItem } from 'primeng/primeng';
-import { IUser, User } from './../../models/users';
 import { Component, OnInit } from '@angular/core';
+import { User } from "../../shared/models/user";
+import { UserService } from "../../shared/services/user.service";
+
+class NewUser implements User {
+  id: number;
+  username: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  constructor() {
+       this.id = 123;
+       this.username = '';
+       this.password = '';
+       this.firstName = '';
+       this.lastName = '';
+     }
+}
 
 @Component({
-  selector: 'users',
-  templateUrl: './users.html',
-  styleUrls: ['./users.scss'],
-  providers: [ApiService]
+  selector: 'app-users',
+  templateUrl: './users.component.html',
+  styleUrls: ['./users.component.scss']
 })
 export class UsersComponent implements OnInit {
   users: User[] = [];
-  roles: SelectItem[];
-  error: any;
 
-  items: any;
-  user: User = new User();
+  user: User = new NewUser();
   selectedUser: User;
   newUser: boolean;
-  displayDialog: boolean;
-
-  constructor(private apiService: ApiService) { }
+  constructor(private userService: UserService) {
+  }
 
   ngOnInit() {
-    this.apiService.getUsers().subscribe(
-      data => this.users = data,
-      error => {
-        this.error = error;
-        console.log(error);
-      });
-    console.log(this.users);
-    this.roles = [{ label: 'Administrator', value: null },
-    { label: 'Internal User', value: 'Internal' }];
+    this.loadAllUsers();
   }
 
-  showDialog() {
+  addNewUser() {
     this.newUser = true;
-    this.user = new User();
-    this.displayDialog = true;
-  }
-
-  save() {
-    if (this.newUser) {
-      this.users.push(this.user);
-    } else {
-      this.users[this.findUserIndex()] = this.user;
-    }
+    this.user = new NewUser();
+    let users = [...this.users];
+    users.push(this.user);
+    this.selectedUser = this.user;
+    this.users = users;
     this.user = null;
-    this.displayDialog = false;
   }
 
-  delete() {
-    const index = this.findUserIndex();
-    this.users = this.users.filter((val, i) => i !== index);
-    this.user = null;
-    this.displayDialog = false;
+  deleteUser(id: number) {
+    this.userService.delete(id).subscribe(() => { this.loadAllUsers() });
+    this.selectedUser = this.users[0];
   }
 
-  findUserIndex(): number {
-    return this.users.indexOf(this.selectedUser);
+  onRowSelect(event) {
+    this.selectedUser = event.data;
   }
 
-  addItem() {
-    // this.userService.addUser(user);
+  private loadAllUsers() {
+    this.userService.getAll().subscribe(users => { 
+      this.users = users;
+      this.selectedUser = this.users[0];
+      console.log('Users: ', this.users);
+    });
   }
+
 }

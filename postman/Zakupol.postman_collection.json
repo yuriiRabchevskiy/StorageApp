@@ -1,0 +1,51 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Zakupol",
+		"_postman_id": "6de8834d-3f3c-3365-0479-7165d54faa2e",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register New User",
+			"request": {
+				"url": "http://{{host}}/api/account/register",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\temail: \"felixdesuzza@gmail.com\",\n\tpassword: \"Neuser_13\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"url": "http://{{host}}/api/account/login",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\temail: \"felixdesuzza@gmail.com\",\n\tpassword: \"Neuser_13\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

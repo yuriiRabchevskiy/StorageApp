@@ -1,0 +1,23 @@
+<nav class="nav-bar">
+  <ul class="nav-wrap">
+    <a class="logo-wrap" routerLink="/home">
+      <div class="userLogo" (click)="selectPage('home')">
+        Hi {{currentUser.firstName}}!
+      </div>
+    </a>
+    <a class="link-wrap" [class.link-active]="page === selectedPage" *ngFor="let page of pages" routerLink="/{{page}}">
+      <li class="u-link" (click)="selectPage(page)">{{page}}</li>
+    </a>
+  </ul>
+  <ul class="nav-wrap">
+    <li class="link-wrap">
+      <a class="u-link" [routerLink]="['/login']">Logout</a>
+    </li>
+  </ul>
+</nav>
+
+
+<div class="layout">
+  <app-alert></app-alert>
+  <router-outlet></router-outlet>
+</div>

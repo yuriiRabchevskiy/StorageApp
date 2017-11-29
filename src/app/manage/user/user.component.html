@@ -1,0 +1,26 @@
+<div class="details-wrap flex-col">
+  <div class="details-head">
+    <span class="details-name" title="{{selectedUser?.firstName}}">Ім'я: {{selectedUser?.firstName}}</span>
+  </div>
+  <form class="details-body flex-col">
+    <div class="u-input-wrapper">
+      <input type="text" size="30" pInputText [(ngModel)]="selectedUser.firstName" name="fName" #fName="ngModel" required>
+      <div class="label">Ім'я</div>
+    </div>
+    <div class="u-input-wrapper">
+      <input type="text" size="30" pInputText [(ngModel)]="selectedUser.lastName" name="lName" #lName="ngModel" required>
+      <div class="label">Фамілія</div>
+    </div>
+    <div class="u-input-wrapper">
+      <input type="text" size="30" pInputText [(ngModel)]="selectedUser.username" name="login" #login="ngModel" required>
+      <div class="label">Логін</div>
+    </div>
+    <div class="u-input-wrapper">
+      <input type="text" size="30" pInputText [(ngModel)]="selectedUser.password" name="pass" #pass="ngModel" required>
+      <div class="label">Пароль</div>
+    </div>
+  </form>
+  <div class="details-foot">
+    <button pButton type="submit" (click)="saveUser()" label="Зберегти"></button>
+  </div>
+</div>
