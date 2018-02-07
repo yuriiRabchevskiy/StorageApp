@@ -1,0 +1,59 @@
+<p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
+    <p-header>{{header}}</p-header>
+    <div class="dialog-body flex-col" *ngIf="product">
+        <div class="d-page-wrap flex-col">
+            <div class="flex-row flex-wrap">
+                <mat-form-field class="s-input-wrapper">
+                    <mat-select placeholder="Категорія" [(ngModel)]="selectedCategory" name="category">
+                        <mat-option *ngFor="let item of categories" [value]="item.id">
+                            {{item.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput type="text" placeholder="Назва Продукта" [(ngModel)]="product.productType" name="productType" #productType="ngModel">
+                </mat-form-field>
+            </div>
+            <div class="flex-row flex-wrap">
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput type="text" placeholder="Виробник" [(ngModel)]="product.producer" name="producer" #producer="ngModel">
+                </mat-form-field>
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput type="text" placeholder="Модель" [(ngModel)]="product.model" name="model" #model="ngModel">
+                </mat-form-field>
+            </div>
+            <div class="flex-row flex-wrap">
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput type="text" placeholder="Колір" [(ngModel)]="product.color" name="color" #color="ngModel">
+                </mat-form-field>
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput type="text" placeholder="Розмір" [(ngModel)]="product.size" name="size" #size="ngModel">
+                </mat-form-field>
+            </div>
+            <div class="flex-row flex-wrap">
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput type="number" placeholder="Ціна закупівельна" [(ngModel)]="product.recommendedBuyPrice" name="buyPrice" #buyPrice="ngModel"
+                        min="0" step="0.01">
+                </mat-form-field>
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput type="number" placeholder="Ціна продажу" [(ngModel)]="product.recommendedSalePrice" name="salePrice" #salePrice="ngModel"
+                        min="0" step="0.01">
+                </mat-form-field>
+            </div>
+            <div class="flex-row flex-wrap flex-area-wrap" [class.area-xs]="product.isNew">
+                <mat-form-field class="s-area-wrapper">
+                    <textarea matInput placeholder="Нотатки" [(ngModel)]="product.freeNote" name="freeNote" #freeNote="ngModel"></textarea>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="d-cb-wrap flex-row" *ngIf="product.isNew">
+            <p-checkbox class="s-cb" *ngIf="product.isNew" name="next" label="Додати ще" [(ngModel)]="addNext" binary="true" (onChange)="addMore($event)"></p-checkbox>
+            <p-checkbox class="s-cb" *ngIf="addNext" name="next" label="Додати копію" [(ngModel)]="addCopy" binary="true" (onChange)="addMoreCopy($event)"></p-checkbox>
+        </div>
+    </div>
+
+    <p-footer class="s-dialog-foot">
+        <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save(product)" label="Зберегти"></button>
+        <button class="d-s-button-cancel" type="button" pButton icon="fa-close" label="Закрити" (click)="closeDialog()"></button>
+    </p-footer>
+</p-dialog>

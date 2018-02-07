@@ -2,11 +2,305 @@
 	"variables": [],
 	"info": {
 		"name": "Zakupol",
-		"_postman_id": "6de8834d-3f3c-3365-0479-7165d54faa2e",
+		"_postman_id": "104c30cb-310b-cfe2-3c26-c9465faaf5e5",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
+		{
+			"name": "List All Users",
+			"request": {
+				"url": "http://{{host}}/api/warehouse",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"productType\": \"Чемодан\",\n            \"model\": \"720\",\n            \"producer\": \"RGL\",\n            \"color\": \"Чорний\",\n            \"size\": \"Середній\",\n            \"freeNote\": \"Пластик\",\n            \"recommendedBuyPrice\": 750,\n            \"recommendedSalePrice\": 900,\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "List All Categories",
+			"request": {
+				"url": "http://{{host}}/api/warehouse",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"productType\": \"Чемодан\",\n            \"model\": \"720\",\n            \"producer\": \"RGL\",\n            \"color\": \"Чорний\",\n            \"size\": \"Середній\",\n            \"freeNote\": \"Пластик\",\n            \"recommendedBuyPrice\": 750,\n            \"recommendedSalePrice\": 900,\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "New Category",
+			"request": {
+				"url": "http://{{host}}/api/category",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"name\": \"Техніка\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Edit Category",
+			"request": {
+				"url": "http://{{host}}/api/category",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"id\": \"3\",\n\t\t\t\"name\": \"Інше\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "List All Warehouses",
+			"request": {
+				"url": "http://{{host}}/api/warehouse",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"productType\": \"Чемодан\",\n            \"model\": \"720\",\n            \"producer\": \"RGL\",\n            \"color\": \"Чорний\",\n            \"size\": \"Середній\",\n            \"freeNote\": \"Пластик\",\n            \"recommendedBuyPrice\": 750,\n            \"recommendedSalePrice\": 900,\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "New Warehouse",
+			"request": {
+				"url": "http://{{host}}/api/warehouse",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"name\": \"Шегині\",\n            \"address\": \"Шегині\",\n            \"description\": \"Нема\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Edit Warehouse",
+			"request": {
+				"url": "http://{{host}}/api/warehouse",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"id\": \"2\",\n            \"ProductType\": \"Чемодан\",\n            \"Model\": \"773\",\n            \"Producer\": \"RGL\",\n            \"Color\": \"Чорний\",\n            \"Size\": \"Середній\",\n            \"FreeNote\": \"Тканина\",\n            \"RecommendedBuyPrice\": \"500\",\n            \"RecommendedSalePrice\": \"650\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "List All Products",
+			"request": {
+				"url": "http://{{host}}/api/product",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"productType\": \"Чемодан\",\n            \"model\": \"720\",\n            \"producer\": \"RGL\",\n            \"color\": \"Чорний\",\n            \"size\": \"Середній\",\n            \"freeNote\": \"Пластик\",\n            \"recommendedBuyPrice\": 750,\n            \"recommendedSalePrice\": 900,\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Add Product To Store",
+			"request": {
+				"url": "http://{{host}}/api/product/1/add",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"fromId\": 1,\n    \t\t\"quantity\" : 3,\n    \t\t\"description\": \"Завіз для Вєталя\",\n    \t\t\"price\": 150,\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "New Product",
+			"request": {
+				"url": "http://{{host}}/api/product",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"ProductType\": \"Чемодан\",\n            \"Model\": \"720\",\n            \"Producer\": \"RGL\",\n            \"Color\": \"Чорний\",\n            \"Size\": \"Середній\",\n            \"FreeNote\": \"Пластик\",\n            \"RecommendedBuyPrice\": \"750\",\n            \"RecommendedSalePrice\": \"900\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Edit Product",
+			"request": {
+				"url": "http://{{host}}/api/product",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"id\": \"2\",\n            \"ProductType\": \"Чемодан\",\n            \"Model\": \"773\",\n            \"Producer\": \"RGL\",\n            \"Color\": \"Чорний\",\n            \"Size\": \"Середній\",\n            \"FreeNote\": \"Тканина\",\n            \"RecommendedBuyPrice\": \"500\",\n            \"RecommendedSalePrice\": \"650\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Check Auth",
+			"request": {
+				"url": "http://{{host}}/api/account/auth",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  email: \"felixdesuzza@gmail.com\",\n  password: \"Neuser_13\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
 		{
 			"name": "Register New User",
 			"request": {
@@ -17,11 +311,16 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{bearer}}",
+						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\temail: \"felixdesuzza@gmail.com\",\n\tpassword: \"Neuser_13\"\n}"
+					"raw": "{\n  email: \"felixdesuzza@gmail.com\",\n  password: \"Neuser_13\"\n}"
 				},
 				"description": ""
 			},
@@ -41,7 +340,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\temail: \"felixdesuzza@gmail.com\",\n\tpassword: \"Neuser_13\"\n}"
+					"raw": "{\n  userName: \"felixdesuzza@gmail.com\",\n  password: \"Neuser_13\"\n}"
 				},
 				"description": ""
 			},

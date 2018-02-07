@@ -1,0 +1,43 @@
+<p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
+    <p-header>Користувач:
+        <i>{{user.name}} {{user.surname}}</i>
+    </p-header>
+    <form [formGroup]="userForm" class="dialog-body flex-col" novalidate autocomplete="off">
+        <div class="d-page-wrap flex-col">
+            <div class="flex-row flex-wrap">
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput placeholder="Логін" formControlName="login" required>
+                </mat-form-field>
+                <mat-form-field class="s-input-wrapper">
+                    <mat-select placeholder="Роль" formControlName="isAdmin">
+                        <mat-option *ngFor="let rol of userRoles" [value]="rol.value">
+                            {{rol.label}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="flex-row flex-wrap">
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput placeholder="І'мя" formControlName="name">
+                </mat-form-field>
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput placeholder="Фамілія" formControlName="surname">
+                </mat-form-field>
+            </div>
+            <div class="flex-row flex-wrap">
+                <mat-form-field class="s-input-wrapper">
+                    <input type="tel" matInput placeholder="Телефон" formControlName="phone">
+                </mat-form-field>
+            </div>
+            <div class="flex-row flex-wrap flex-area-wrap">
+                <mat-form-field class="s-area-wrapper">
+                    <textarea matInput placeholder="Нотатки" formControlName="notes"></textarea>
+                </mat-form-field>
+            </div>
+        </div>
+    </form>
+    <p-footer class="s-dialog-foot">
+        <button class="d-s-button" type="submit" pButton icon="fa-check" (click)="save($event)" label="Зберегти" [disabled]="userForm.invalid"></button>
+        <button class="d-s-button-cancel" type="button" pButton icon="fa-close" label="Закрити" (click)="closeDialog()"></button>
+    </p-footer>
+</p-dialog>

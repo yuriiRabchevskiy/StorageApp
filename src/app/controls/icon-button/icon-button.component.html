@@ -1,0 +1,5 @@
+<button #tooltip class="i-button {{buttClass}}" [disabled]="disabled" title="" (click)="onClick($event)" type="button"
+    [ngClass]="{'i-disabled': disabled === true}">
+    <span class="i-wrap {{sprite}} {{icon}}" pTooltip="{{title}}" tooltipPosition="bottom" [appendTo]="tooltip"
+    tooltipStyleClass="i-s-tooltip"></span>
+</button>

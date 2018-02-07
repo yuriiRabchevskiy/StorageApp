@@ -1,23 +1,30 @@
 <nav class="nav-bar">
   <ul class="nav-wrap">
-    <a class="logo-wrap" routerLink="/home">
-      <div class="userLogo" (click)="selectPage('home')">
-        Hi {{currentUser.firstName}}!
+    <a class="logo-wrap" routerLink="/storage">
+      <li class="s-logo" (click)="selectPage('storage')"></li>
+    </a>
+    <app-i-button class="menu-button" *ngIf="view.isMobile" [icon]="open ? 'i-closed' : 'i-menu'" (iClick)="openMenu()"></app-i-button>
+    <div class="flex-row" [ngClass]="{'mob-menu': view.isMobile, 'menu-open': open && view.isMobile}">
+      <div *ngFor="let page of pages">
+        <a class="link-wrap" [class.link-active]="page.url === selectedPage" *ngIf="page.view" routerLink="/{{page.url}}" (click)="selectPage(page.url)">
+          <li class="u-link">{{page.title}}</li>
+        </a>
       </div>
-    </a>
-    <a class="link-wrap" [class.link-active]="page === selectedPage" *ngFor="let page of pages" routerLink="/{{page}}">
-      <li class="u-link" (click)="selectPage(page)">{{page}}</li>
-    </a>
+    </div>
   </ul>
   <ul class="nav-wrap">
-    <li class="link-wrap">
-      <a class="u-link" [routerLink]="['/login']">Logout</a>
+    <li class="login-wrap">{{userLogin}}</li>
+    <li class="logout-wrap" (click)=logout()>
+      <div class="s-logout"></div>
     </li>
   </ul>
 </nav>
 
+<div *ngIf="view.isMobile &&  open" class="overlay " (click)="closeMenu()"></div>
 
 <div class="layout">
-  <app-alert></app-alert>
   <router-outlet></router-outlet>
 </div>
+
+<p-growl [(value)]="msgs"></p-growl>
+<app-spinner *ngIf="showSpinner"></app-spinner>

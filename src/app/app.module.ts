@@ -3,31 +3,32 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule, BaseRequestOptions } from '@angular/http';
+import 'rxjs/Rx';
+import 'hammerjs';
 
-import { routing } from "./app.routing";
+import { routing } from './app.routing';
 import { AppComponent } from './app.component';
-import { DataTableModule, DialogModule, InputTextModule, DropdownModule, ButtonModule, SharedModule, TabViewModule } from 'primeng/primeng';
-import { AlertService } from './shared/services/alert.service';
-import { AuthGuard } from './shared/auth.guard';
-import { AuthenticationService } from "./shared/services/authentication.service";
-import { ApiService } from "./shared/services/api.service";
-import { UserService } from "./shared/services/user.service";
-import { LugageService } from "./shared/services/lugage.service";
 
-import { RegisterComponent } from './register/register.component';
+import { MatTabsModule, MatRadioModule, MatInputModule,
+  MatFormFieldModule, MatIconModule, MatSelectModule, ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material';
+
+import { ApiService } from './shared/services/api.service';
+import { UserService } from './shared/services/user.service';
+import { AuthGuard } from './shared/services/auth-guard';
+
 import { ShareModule } from './shared/share.module';
+import { MessageService } from 'primeng/components/common/messageservice';
+import { DataTableModule, DialogModule, InputTextModule,
+  SpinnerModule, ButtonModule, CheckboxModule, TooltipModule,
+  GrowlModule, SharedModule } from 'primeng/primeng';
 
-// fake backend
-import { fakeBackendProvider } from "./shared/fake-backend";
-import { MockBackend } from "@angular/http/testing";
+
 
 @NgModule({
   declarations: [
-    AppComponent,
-    RegisterComponent,
-  ],
+    AppComponent ],
   imports: [
     BrowserModule,
     CommonModule,
@@ -35,24 +36,31 @@ import { MockBackend } from "@angular/http/testing";
     FormsModule,
     HttpModule,
     routing,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatTabsModule,
+    MatRadioModule,
+    MatIconModule,
     DataTableModule,
-    DropdownModule,
     DialogModule,
-    InputTextModule, 
+    InputTextModule,
+    SpinnerModule,
     ButtonModule,
-    TabViewModule,
+    CheckboxModule,
+    TooltipModule,
+    GrowlModule,
     SharedModule,
     ShareModule
   ],
-  providers: [AuthGuard,
-    AlertService,
-    AuthenticationService,
+  providers: [
     ApiService,
     UserService,
-    LugageService,
-    fakeBackendProvider,
-    MockBackend,
-    BaseRequestOptions],
+    AuthGuard,
+    MessageService,
+    { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

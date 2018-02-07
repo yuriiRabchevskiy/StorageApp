@@ -1,12 +1,77 @@
+@import '../../assets/css/globals';
 .nav-bar {
     position: fixed;
-    width: 100vw;
     top: 0;
     left: 0;
     display: flex;
-    height: 64px;
-    background: #3e3a49;
+    @include wH(100vw, 64px);
+    background: $pageHeaderColor;
     justify-content: space-between;
+    z-index: 10;
+    @include customMaxWidth(1023px) {
+        height: 40px;
+    }
+}
+
+.logo-wrap {
+    display: block;
+    @include wH(64px, 100%);
+    margin: 0px 4px 0px 8px;
+    text-decoration: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    @include customMaxWidth(1023px) {
+        width: 40px;
+    }
+}
+
+.s-logo {
+    display: block;
+    @include wH(100%, 100%);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.logout-wrap {
+    @extend .logo-wrap;
+    box-sizing: border-box;
+    padding: 8px;
+    margin: 0px;
+    opacity: 0.8;
+    &:hover {
+        opacity: 1;
+    }
+    @include customMaxWidth(1023px) {
+        padding: 0px;
+    }
+}
+
+.s-logout {
+    display: block;
+    @include wH(100%, 100%);
+    background-image: $logout;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.login-wrap {
+    display: block;
+    @include wH(auto, 100%);
+    max-width: 280px;
+    line-height: 64px;
+    font-size: 18px;
+    margin: 0px 4px;
+    color: #fff;
+    cursor: default;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    @include customMaxWidth(1023px) {
+        line-height: 40px;
+        font-size: 14px;
+    }
 }
 .nav-wrap {
     display: flex;
@@ -16,25 +81,10 @@
     margin: 0px;
     list-style-type: none;
     padding: 0;
-    padding-right: 12px;
 }
-.logo-wrap {
-    color: #fff;
-    text-decoration: none;
-    cursor: pointer;
-}
-.userLogo {
-    height: 64px;
-    line-height: 64px;
-    font-size: 24px;
-    padding: 0px 24px;
-    box-sizing: border-box;
-    color: #fff;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-}
+
 .link-wrap {
-    display: inline-block;
+    display: inline-flex;
     height: 100%;
     line-height: 64px;
     margin: 0px 6px;
@@ -42,20 +92,61 @@
     font-size: 20px;
     box-sizing: border-box;
     border-bottom: 2px solid transparent;
+    text-decoration: none;
     &:hover {
         color: #fff;
-        border-bottom: 2px solid #9fda58;
+        border-bottom: 2px solid red;
+    }
+    @include customMaxWidth(1023px) {
+        line-height: 40px;
+        font-size: 16px;
+    }
+    @include customMaxWidth(599px) {
+        font-size: 14px;
     }
 }
+
 .link-active {
     color: #fff;
-    border-bottom: 2px solid #9fda58;
+    border-bottom: 2px solid red;
 }
+
 .u-link {
     display: inline-block;
     color: inherit;
     font-size: inherit;
     text-transform: capitalize;
     text-decoration: none;
+    box-sizing: inherit;
+    padding: 0px 8px;
     cursor: pointer;
+}
+.menu-button {
+    margin: 0px;
+    margin-left: 8px;
+}
+.mob-menu {
+    @include wH(80%, calc(100vh - 40px));
+    max-width: 280px;
+    position: fixed;
+    left: -300px;
+    top: 40px;
+    background: $pageHeaderColor;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 12px;
+    transition: linear 0.3s;
+    z-index: 10;
+    .link-wrap {
+        margin-bottom: 8px;
+        &:hover {
+            border-bottom-color: transparent;
+        }
+    }
+    .link-active {
+        border-bottom-color: transparent;
+    }
+}
+.menu-open {
+    left: 0px;
 }

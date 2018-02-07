@@ -1,0 +1,7 @@
+@import '../../../assets/css/globals';
+.area-wrap {
+    max-width: none;
+    @include customMaxWidth(767px) {
+        max-width: 400px;
+    }
+}

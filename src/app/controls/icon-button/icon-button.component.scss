@@ -1,0 +1,226 @@
+@import '../../../assets/css/globals';
+.i-button {
+    display: inline-block;
+    position: relative;
+    @include wH(40px, 40px);
+    background-color: $appRedColor;
+    border: none;
+    border-radius: 0px;
+    outline: 0px;
+    padding: 0px;
+    cursor: pointer;
+    &:focus,
+    &:hover {
+        outline: none;
+        background-color: $appRedHoverColor;
+    }
+    &:disabled,
+    &:disabled:hover {
+        cursor: default;
+        background-color: $appRedDisabledColor;
+    }
+    .app-sprite {
+        background-image: $basicIcon;
+    }
+}
+.i-button-xs {
+    @include wH(24px, 24px);
+}
+.i-disabled {
+    background-color: $appRedDisabledColor;
+    &:hover {
+        background-color: $appRedDisabledColor;
+    }
+}
+.i-wrap {
+    display: block;
+    @include wH(100%, 100%);
+}
+.add-icon,
+.i-button.i-disabled:hover .add-icon {
+    background-position: -5px -55px;
+}
+
+.i-button:hover .add-icon,
+.i-button:focus .add-icon {
+    background-position: -7px 0px;
+}
+.add-user-icon,
+.i-button.i-disabled:hover .add-user-icon {
+    background-position: -181px -57px;
+}
+
+.i-button:hover .add-user-icon,
+.i-button:focus .add-user-icon {
+    background-position: -181px -1px;
+}
+.del-icon,
+.i-button.i-disabled:hover .del-icon {
+    background-position: -362px -60px;
+}
+.i-button:hover .del-icon,
+.i-button:focus .del-icon {
+    background-position: -363px -7px;
+}
+.copy-icon,
+.i-button.i-disabled:hover .copy-icon {
+    background-position: -59px -58px;
+}
+.i-button:hover .copy-icon,
+.i-button:focus .copy-icon {
+    background-position: -55px -1px;
+}
+.edit-icon,
+.i-button.i-disabled:hover .edit-icon {
+    background-position: -602px -50px;
+}
+.i-button:hover .edit-icon,
+.i-button:focus .edit-icon {
+    background-position: -607px -4px;
+}
+.transfer-icon,
+.i-button.i-disabled:hover .transfer-icon {
+    background-position: -423px -53px;
+}
+.i-button:hover .transfer-icon,
+.i-button:focus .transfer-icon {
+    background-position: -420px -1px;
+}
+.addition-icon,
+.i-button.i-disabled:hover .addition-icon {
+    background-position: -118px -58px;
+}
+.i-button:hover .addition-icon,
+.i-button:focus .addition-icon {
+    background-position: -119px -1px;
+}
+.withdrawal-icon,
+.i-button.i-disabled:hover .withdrawal-icon {
+    background-position: -1183px -47px;
+}
+.i-button:hover .withdrawal-icon,
+.i-button:focus .withdrawal-icon {
+    background-position: -1183px -2px;
+}
+.sell-icon,
+.i-button.i-disabled:hover .sell-icon {
+    background-position: -549px -49px;
+}
+.i-button:hover .sell-icon,
+.i-button:focus .sell-icon {
+    background-position: -550px -4px;
+}
+.i-refresh,
+.i-button.i-disabled:hover .i-refresh {
+    background-position: -483px -49px;
+}
+.i-button:hover .i-refresh,
+.i-button:focus .i-refresh {
+    background-position: -483px -2px;
+}
+.i-open,
+.i-button.i-disabled:hover .i-open {
+    background-position: -662px -49px;
+}
+.i-button:hover .i-open,
+.i-button:focus .i-open {
+    background-position: -661px -4px;
+}
+.i-close,
+.i-button.i-disabled:hover .i-close {
+    background-position: -711px -50px;
+}
+.i-button:hover .i-close,
+.i-button:focus .i-close {
+    background-position: -711px -4px;
+}
+
+.i-export-one,
+.i-button.i-disabled:hover .i-export-one {
+    background-position: -936px -47px;
+}
+.i-button:hover .i-export-one,
+.i-button:focus .i-export-one {
+    background-position: -936px -2px;
+}
+.i-export-all,
+.i-button.i-disabled:hover .i-export-all {
+    background-position: -879px -47px;
+}
+.i-button:hover .i-export-all,
+.i-button:focus .i-export-all {
+    background-position: -878px -2px;
+}
+.i-basket,
+.i-button.i-disabled:hover .i-basket {
+    background-position: -985px -45px;
+}
+.i-button:hover .i-basket,
+.i-button:focus .i-basket {
+    background-position: -986px -1px;
+}
+
+.i-closeOrder,
+.i-button.i-disabled:hover .i-closeOrder {
+    background-position: -1041px -47px;
+}
+.i-button:hover .i-closeOrder,
+.i-button:focus .i-closeOrder {
+    background-position: -1040px -2px;
+}
+
+.i-menu,
+.i-button.i-disabled:hover .i-menu {
+    background-position: -820px -47px;
+}
+.i-button:hover .i-menu,
+.i-button:focus .i-menu {
+    background-position: -819px 0px;
+}
+.i-closed,
+.i-button.i-disabled:hover .i-closed {
+    background-position: -763px -49px;
+}
+.i-button:hover .i-closed,
+.i-button:focus .i-closed {
+    background-position: -763px -2px;
+}
+
+.i-collapse,
+.i-button.i-disabled:hover .i-collapse {
+    background-position: -1229px -46px;
+}
+.i-button:hover .i-collapse,
+.i-button:focus .i-collapse {
+    background-position: -1230px -4px;
+}
+.i-expand,
+.i-button.i-disabled:hover .i-expand {
+    background-position: -1272px -44px;
+}
+.i-button:hover .i-expand,
+.i-button:focus .i-expand {
+    background-position: -1272px -4px;
+}
+.i-returnOrder,
+.i-button.i-disabled:hover .i-returnOrder {
+    background-position: -1133px -47px;
+}
+.i-button:hover .i-returnOrder,
+.i-button:focus .i-returnOrder {
+    background-position: -1134px -2px;
+}
+//for xs icon
+.i-clear,
+.i-button.i-disabled:hover .i-clear {
+    background-position: -771px -131px;
+}
+.i-button:hover .i-clear,
+.i-button:focus .i-clear {
+    background-position: -771px -96px;
+}
+//---------------
+.i-button.i-disabled .i-wrap,
+.i-button.i-disabled:hover .i-wrap {
+    opacity: 0.5;
+}

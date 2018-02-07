@@ -1,22 +1,521 @@
 @import '../../assets/css/globals';
 .login-page {
-    width: 100vw;
-    height: 100vh;
-    justify-content: center;
+    @include flexJA(space-between, flex-start);
+    @include wH(100%, 100%);
+    min-height: 320px;
+    min-width: 320px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: $pageBackColor;
+}
+
+.loginHeader,
+.loginFooter {
+    @include flexJA(flex-start, center);
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    @include wH(100%, 100px);
+    background-color: $pageHeaderColor;
+    @include customMaxWidth(800px) {
+        height: 74px;
+        left: 0px;
+    }
+}
+
+.loginFooter {
+    justify-content: flex-end;
+    align-items: flex-end;
+    top: unset;
+    bottom: 0px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.copyright {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    @include customMaxWidth(1024px) {
+        font-size: 12px;
+    }
+    @include customMaxWidth(800px) {
+        font-size: 10px;
+    }
+}
+
+.project-wrap {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    cursor: default;
+    .s-logo {
+        @include wH(100px, 100%);
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: 50%;
+        margin: 0px 8px;
+        flex-shrink: 0;
+    }
+    .app-name {
+        display: flex;
+        align-items: center;
+        width: calc(100% - 116px);
+        color: #fff;
+        font-weight: 900;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size: $fontSize * 2 + 2;
+        text-align: center;
+    }
+}
+
+.zacupolLinks {
+    position: absolute;
+    white-space: nowrap;
+    padding: 8px;
+    a {
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.6);
+        text-transform: uppercase;
+        &:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+    }
+}
+
+.loginHeader .zacupolLinks {
+    right: 8px;
+    top: 36px;
+    @include customMaxWidth(800px) {
+        display: none;
+    }
+}
+
+.loginFooter .zacupolLinks {
+    display: none;
+    @include customMaxWidth(800px) {
+        display: block;
+        left: 8px;
+        bottom: 20px;
+    }
+}
+
+.form-wrapper {
+    @include flexJA(center, center);
+    @include wH(100vw, 100vh);
+    box-sizing: border-box;
+    padding: 100px 0px;
+    min-width: 320px;
+    min-height: 400px;
+    @include customMaxWidth(800px) {
+        padding: 74px 0px;
+    }
+}
+
+.backgroundForm {
+    @include flexJA(center, center);
+    @include wH(100%, 100%);
+    min-width: 280px;
+    min-height: 100px;
+    max-width: 600px;
+    max-height: 500px;
+    box-sizing: border-box;
+    padding: 10px;
+    flex-shrink: 1;
+}
+
+.loginForm {
+    @include flexJA(space-between, flex-start);
+    @include wH(100%, 100%);
+    position: relative;
+    top: 0;
+    min-height: 80px;
+    max-height: 300px;
+    max-width: 460px;
+    background-color: transparent;
+    border-radius: 0px;
+    flex-shrink: 1;
+}
+
+.error-wrapper {
+    @include flexJA(flex-start, center);
+    position: relative;
+    width: calc(100% - 48px);
+    min-width: 220px;
+    margin: 0px 24px;
+    flex-shrink: 0;
+    max-height: 40px;
+    flex-grow: 1;
+    min-height: 20px;
+    font-size: $fontSize - 2;
+}
+
+.error-mes {
+    font-size: inherit;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.login-form-input-wrapper {
+    @include flexJA(center, center);
+    width: calc(100% - 48px);
+    margin: 0px 24px;
+    box-sizing: border-box;
+    min-height: 112px;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.mat-input-wrap {
+    display: flex;
+    flex-direction: column;
+    max-height: 80px;
+    width: 100%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 14px;
+    flex-shrink: 1;
+    flex-grow: 1;
+    min-height: 30px;
+}
+
+:host /deep/ .mat-input-wrap .mat-form-field-wrapper {
+    display: flex;
+    flex-grow: 1;
+}
+
+:host /deep/ .mat-form-field-flex {
+    flex-grow: 1;
+    box-sizing: border-box;
+    padding-bottom: 2px;
     align-items: center;
+    position: relative;
+}
+
+:host /deep/ .mat-form-field-infix {
+    padding: 4px 2px;
+    flex-grow: 1;
+    height: 100%;
+    box-sizing: border-box;
+    max-width: calc(100% - 24px);
+}
+
+:host /deep/ .mat-input-element {
+    height: 100%;
+    font-size: 18px;
+    &:-webkit-autofill,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:active {
+        transition: background-color 5000s ease-in-out 0s;
+        -webkit-box-shadow: 0 0 0px 1000px $pageBackColor inset;
+    }
+}
+
+:host /deep/ .mat-form-field-suffix {
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+    width: 24px;
+    height: 100%;
+    border-top: .84375em solid transparent;
+    box-sizing: border-box;
+    padding: 4px 0px;
+    display: flex;
+    align-items: center;
+    .mat-icon {
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        display: flex;
+    }
+}
+
+:host /deep/ .mat-input-subscript-wrapper {
+    height: 18px;
+    margin-top: 0px;
+    line-height: 18px;
+    flex-shrink: 0;
+}
+
+:host /deep/ .mat-form-field-underline {
+    height: 2px;
+    flex-shrink: 0;
+    .mat-form-field-ripple {
+        height: 2px;
+    }
+}
+
+.btn {
+    width: calc(100% - 48px);
+    background-color: rgba(22, 22, 22, 0.8);
+    margin: 0px 24px 24px 24px;
+    padding: 0px;
+    border: none;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: $fontSize + 8;
+    outline: 0;
+    flex-shrink: 0;
+    flex-grow: 1;
+    min-height: 20px;
+    max-height: 40px;
+    cursor: pointer;
+    @include customMaxWidth(800px) {
+        font-size: $fontSize;
+    }
+    &:hover {
+        color: rgba(255, 255, 255, 1);
+        background-color: rgba(22, 22, 22, 1);
+    }
+    &:disabled {
+        color: rgba(255, 255, 255, 0.5);
+        background-color: rgba(22, 22, 22, 0.5);
+        cursor: default;
+        &:hover {
+            color: rgba(255, 255, 255, 0.5);
+            background-color: rgba(22, 22, 22, 0.5);
+        }
+    }
+}
+
+.forgot-pass {
+    position: absolute;
+    bottom: 0;
+    max-width: calc(100% - 24px);
+    margin: 0px 24px;
+    height: 24px;
+    line-height: 30px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #f44336;
+}
+
+
+/* Text with lines*/
+
+.u-visible-off {
+    visibility: hidden;
+}
+
+.errorInput {
+    color: #FF4444;
+    border: 1px solid #FF4444;
+}
+
+// for forgot dialog
+.forgot-wrap {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
     background: #fff;
-}
-.form-wrap {
-    width: 50%;
-    max-width: 400px;
-    min-width: 300px;
-    height: 50%;
-    max-height: 400px;
+    min-width: 260px;
+    max-width: 500px;
     min-height: 200px;
-    background: #3a3e49;
-    justify-content: center;
-    align-items: center;
+    max-height: 400px;
+    width: 80%;
+    height: 60%;
+    z-index: -1;
+    opacity: 0;
+    margin: auto;
 }
-.u-ui-wrap {
-    margin-bottom: 24px;
+
+.forgot-wrap.active {
+    animation: anvil 1s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+    z-index: 200;
+    opacity: 1;
+}
+
+.forgot-content {
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+.forgot-head {
+    position: relative;
+    min-height: 40px;
+    max-height: 80px;
+    flex-shrink: 0;
+}
+
+.forgot-title {
+    display: block;
+    text-align: center;
+    margin: 0px 20px;
+    font-size: 18px;
+    @include customMaxWidth(599px) {
+        font-size: 14px;
+    }
+}
+
+.forgot-desc {
+    display: block;
+    text-align: center;
+    margin: 0px;
+    font-size: 12px;
+    opacity: 0.6;
+    @include customMaxWidth(599px) {
+        font-size: 10px;
+    }
+}
+
+.forgot-close {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    color: grey;
+    background: transparent;
+    border: none;
+    &:hover,
+    &:enabled:hover,
+    &:focus {
+        border: none;
+        background: transparent;
+        outline: 0;
+        color: black;
+    }
+    @include customMaxWidth(599px) {
+        right: -6px;
+        top: -6px;
+    }
+}
+
+.forgot-body {
+    flex-grow: 1;
+    flex-shrink: 1;
+    justify-content: center;
+}
+
+.forgot-field {
+    max-width: calc(100% - 48px);
+    margin: 0px 24px;
+}
+
+.forgot-foot {
+    flex-shrink: 0;
+    padding: 12px 20px;
+    text-align: center;
+}
+
+.d-s-button.forgot-button {
+    box-shadow: none;
+    width: 100%;
+}
+
+@-webkit-keyframes anvil {
+    0% {
+        transform: scale(5) rotate(0);
+        opacity: 0;
+        box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+    }
+    50% {
+        transform: scale(1) rotate(-0.2deg);
+        opacity: 1;
+        box-shadow: 0 0 0 rgba(241, 241, 241, 0.5);
+    }
+    75% {
+        transform: scale(1) rotate(0.2deg);
+        opacity: 1;
+        box-shadow: 0 0 250px rgba(241, 241, 241, 0.5);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+        box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+    }
+}
+
+@-moz-keyframes anvil {
+    0% {
+        transform: scale(5) rotate(0);
+        opacity: 0;
+        box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+    }
+    50% {
+        transform: scale(1) rotate(-0.2deg);
+        opacity: 1;
+        box-shadow: 0 0 0 rgba(241, 241, 241, 0.5);
+    }
+    75% {
+        transform: scale(1) rotate(0.2deg);
+        opacity: 1;
+        box-shadow: 0 0 250px rgba(241, 241, 241, 0.5);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+        box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+    }
+}
+
+@-ms-keyframes anvil {
+    0% {
+        transform: scale(5) rotate(0);
+        opacity: 0;
+        box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+    }
+    50% {
+        transform: scale(1) rotate(-0.2deg);
+        opacity: 1;
+        box-shadow: 0 0 0 rgba(241, 241, 241, 0.5);
+    }
+    75% {
+        transform: scale(1) rotate(0.2deg);
+        opacity: 1;
+        box-shadow: 0 0 250px rgba(241, 241, 241, 0.5);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+        box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+    }
+}
+
+@-o-keyframes anvil {
+    0% {
+        transform: scale(5) rotate(0);
+        opacity: 0;
+        box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+    }
+    50% {
+        transform: scale(1) rotate(-0.2deg);
+        opacity: 1;
+        box-shadow: 0 0 0 rgba(241, 241, 241, 0.5);
+    }
+    75% {
+        transform: scale(1) rotate(0.2deg);
+        opacity: 1;
+        box-shadow: 0 0 250px rgba(241, 241, 241, 0.5);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+        box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+    }
+}
+
+@keyframes anvil {
+    0% {
+        transform: scale(5) rotate(0);
+        opacity: 0;
+        box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+    }
+    50% {
+        transform: scale(1) rotate(-0.2deg);
+        opacity: 1;
+        box-shadow: 0 0 0 rgba(241, 241, 241, 0.5);
+    }
+    75% {
+        transform: scale(1) rotate(0.2deg);
+        opacity: 1;
+        box-shadow: 0 0 250px rgba(241, 241, 241, 0.5);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+        box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+    }
 }

@@ -2,6 +2,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using DataAccess;
+using DataAccess.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,13 +11,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using BusinessLogic.Repository;
+using Storage.Code;
+using DataAccess.Models;
+using FluentValidation.AspNetCore;
+using FluentValidation;
+using BusinessLogic.Models.Api;
+using System.Net.Mail;
+using Storage.Code.Services;
 
 namespace Storage
 {
   public class Startup
   {
-
-    private string _connection = @"Data Source=btv.cloudapp.net;Initial Catalog=zakupol;Integrated Security=False;User ID=storage;Password=StoreGuard111";
 
     public Startup(IConfiguration configuration)
     {
@@ -28,16 +35,29 @@ namespace Storage
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-      services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(_connection));
+      var connectionString = Configuration.GetConnectionString("appConnectionString");
+      services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Transient);
+      services.AddTransient<IProductsRepository, ProductsRepository>();
+      services.AddTransient<ICategoriesRepository, CategoriesRepository>();
+      services.AddTransient<IWarehouseRepository, WarehousesRepository>();
+      services.AddTransient<IOrdersRepository, OrdersRepository>();
 
-      services.AddIdentity<IdentityUser, IdentityRole>()
+      services.AddTransient<IValidator<ApiProdAction>, ApiProdActionValidator>();
+      services.AddTransient<IValidator<ApiProdTransfer>, ApiProdTransferValidator>();
+      services.AddTransient<IValidator<ApiProdSell>, ApiProdSellValidator>();
+
+      services.AddTransient<IEmailSender, EmailSender>();
+
+      services.AddIdentity<ApplicationUser, IdentityRole>(cfg =>
+        {
+          cfg.SignIn.RequireConfirmedEmail = true;
+        })
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
 
       // ===== Add Jwt Authentication ========
       JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
-      services
-        .AddAuthentication(options =>
+      services.AddAuthentication(options =>
         {
           options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
           options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -57,8 +77,17 @@ namespace Storage
           };
         });
 
+      // ==============================
       services.AddCors();
-      services.AddMvc();
+      services.AddMvc(cfg =>
+        {
+        }).AddFluentValidation().AddJsonOptions(opt => opt.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore);
+
+      services.AddAuthorization(options =>
+      {
+        options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
+      });
+
       services.Configure<IISOptions>(options => { });
 
     }
@@ -73,11 +102,15 @@ namespace Storage
 
       app.UseAuthentication();
 
-      app.UseCors(builder => builder.WithOrigins("http://localhost:1609, http://localhost:3000, http://localhost, http://localhost:4200"));
+      app.UseCors(builder => builder.WithOrigins("http://localhost:1609", "http://localhost:3000", "http://localhost", "http://localhost:4200",
+        "http://btv.cloudapp.net:4201", "http://btv.cloudapp.net").AllowAnyHeader().AllowCredentials().AllowAnyMethod().AllowAnyOrigin());
       app.UseMvc();
 
       // ===== Create tables ======
-      dbContext.Database.EnsureCreated();
+      // dbContext.Database.EnsureCreated();
+      dbContext.Database.Migrate();    
+
+      StorageConfiguration.SetupAutoMapper();
     }
   }
 }

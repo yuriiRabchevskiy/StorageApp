@@ -1,0 +1,2 @@
+// others
+export * from './dictionary';

@@ -1,0 +1,59 @@
+<p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
+    <p-header class="sell-header">
+        <app-i-button class="nav-button nav-back" *ngIf="items.length > 0 && view.isMobile" icon="i-close" (iClick)="back()" [disabled]="sellCount === 0 || page === 1"></app-i-button>
+        <div class="d-header-title">{{pageNames[page - 1]}}</div>
+        <app-i-button class="nav-button nav-next" *ngIf="items.length > 0 && view.isMobile" icon="i-open" (iClick)="next()" [disabled]="sellCount === 0 || page === lastPage"></app-i-button>
+    </p-header>
+    <div class="dialog-body flex-col">
+        <div class="d-page-wrap flex-col" [class.s-hidden]="page !== productPage">
+            <ul class="card-wrapper" *ngIf="items.length > 0">
+                <li *ngFor="let item of items" class="card">
+                    <div class="card-head">
+                        <span class="card-name">{{item.product.productType}} {{item.product.model}}</span>
+                        <app-i-button class="clear-button" buttClass="i-button-xs" icon="i-clear" (iClick)="remove(item)"></app-i-button>
+                    </div>
+                    <div class="card-body">
+                        <div class="flex-row flex-wrap">
+                            <span class="card-prop">Виробник:</span>
+                            <span class="card-info">{{item.product.producer}}</span>
+                        </div>
+                        <div class="flex-row flex-wrap">
+                            <span class="card-prop">Колір:</span>
+                            <span class="card-info">{{item.product.color}}</span>
+                        </div>
+                        <div class="flex-row flex-wrap">
+                            <span class="card-prop">Розмір:</span>
+                            <span class="card-info">{{item.product.size}}</span>
+                        </div>
+                        <div class="flex-row flex-wrap">
+                            <span class="card-prop">Склад:</span>
+                            <span class="card-info">{{getLocationName(item.prodOrder.fromId)}}</span>
+                        </div>
+                    </div>
+                    <div class="card-foot">
+                        <div class="card-price">
+                            {{item.prodOrder.quantity}} * {{item.prodOrder.price}}
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <div *ngIf="items.length <= 0" class="smile-wrap flex-col">
+                <div class="smile-icon"></div>
+                <div class="smile-label">Кошик пустий</div>
+            </div>
+        </div>
+        <app-order-editor #orderEditor [item]="order" class="d-page-wrap flex-col" [class.s-hidden]="page !== clientPage"></app-order-editor>
+    </div>
+    <p-footer class="s-dialog-foot">
+        <div class="foot-group step-grop-footer" *ngIf="!view.isMobile || items.length > 0">
+            <button *ngIf="items.length > 0" class="d-s-button" pButton type="button" (click)="back()" [disabled]="sellCount === 0 || page === 1"
+                label="Назад"></button>
+            <button *ngIf="items.length > 0" class="d-s-button" pButton type="button" (click)="next()" [disabled]="sellCount === 0 || page === lastPage"
+                label="Далі"></button>
+        </div>
+        <div class="foot-group">
+            <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save()" label="Зберегти" [disabled]="(items.length <= 0) || orderEditor.invalid"></button>
+            <button class="d-s-button-cancel" type="button" pButton icon="fa-close" label="Закрити" (click)="closeDialog()"></button>
+        </div>
+    </p-footer>
+</p-dialog>

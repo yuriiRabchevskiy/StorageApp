@@ -1,0 +1,17 @@
+<p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
+    <p-header>Повернення</p-header>
+    <form [formGroup]="cancelOrder" class="dialog-body flex-col">
+        <div class="return-desc">Якщо видалити це замовлення, його неможливо буде відновити пізніше.<br />
+            Це остання операція, всі товари будуть повернуті до відповідного складу.
+        </div>
+        <div class="flex-row flex-wrap flex-area-wrap">
+            <mat-form-field class="s-area-wrapper">
+                <textarea matInput placeholder="Причина повернення:" formControlName="reason"></textarea>
+            </mat-form-field>
+        </div>
+    </form>
+    <p-footer class="s-dialog-foot">
+        <button class="d-s-button" type="submit" pButton (click)="confirmation(true)" label="Повернути" [disabled]="cancelOrder.invalid"></button>
+        <button class="d-s-button-cancel" type="button" pButton (click)="confirmation(false)" label="Відмінити"></button>
+    </p-footer>
+</p-dialog>

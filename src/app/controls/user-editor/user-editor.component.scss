@@ -1,0 +1,58 @@
+@import '../../../assets/css/globals';
+.spinner-wrap {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    @include flexJA(center, center);
+    min-height: 320px;
+    min-width: 320px;
+    z-index: 5;
+    padding-top: 64px;
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.8);
+    transition: opacity 400ms ease-in;
+    pointer-events: auto;
+    @include customSize(1023px, 767px) {
+        padding-top: 48px;
+    }
+    @include customMaxWidth(1023px) {
+        padding-top: 48px;
+    }
+}
+.loader-wrapper {
+    @include flexJA(flex-start, center);
+    @include wH(100%, 60%);
+    @include customMaxHeight(499px) {
+        height: 70%;
+    }
+}
+.loader {
+    @include flexJA(center, center);
+    @include wH(50%, 50%);
+    max-width: 120px;
+    max-height: 120px;
+    margin: auto;
+}
+#loaderCircle {
+    background-image: $loader;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: 50% 50%;
+    @include wH(100%, 100%);
+    -webkit-animation: rotation 2s infinite linear;
+    -o-animation: rotation 2s infinite linear;
+    -moz-animation: rotation 2s infinite linear;
+    -ms-animation: rotation 2s infinite linear;
+    animation: rotation 2s infinite linear;
+    animation-play-state: running;
+}
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}

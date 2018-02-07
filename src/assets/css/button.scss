@@ -1,0 +1,99 @@
+@import 'globals';
+//styles for main button with icon and for tooltip
+app-i-button {
+    display: inline-block;
+    @include wH(40px, 40px);
+    margin: 2px;
+}
+
+.i-s-tooltip {
+    position: fixed;
+    left: unset !important;
+    top: unset !important;
+    max-width: none;
+    margin-left: -2px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    @include customMaxWidth(767px) {
+        display: none !important;
+    }
+    .ui-tooltip-arrow {
+        left: 0px;
+        margin-left: 0px;
+        border-bottom-color: $appRedHoverColor;
+    }
+    .ui-tooltip-text {
+        padding: .125em .5em;
+        background-color: $appRedHoverColor;
+        color: #fff;
+        white-space: nowrap;
+        height: 30px;
+        line-height: 28px;
+        font-size: $fontSize !important;
+        box-shadow: 0 1px 3px 0 black;
+        border-radius: 0px;
+    }
+}
+.i-button.i-disabled >.i-s-tooltip {
+    display: none !important;
+}
+// --------------------------------
+//  this styles using in dialog for button
+.button-wrap {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.d-button {
+    margin: 0px 4px;
+    height: 40px;
+    min-width: 100px;
+    box-sizing: border-box;
+    border-radius: 0px;
+    border: 1px solid;
+    border-color: $appRedColor;
+    background: $appRedColor;
+    box-shadow: -3px 3px 12px -2px black;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    opacity: 0.9;
+    outline: 0;
+    cursor: pointer;
+    &:hover,
+    &:enabled:hover {
+        border-color: $appRedHoverColor;
+        background: $appRedHoverColor;
+        opacity: 1;
+        transition: none;
+    }
+    &:disabled,
+    &:disabled:hover {
+        border-color: $appRedColor;
+        background: $appRedColor;
+        cursor: default;
+        opacity: 0.5;
+    }
+    @include customMaxWidth(800px) {
+        font-size: 12px;
+        width: 100%;
+        margin: 0px !important;
+        float: none;
+        box-shadow: none;
+    }
+}
+
+.d-s-button.ui-button.ui-widget {
+    @extend .d-button;
+}
+
+.d-s-button-cancel.ui-button.ui-widget {
+    @extend .d-button;
+    background: black;
+    color: #fff;
+    border-color: #fff;
+    &:hover,
+    &:enabled:hover {
+        background: #fff;
+        color: black;
+        border-color: black;
+    }
+}
