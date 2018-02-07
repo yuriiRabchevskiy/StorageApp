@@ -1,0 +1,33 @@
+@import '../../../assets/css/globals';
+.confirm-wrap {
+    position: fixed;
+    top: calc(50% - 150px);
+    left: calc(50% - 150px);
+    width: 300px;
+    height: 200px;
+    background: silver;
+    box-shadow: -12px 12px 12px -6px black;
+    z-index: 10000;
+    box-sizing: border-box;
+    padding: 6px;
+}
+.confirm-body {
+    display: flex;
+    align-items: center;
+    height: calc(100% - 40px); 
+}
+:host /deep/ .confirm-title {
+    display: block;
+    text-align: center;
+    color: black;
+    font-size: $fontSize + 4;
+}
+.confirm-bottom {
+    height: 40px;
+    justify-content: center;
+}
+.d-s-button.ui-button.ui-widget,
+.d-s-button-cancel.ui-button.ui-widget {
+    width: 120px;
+    margin: 0px auto;
+}

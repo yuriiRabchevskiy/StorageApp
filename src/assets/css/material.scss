@@ -1,0 +1,127 @@
+@import 'globals';
+.cdk-overlay-container {
+    z-index: 9999;
+}
+.storage-tab.mat-tab-group {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    margin-bottom: 12px;
+    height: 40px;
+    flex-shrink: 0;
+    .mat-tab-header {
+        border-bottom: none;
+    }
+    .mat-tab-label {
+        min-width: 80px;
+        height: 40px;
+        padding: 0px 12px;
+        border-bottom: 2px solid transparent;
+        font-size: 18px;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        color: black;
+        opacity: 0.7;
+    }
+    .mat-tab-label:hover,
+    .mat-tab-label.mat-tab-label-active {
+        color: black;
+        opacity: 1;
+        border-bottom: 2px solid $appRedColor;
+    }
+    .mat-tab-body-wrapper {
+        display: none;
+    }
+    .mat-ink-bar {
+        background-color: $appRedColor;
+    }
+}
+.s-input-wrapper.mat-input-container,
+.s-area-wrapper.mat-input-container {
+    @include wH(calc(50% - 40px), 60px);
+    min-width: 260px;
+    max-width: 400px;
+    margin-right: 40px;
+    margin-bottom: 6px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    @include customMaxWidth(800px) {
+        width: calc(100% - 40px);
+        margin: 0px auto 6px auto;
+    }
+    .mat-input-wrapper {
+        height: 100%;
+        padding-bottom: 20px;
+    }
+    .mat-form-field-flex,
+    .mat-form-field-infix {
+        height: 100%;
+    }
+    .mat-form-field-infix {
+        padding: 0px;
+        border-top: 12px solid transparent;
+    }
+    .mat-input-element {
+        height: 100%;
+        margin: 0px;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        padding: 4px 0px;
+    }
+    .mat-form-field-placeholder-wrapper {
+        padding-top: 12px;
+        top: -12px;
+    }
+    .mat-form-field-required-marker {
+        color: inherit;
+    }
+    .mat-form-field-underline,
+    .mat-form-field-ripple {
+        height: 2px;
+        bottom: 18px;
+    }
+    .mat-form-field-underline.mat-disabled {
+        background-image: linear-gradient(to right,rgba(0,0,0,8) 0,rgba(0,0,0,.8) 33%,transparent 0);
+    }
+    .mat-form-field-subscript-wrapper {
+        height: 18px;
+        margin-top: 2px;
+    }
+    .mat-select,
+    .mat-select-trigger {
+        height: 100%;
+    }
+    .mat-select-value {
+        line-height: 28px;
+    }
+    .mat-input-element:disabled,
+    .mat-select-arrow,
+    .mat-select-disabled .mat-select-value {
+        color: rgba(0,0,0,.8);
+    }
+}
+
+.s-area-wrapper.mat-input-container {
+    width: calc(100% - 40px);
+    max-width: 800px;
+    min-height: 100%;
+    height: auto;
+    margin-bottom: 6px;
+    @include customMaxWidth(800px) {
+        max-width: 400px;
+        margin: 0px auto;
+    }
+    .mat-form-field-wrapper {
+        padding-bottom: 2px;
+    }
+    .mat-form-field-underline {
+        bottom: 0px;
+    }
+    textarea.mat-input-element {
+        height: 100%;
+        resize: none;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        background-color: #D7DFDC;
+    }
+}
+.mat-form-field-underline {
+    background-color: rgba(0, 0, 0, 1);
+}
+.mat-form-field-placeholder {
+    color: rgba(0, 0, 0, 1);
+}

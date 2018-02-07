@@ -1,65 +1,169 @@
-import { Component, OnInit } from '@angular/core';
-import { User } from "../../shared/models/user";
-import { UserService } from "../../shared/services/user.service";
-
-class NewUser implements User {
-  id: number;
-  username: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  constructor() {
-       this.id = 123;
-       this.username = '';
-       this.password = '';
-       this.firstName = '';
-       this.lastName = '';
-     }
-}
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { ApiService } from '../../shared/services/api.service';
+import { ISUser, User, IUserToEdit } from './../../models/manage';
+import { ApiListComponent } from '../../models/component/list-api.component';
+import { ApiResponse } from '../../models/api';
+import { Router } from '@angular/router';
+import { MessageService } from 'primeng/components/common/messageservice';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss']
 })
-export class UsersComponent implements OnInit {
-  users: User[] = [];
+export class UsersComponent extends ApiListComponent<ISUser> {
+  selectedItem: ISUser;
 
-  user: User = new NewUser();
-  selectedUser: User;
-  newUser: boolean;
-  constructor(private userService: UserService) {
+  displayDialog: boolean = false;
+  displayEditDialog: boolean = false;
+  showConfirm: boolean = false;
+
+  constructor(private apiService: ApiService, public router: Router,
+    private notifi: MessageService) {
+    super();
   }
 
-  ngOnInit() {
-    this.loadAllUsers();
+  onRowClick(val) {
+    if (this.selectedItem !== val.data) return;
+    this.displayEditDialog = true;
   }
 
   addNewUser() {
-    this.newUser = true;
-    this.user = new NewUser();
-    let users = [...this.users];
-    users.push(this.user);
-    this.selectedUser = this.user;
-    this.users = users;
-    this.user = null;
+    this.displayDialog = true;
   }
 
-  deleteUser(id: number) {
-    this.userService.delete(id).subscribe(() => { this.loadAllUsers() });
-    this.selectedUser = this.users[0];
+  confirmDelete(val: boolean) {
+    if (!val) {
+      this.showConfirm = false;
+      return;
+    }
+    this.delete(this.selectedItem);
+    this.showConfirm = false;
   }
 
-  onRowSelect(event) {
-    this.selectedUser = event.data;
+  confirmation() {
+    this.showConfirm = true;
   }
 
-  private loadAllUsers() {
-    this.userService.getAll().subscribe(users => { 
-      this.users = users;
-      this.selectedUser = this.users[0];
-      console.log('Users: ', this.users);
-    });
+
+  delete(val: ISUser) {
+    let deleteUser = val;
+    this.work.showSpinner = true;
+    this.apiService.deleteUser(deleteUser.id).subscribe(
+      res => {
+        this.work.showSpinner = false;
+        if (res.success) {
+          this.remove(deleteUser);
+          this.notifi.add(
+            {
+              severity: 'success',
+              summary: 'Successfully',
+              detail: 'Користувача видалено'
+            });
+        }
+      },
+      err => {
+        this.work.showSpinner = false;
+        this.notifi.add(
+          {
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Користувача не видалено' + err
+          });
+      }
+    );
+    if (this.filteredData.length > 0) {
+      this.selectedItem = this.filteredData[0];
+    }
+  }
+
+  save(val: ISUser) {
+    let user = val;
+    this.apiService.addUser(user).subscribe(
+      res => {
+        if (res.success) {
+          user.id = res.item;
+          this.notifi.add(
+            {
+              severity: 'success',
+              summary: 'Successfully',
+              detail: 'Користувача додано'
+            });
+          this.add(user);
+          this.selectedItem = user;
+        } else {
+          this.notifi.add(
+            {
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Користувача не додано: ' + res.errors[0].message
+            }
+          );
+        }
+      },
+      err => {
+        this.notifi.add(
+          {
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Користувача не додано' + err
+          });
+      }
+    );
+    this.displayDialog = false;
+  }
+
+  saveChange(val: IUserToEdit) {
+    let user = val;
+    this.updateField(this.selectedItem, val);
+    this.apiService.editUser(this.selectedItem.id, user).subscribe(
+      res => {
+        if (res.success) {
+          this.notifi.add(
+            {
+              severity: 'success',
+              summary: 'Successfully',
+              detail: 'Зміни збережено'
+            });
+        }
+      },
+      err => {
+        this.notifi.add(
+          {
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Зміни не збережено' + err
+          });
+        console.log(err);
+      }
+    );
+    this.selectedItem = this.filteredData[0];
+    this.displayEditDialog = false;
+  }
+
+  doGetData() {
+    return this.apiService.getUsers();
+  }
+
+  onDataReceived(res: ApiResponse<ISUser>) {
+    super.onDataReceived(res);
+    console.log(res);
+  }
+
+  showToEdit() {
+    this.displayEditDialog = true;
+  }
+
+  public closeDialog(event) {
+    this.displayEditDialog = event;
+    this.displayDialog = event;
+    if (this.filteredData.length < 1) return;
+    this.selectedItem = this.filteredData[0];
+  }
+
+  //for update field in p-datatable
+  updateField(user: ISUser, val) {
+    Object.keys(val).map(key => user[key] = val[key]);
   }
 
 }

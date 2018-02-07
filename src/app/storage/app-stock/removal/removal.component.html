@@ -1,0 +1,47 @@
+<p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
+    <p-header>Забрати товар зі складу</p-header>
+    <div class="dialog-body flex-col" *ngIf="product">
+        <div class="d-page-wrap flex-col">
+            <div class="flex-row">
+                <div class="product-name">{{product.size}} {{product.color}} {{product.productType}} - {{product.model}} {{product.producer}}</div>
+            </div>
+            <div class="flex-row flex-wrap">
+                <mat-form-field class="s-input-wrapper">
+                    <mat-select placeholder="Склад" [(ngModel)]="selectedLocation" name="local">
+                        <mat-option *ngFor="let item of locations" [value]="item.id">
+                            {{item.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div class="balance-wrap flex-row">
+                    <div class="l-data-balance">
+                        <div class="balance-label">Доступно</div>
+                        <div class="balance-value">{{product.balance[selectedLocation] || 0}}</div>
+                    </div>
+                    <div class="r-data-balance">
+                        <div class="balance-label">Стане</div>
+                        <div class="balance-value">{{expectedCount}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-row">
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput type="number" placeholder="Кількість" [(ngModel)]="removeCount" name="count" #countInp="ngModel" [min]="minCount"
+                    [max]="count">
+                </mat-form-field>
+            </div>
+            <div class="flex-row flex-wrap flex-area-wrap">
+                <mat-form-field class="s-area-wrapper">
+                    <textarea matInput placeholder="Вкажіть Причину" [(ngModel)]="description" name="freeNote" #freeNote="ngModel"></textarea>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="d-cb-wrap flex-row">
+            <p-checkbox class="s-cb" name="next" label="Забрати ще" [(ngModel)]="removeNext" binary="true" (onChange)="removeMore($event)"></p-checkbox>
+        </div>
+    </div>
+    <p-footer class="s-dialog-foot">
+        <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save()" label="Зберегти"></button>
+        <button class="d-s-button-cancel" type="button" pButton icon="fa-close" label="Закрити" (click)="closeDialog()"></button>
+    </p-footer>
+</p-dialog>

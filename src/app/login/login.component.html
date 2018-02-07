@@ -1,20 +1,63 @@
 <div class="login-page flex-col">
-   
-    <form class="form-wrap flex-col" name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
-        <span class="ui-float-label u-ui-wrap">
-            <input id="float-input" type="text" size="30" pInputText name="username" [(ngModel)]="model.username" #username="ngModel"
-                required>
-            <label for="float-input">Username</label>
-            <div *ngIf="f.submitted && !username.valid" class="help-block">Username is required</div>
-        </span>
-        <span class="ui-float-label u-ui-wrap">
-            <input id="float-input" type="password" size="30" pInputText name="password" [(ngModel)]="model.password" #password="ngModel" required>
-            <label for="float-input">Password</label>
-            <div *ngIf="f.submitted && !password.valid" class="help-block">Password is required</div>
-        </span>
-        <div class="form-group">
-            <button pButton type="submit" label="Login" [disabled]="loading"></button>
-            <a [routerLink]="['/register']" class="btn btn-link">Register</a>
+    <div class="loginHeader flex-row">
+        <div class="project-wrap">
+            <div class="s-logo"></div>
+            <div class="app-name">Zakupol</div>
         </div>
-    </form>
+        <div class="zacupolLinks">
+            <a href="https://zakupol.prom.ua/" target="_blank">Go to Zakupol.prom.ua</a>
+        </div>
+    </div>
+    <div class="form-wrapper flex-row">
+        <div class="backgroundForm flex-row">
+            <form (ngSubmit)="onSubmit(loginForm.value)" [formGroup]="loginForm" class="loginForm flex-col">
+                <div class="error-wrapper flex-row">
+                    <mat-error class="error-mes" *ngIf="error">Логін або Пароль невірний</mat-error>
+                    <mat-error class="error-mes" *ngIf="connectionError">Сталася помилка підключення.
+                        <br/> Перевірте підключення до Інтернету.</mat-error>
+                </div>
+                <div class="login-form-input-wrapper flex-col">
+                    <mat-form-field class="mat-input-wrap" [hideRequiredMarker]="true">
+                        <input matInput placeholder="Логін" type="text" [formControl]="loginForm.controls['login']" required>
+                        <mat-error *ngIf="loginForm.controls['login'].invalid">Ви не ввели логін</mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="mat-input-wrap" [hideRequiredMarker]="true">
+                        <input matInput placeholder="Пароль" [formControl]="loginForm.controls['password']" type="password" required autocomplete="new-password">
+                        <mat-error *ngIf="loginForm.controls['password'].invalid">Ви не ввели пароль</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <button class="btn" [disabled]="loginForm.invalid">Login</button>
+                <div class="forgot-pass" (click)="forgotPassword()">Забули пароль?</div>
+            </form>
+        </div>
+    </div>
+    <div class="loginFooter flex-row">
+        <div class="zacupolLinks">
+            <a href="https://zakupol.prom.ua/" target="_blank">Go to Zakupol.prom.ua</a>
+        </div>
+        <span class="copyright">&copy; ALL RIGHTS RESERVED</span>
+    </div>
 </div>
+
+<div *ngIf="showForgotDialog" class="forgot-wrap" [class.active]="showForgotDialog">
+    <div class="forgot-content flex-col">
+        <div class="forgot-head">
+            <span class="forgot-title"><b>Забули свій пароль?</b></span>
+            <span class="forgot-desc">Будь-ласка, введіть електронну адресу, яку зареєстровано.</span>
+            <button class="forgot-close" type="button" pButton icon="fa-close" (click)="closeForgotDialog()"></button>
+        </div>
+        <form [formGroup]="forgotForm" class="forgot-body flex-col">
+            <mat-form-field class="forgot-field">
+                <input matInput placeholder="Введіть емейл" [formControl]="forgotForm.controls['email']" required>
+                <mat-error *ngIf="forgotForm.controls['email'].hasError('email')">Невалідний емейл</mat-error>
+                <mat-error *ngIf="forgotForm.controls['email'].hasError('required')">Ви не ввели дані</mat-error>
+            </mat-form-field>
+        </form>
+        <div class="forgot-foot">
+            <button class="d-s-button forgot-button" type="submit" pButton label="Нагадати пароль" (click)="forgot(forgotForm.value)" [disabled]="forgotForm.invalid"></button>
+        </div>
+    </div>
+</div>
+<div *ngIf="showForgotDialog" class="overlay" (click)="closeForgotDialog()"></div>
+<p-growl [(value)]="msgs"></p-growl>

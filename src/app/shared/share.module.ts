@@ -1,9 +1,15 @@
 import { HttpModule } from '@angular/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DataTableModule, DropdownModule, DialogModule, InputTextModule,
-         SharedModule, ButtonModule, TabViewModule } from "primeng/primeng";
+import 'hammerjs';
+import { MatTabsModule, MatRadioModule, MatInputModule, MatFormFieldModule,
+    MatIconModule, MatSelectModule } from '@angular/material';
+import { EqualValidatorDirective } from './directive/index';
+import { DataTableModule, DialogModule, InputTextModule,
+  SpinnerModule, ButtonModule, CheckboxModule, TooltipModule,
+  GrowlModule, SharedModule } from 'primeng/primeng';
+
 
 @NgModule({
   imports: [
@@ -11,16 +17,25 @@ import { DataTableModule, DropdownModule, DialogModule, InputTextModule,
   ],
   exports: [
     FormsModule,
+    ReactiveFormsModule,
     HttpModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatTabsModule,
+    MatRadioModule,
+    MatIconModule,
     DataTableModule,
-    DropdownModule,
     DialogModule,
     InputTextModule,
+    SpinnerModule,
     ButtonModule,
-    TabViewModule,
+    CheckboxModule,
+    TooltipModule,
+    GrowlModule,
     SharedModule,
   ],
-  declarations: [],
+  declarations: [EqualValidatorDirective],
   providers: []
 })
 export class ShareModule { }

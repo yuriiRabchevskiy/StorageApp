@@ -1,14 +1,107 @@
 // Background style
-$appBackColor: #1b1c21;
-$pageBackColor: #31353f;
+
+// $pallet: grey#AF8080, red#FF0000, white#FFB6B6;
+$appBackColor: #fff;
+$pageBackColor: #e0e0e0;
+$pageHeaderColor: #222222;
+
+$disabledColor: #8A8080;
+$hoverColor: #F6D1D1;
+
+$defBtn: #312E2E;
 // Font style
+$disabledText: #2A1818;
 $WhiteColor: #ffffff;
 $CaColor: #cacaca;
+$textFontColor: #7f898a;
+
 $fontSize: 14px;
 $GoldColor: #988D67;
 $InValid: #D53939;
 $GreenColor: #619226;
 
+$appRedColor: rgba(198, 40, 40, 0.8);
+$appRedHoverColor: rgba(198, 40, 40, 1);
+$appRedDisabledColor: rgba(198, 40, 40, 0.5);
+
+
 
 $assetsPath: '/assets';
 $login_background: url('#{$assetsPath}/images/login_background.png');
+
+// mixin for code
+@mixin flexJA($just, $align) {
+    justify-content: $just;
+    align-items: $align;
+}
+@mixin flex($display, $direction, $justify, $align) {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: $display;
+    flex-direction: $direction;
+    justify-content: $justify;
+    align-items: $align;
+}
+
+@mixin wH($width, $height) {
+    width: $width;
+    height: $height;
+}
+
+// adaptive mixin
+$tablet-width: 799px;
+$tablet-height: 599px;
+@mixin tablet {
+    @media all and (max-width: #{$tablet-width}) and (max-height: #{$tablet-height}),
+    all and (max-width: #{$tablet-width}),
+    all and (max-height: #{$tablet-height}) {
+        @content;
+    }
+}
+
+@mixin customSize($customWidth, $customHeight) {
+    @media all and (max-width: #{$customWidth}) and (max-height: #{$customHeight}) {
+        @content;
+    }
+}
+
+@mixin customMinSize($customWidth, $customHeight) {
+    @media all and (min-width: #{$customWidth}) and (min-height: #{$customHeight}) {
+        @content;
+    }
+}
+
+@mixin customMaxWidth($customWidth) {
+    @media all and (max-width: #{$customWidth}) {
+        @content;
+    }
+}
+
+@mixin customMinWidth($customMinWidth) {
+    @media all and (min-width: #{$customMinWidth}) {
+        @content;
+    }
+}
+
+@mixin customMaxHeight($customHeight) {
+    @media all and (max-height: #{$customHeight}) {
+        @content;
+    }
+}
+
+@mixin customMinHeight($customMinHeight) {
+    @media all and (min-height: #{$customMinHeight}) {
+        @content;
+    }
+}
+
+// img
+$assetsPath: '/assets';
+$logo: url(#{$assetsPath}/images/logo.png);
+$logout: url(#{$assetsPath}/images/logout.png);
+$loader: url(#{$assetsPath}/images/loader.png);
+$badSmile: url(#{$assetsPath}/images/bad-smile.png);
+$navBar: url(#{$assetsPath}/sprite/nav-bar.png);
+$basicIcon: url(#{$assetsPath}/sprite/app-basic.png);

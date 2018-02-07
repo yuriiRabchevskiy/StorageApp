@@ -1,21 +1,37 @@
 <div class="page-wrap flex-row">
-  <div class="main-part">
-    <p-dataTable [value]="users" selectionMode="single" [(selection)]="selectedUser" [paginator]="true" rows="15" [responsive]="true"
-      (onRowSelect)="onRowSelect($event)">
-      <p-header class="table-head">
-        
-          <button type="button" class="t-button" pButton icon="fa-plus" (click)="addNewUser()" label="Додати Юзера"></button>
-        
-          <button type="button" class="t-button" pButton icon="fa-close" (click)="deleteUser(selectedUser.id)" label="Видалити"></button>
-        
-      </p-header>
-      <p-column field="firstName" header="Ім'я" [sortable]="true"></p-column>
-      <p-column field="lastName" header="Фамілія" [sortable]="true"></p-column>
-      <p-column field="username" header="Логін" [sortable]="true"></p-column>
-      <p-column field="password" header="Пароль" [sortable]="true"></p-column>
+
+    <p-dataTable class="stock-table user-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem" [loading]="showSpinner"
+        [paginator]="true" [rowsPerPageOptions]="[30,50,100]" [rows]="30" [responsive]="true" (onRowClick)="onRowClick($event)"
+        scrollable="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" [globalFilter]="gb" [immutable]=false>
+        <p-header class="table-head" [ngClass]="{'mobile-t-head': view.isMobile}">
+            <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
+                <app-i-button icon="add-user-icon" title="Додати користувача" (iClick)="addNewUser()"></app-i-button>
+                <app-i-button icon="del-icon" title="Видалити користувача" (iClick)="confirmation()"></app-i-button>
+                <app-i-button icon="edit-icon" title="Редагувати користувача" (iClick)="showToEdit()"></app-i-button>
+                <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
+            </app-button-group>
+
+            <div class="button-wrap">
+                <input class="s-serche" #gb type="text" placeholder="Пошук">
+            </div>
+        </p-header>
+        <p-column field="login" header="Логін" [sortable]="true"></p-column>
+        <p-column field="email" header="Емейл" [sortable]="true"></p-column>
+        <p-column field="name" header="Ім'я" [sortable]="true"></p-column>
+        <p-column field="surname" header="Фамілія" [sortable]="true"></p-column>
+        <p-column field="phone" header="Телефон" [sortable]="true"></p-column>
+        <p-column field="isAdmin" header="Роль" [sortable]="true" [style]="{'width':'120px'}">
+            <ng-template let-col let-role="rowData" pTemplate="body">
+                <span>{{role[col.field] === true ? 'Адміністратор' : 'Продавець'}}</span>
+            </ng-template>
+        </p-column>
+        <p-column field="notes" header="Нотатки"></p-column>
     </p-dataTable>
-  </div>
-  <div class="details-part" *ngIf="selectedUser">
-    <app-user [user]="selectedUser"></app-user>
-  </div>
 </div>
+<app-user [userList]="filteredData" *ngIf="displayDialog" (onCloseDialog)="closeDialog($event)" (saveUser)="save($event)"></app-user>
+<app-user-editor *ngIf="displayEditDialog" [user]="selectedItem" (onCloseDialog)="closeDialog($event)" (saveChange)="saveChange($event)"></app-user-editor>
+<app-confirm (confirm)="confirmDelete($event)" *ngIf="showConfirm">
+    <span header class="confirm-title">Ви впевнені, що бажаєте видалити користувача:
+        <b>{{selectedItem.name}}</b>
+    </span>
+</app-confirm>

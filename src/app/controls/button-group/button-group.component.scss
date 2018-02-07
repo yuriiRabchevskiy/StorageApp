@@ -1,0 +1,39 @@
+@import '../../../assets/css/globals';
+.group-wrap {
+    display: flex;
+    width: auto;
+    overflow: hidden;
+}
+.open {
+    align-items: flex-start;
+    @include wH(auto, auto);
+    max-width: 320px;
+    min-height: 52px;
+    z-index: 8;
+    opacity: 1;
+    position: relative;
+    top: 0px;
+    background: silver;
+    box-sizing: border-box;
+    padding: 0px 0px 0px 44px;
+}
+.closed {
+    position: absolute;
+    left: 0px;
+}
+.but-wrap {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.hidden-content {
+    display: none;
+}
+.show-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-between;
+}
+:host /deep/ .show-content >* {
+    margin-bottom: 4px;
+}

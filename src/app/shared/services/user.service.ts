@@ -1,39 +1,37 @@
-import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
-import { User } from "../models/user";
+import { Injectable, EventEmitter } from '@angular/core';
+import { IDictionary, Dictionary } from './../../models/dictionary';
+import { IUser } from './../../models/manage/user';
 
 @Injectable()
 export class UserService {
-    constructor(private http: Http) { }
- 
-    getAll() {
-        return this.http.get('/api/users', this.jwt()).map((response: Response) => response.json());
-    }
- 
-    getById(id: number) {
-        return this.http.get('/api/users/' + id, this.jwt()).map((response: Response) => response.json());
-    }
- 
-    create(user: User) {
-        return this.http.post('/api/users', user, this.jwt()).map((response: Response) => response.json());
-    }
- 
-    update(user: User) {
-        return this.http.put('/api/users/' + user.id, user, this.jwt()).map((response: Response) => response.json());
-    }
- 
-    delete(id: number) {
-        return this.http.delete('/api/users/' + id, this.jwt()).map((response: Response) => response.json());
-    }
- 
-    // private helper methods
- 
-    private jwt() {
-        // create authorization header with jwt token
-        let currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (currentUser && currentUser.token) {
-            let headers = new Headers({ 'Authorization': 'Bearer ' + currentUser.token });
-            return new RequestOptions({ headers: headers });
-        }
-    }
+
+  private static user: IUser;
+
+  static updateUser() {
+    UserService.user = JSON.parse(localStorage.getItem('user'));
+  }
+
+  setLocal(user: IUser) {
+    UserService.user = user;
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
+  getLocal(): IUser {
+    return UserService.user;
+  }
+
+  clearLocal() {
+    localStorage.removeItem('user');
+    UserService.user = null;
+  }
+}
+
+UserService.updateUser();
+if (window.addEventListener) {
+  window.addEventListener('storage', storage_event, false);
+}
+
+function storage_event(e) {
+  console.log('User updated from other tab');
+  UserService.updateUser();
 }

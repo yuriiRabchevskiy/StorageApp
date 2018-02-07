@@ -20,7 +20,7 @@
       "prefix": "app",
       "styles": [
         "../node_modules/primeng/resources/primeng.css",
-        "../node_modules/primeng/resources/themes/trontastic/theme.css",
+        "../node_modules/primeng/resources/themes/omega/theme.css",
         "../node_modules/font-awesome/css/font-awesome.css",
         "styles.scss"
       ],

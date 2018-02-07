@@ -1,0 +1,129 @@
+@import 'globals';
+.my-input {
+    box-sizing: border-box;
+    font-size: $fontSize;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    border: 1px solid;
+    border-color: black;
+    border-radius: 0px;
+    background-color: silver;
+    color: black;
+    outline: 0;
+    cursor: pointer;
+    &:hover,
+    &:focus,
+    &:enabled:hover {
+        color: $WhiteColor;
+        border-color: black;
+        background-color: black;
+        box-shadow: none;
+    }
+    &:disabled,
+    &:disabled:hover,
+    &:disabled:focus {
+        border-color: silver;
+        background-color: silver;
+        color: black;
+        cursor: default;
+    }
+}
+// input.s-input {
+//     @extend .my-input;
+//     @include wH(100%, 40px);
+//     padding: 4px;
+// }
+// textarea.s-area {
+//     @extend .my-input;
+//     height: 112px;
+//     outline: 0;
+//     resize: none;
+// }
+// label.s-label {
+//     @include wH(100%, 18px);
+//     font-size: $fontSize;
+//     margin-bottom: 2px;
+//     color: grey;
+//     font-family: Verdana, Geneva, Tahoma, sans-serif;
+//     &:active {
+//         color: black;
+//     }
+// }
+// p-inputMask:hover + label.s-label,
+// p-inputMask.ui-inputwrapper-focus + label.s-label,
+// textarea.s-area:hover + label.s-label,
+// textarea.s-area:focus + label.s-label,
+// input.s-input:hover + label.s-label,
+// input.s-input:focus + label.s-label,
+// .s-dropdown:hover + label.s-label,
+// .s-dropdown:focus + label.s-label {
+//     color: black;
+// }
+// textarea.s-area:disabled:hover + label.s-label,
+// textarea.s-area:disabled:focus + label.s-label,
+// input.s-input:disabled:hover + label.s-label,
+// input.s-input:disabled:focus + label.s-label,
+// .s-dropdown-disabled:hover + label.s-label,
+// .s-dropdown-disabled:focus + label.s-label {
+//     color: grey;
+// }
+.s-cb {
+    .ui-chkbox-box {
+        width: 20px;
+        height: 20px;
+        border-radius: 0px;
+        border: 1px solid;
+        border-color: rgba(0,0,0,0.8);
+        line-height: 20px;
+        background: silver;
+    }
+    .ui-chkbox-box.ui-widget:hover {
+        color: #fff;
+        border-color: rgba(0,0,0,1);
+        background: rgba(0,0,0,1);
+    }
+    .ui-chkbox-box.ui-state-focus {
+        box-shadow: none;
+    }
+    .ui-chkbox-box.ui-state-active {
+        border-color: rgba(0,0,0,1);
+        background: rgba(0,0,0,1);
+        color: #fff;
+        box-shadow: none;
+        .ui-chkbox-icon::before {
+            content: '\2714';
+        }
+    }
+    .ui-chkbox-icon {
+        width: 100%;
+        height: 100%;
+        font-weight: 200;
+        font-size: 14px;
+        line-height: 18px;
+        outline: 0;
+    }
+    .ui-chkbox-label {
+        color: rgba(0,0,0,0.8);
+    }
+    .ui-label-active {
+        color: rgba(0,0,0,1);
+    }
+}
+
+input.s-serche {
+    @extend .my-input;
+    @include wH(180px, 40px);
+    padding: 2px 4px;
+    margin: 2px;
+    &:focus,
+    &:hover,
+    &:enabled:hover {
+        border-color: silver;
+    }
+    @include customMaxWidth(586px) {
+        width: 100%;
+        max-width: 369px;
+    }
+    @include customMaxWidth(406px) {
+        width: 180px;
+    }
+}

@@ -1,0 +1,47 @@
+<form [formGroup]="orderEditForm">
+    <div class="flex-row flex-wrap">
+        <mat-form-field class="s-input-wrapper">
+            <input matInput type="number" placeholder="Номер накладної"
+                formControlName="orderNumber" required>
+            <mat-error *ngIf="orderNumber.errors && (orderNumber.dirty || orderNumber.touched)">{{getNumberError()}}</mat-error>
+        </mat-form-field>
+        <mat-form-field class="s-input-wrapper">
+            <mat-select placeholder="Статус" formControlName="status">
+                <mat-option *ngFor="let item of statuses" [value]="item.value">
+                    {{item.label}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="flex-row flex-wrap">
+        <mat-form-field class="s-input-wrapper">
+            <input matInput type="text" placeholder="Кому"
+                formControlName="clientName" required>
+            <mat-error *ngIf="clientName.errors && (clientName.dirty || clientName.touched)">Ви не вказали дані клієнта</mat-error>
+        </mat-form-field>
+        <mat-form-field class="s-input-wrapper">
+            <input matInput type="text" placeholder="Адреса"
+                formControlName="clientAddress" required>
+            <mat-error *ngIf="clientAddress.errors && (clientAddress.dirty || clientAddress.touched)">Ви не ввели адресу</mat-error>
+        </mat-form-field>
+    </div>
+    <div class="flex-row flex-wrap">
+        <mat-form-field class="s-input-wrapper">
+            <input matInput type="tel" placeholder="Телефон"
+                formControlName="clientPhone" required>
+            <mat-error *ngIf="clientPhone.errors && (clientPhone.dirty || clientPhone.touched)">{{getTelError()}}</mat-error>
+        </mat-form-field>
+        <mat-form-field class="s-input-wrapper">
+            <mat-select placeholder="Ти оплати" formControlName="payment">
+                <mat-option *ngFor="let item of payments" [value]="item.value">
+                    {{item.label}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="flex-row flex-wrap flex-area-wrap">
+        <mat-form-field class="s-area-wrapper">
+            <textarea matInput placeholder="Нотатки" formControlName="orderOther"></textarea>
+        </mat-form-field>
+    </div>
+</form>
