@@ -48,12 +48,6 @@
             height: calc(100vh - 80px) !important;
         }
     }
-    .s-dropdown {
-        display: block;
-        @include wH(100%, 40px);
-        max-width: 360px;
-        min-width: 260px;
-    }
     .s-cb {
         display: block;
         margin-right: 12px;
@@ -88,12 +82,17 @@
 }
 
 .dialog-body {
+    @extend .flex-col;
     @include wH(100%, 100%);
     @include customMaxWidth(800px) {
         padding: 0px 4px;
     }
 }
+.d-body-header {
+    flex-shrink: 0;
+}
 .d-page-wrap {
+    @extend .flex-col;
     display: flex;
     flex-grow: 1;
     flex-shrink: 1;
@@ -124,6 +123,9 @@
     @include customMaxWidth(800px) {
         margin: 0px auto 12px auto;
         justify-content: center;
+    }
+    @include customMaxWidth(450px) {
+        max-width: calc(100% - 40px);
     }
 }
 

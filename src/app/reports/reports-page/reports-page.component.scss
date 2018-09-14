@@ -1,0 +1,43 @@
+@import '../../../assets/css/globals';
+app-button-group {
+    z-index: 1;
+}
+.report-but-group {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+}
+
+.report-select {
+    margin-right: 12px;
+    box-sizing: border-box;
+    border: 1px solid;
+    border-color: rgba(0, 0, 0, 0.8);
+    &:hover {
+        border-color: rgba(0, 0, 0, 1);
+    }
+}
+
+.head-title-wrap {
+    justify-content: flex-end;
+    flex-grow: 1;
+    margin-left: 40px;
+}
+
+.title-description {
+    color: gray;
+    font-size: $fontSize - 2;
+    text-align: right;
+    @include customMaxWidth(1024px) {
+        color: black;
+        font-size: $fontSize - 4;
+    }
+    @include customMaxWidth(840px) {
+        font-size: $fontSize - 6;
+    }
+    @include customMaxWidth(800px) {
+        color: gray;
+        text-align: center;
+        font-size: $fontSize - 2;
+    }
+}

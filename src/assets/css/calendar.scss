@@ -1,0 +1,276 @@
+@import 'globals';
+.ui-calendar.st-calendar-wizard {
+    @include wH(260px, 40px);
+    outline: 0;
+    box-shadow: none;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: black;
+    background: $CaColor;
+    border-color: black;
+    margin-right: 12px;
+    &:hover {
+        color: $WhiteColor;
+        background: $defBtn;
+        border-color: $defBtn;
+        .fa-calendar {
+            background-position: -1328px -6px;
+        }
+    }
+    .ui-calendar-button {
+        @include wH(40px, calc(100% - 2px));
+        left: 1px;
+        top: 1px;
+        border-radius: 0px;
+        background: transparent;
+        border: none;
+        margin: 0px;
+        outline: 0;
+        &:hover,
+        &:focus {
+            background: transparent;
+            border: none;
+        }
+    }
+    .ui-button-icon-left {
+        @include wH(100%, 100%);
+        margin: 0px;
+        position: relative;
+        top: 0;
+        left: 0;
+        transition-delay: 0.05s;
+        &::before {
+            display: none;
+        }
+    }
+    .fa-calendar {
+        background-position: -1328px -51px;
+    }
+    .ui-button-text {
+        display: none;
+    }
+}
+
+.st-calendar-input.ui-inputtext {
+    @include wH(100%, 100%);
+    background: inherit;
+    color: inherit;
+    font-size: $fontSize + 2;
+    border: 1px solid;
+    border-color: inherit;
+    border-radius: 0px;
+    outline: 0;
+    padding-left: 40px;
+    text-indent: 0.4em;
+}
+
+.ui-inputwrapper-focus .st-calendar-wizard {
+    .st-calendar-input.ui-inputtext {
+        color: $WhiteColor;
+        background: $defBtn;
+        border-color: $defBtn;
+        box-shadow: none;
+    }
+    .fa-calendar {
+        background-position: -1328px -6px;
+    }
+}
+
+.st-calendar-calendar.ui-datepicker {
+    @include wH(100%, auto);
+    background: black;
+    border: 1px solid;
+    border-color: #fff;
+    border-radius: 0px;
+    box-shadow: -4px 4px 10px 0px rgba(255, 255, 255, 1);
+    .ui-datepicker-header.ui-widget-header {
+        height: 40px;
+        background: black;
+        padding: 0px;
+        color: #fff;
+        border: 2px solid black;
+    }
+    .ui-datepicker-title {
+        height: 100%;
+        line-height: normal;
+        margin: 0px 40px;
+        display: flex;
+    }
+    a.ui-datepicker-prev,
+    a.ui-datepicker-next {
+        @include wH(40px, 100%);
+        top: 0px;
+        border-radius: 0px;
+        background-color: transparent;
+        &:hover {
+            background: $CaColor;
+            .fa-angle-left {
+                background-position: -710px -51px;
+            }
+            .fa-angle-right {
+                background-position: -661px -51px;
+            }
+        }
+    }
+    .ui-datepicker-prev {
+        left: 0px;
+    }
+    .ui-datepicker-next {
+        right: 0px;
+    }
+    span.fa-angle-left,
+    span.fa-angle-right {
+        @include wH(100%, 100%);
+        margin: 0px;
+        position: relative;
+        left: 0;
+        top: 0;
+        &::before {
+            display: none;
+        }
+    }
+    .fa-angle-left {
+        background-position: -710px -5px;
+    }
+    .fa-angle-right {
+        background-position: -660px -6px;
+    }
+    select.ui-datepicker-year,
+    select.ui-datepicker-month {
+        @include wH(calc(50% - 4px), 100%);
+        margin: 0px 2px;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        border: none;
+        background: $CaColor;
+        outline: 0;
+    }
+    .ui-datepicker-buttonbar {
+        @include wH(100%, 40px);
+        padding: 0px;
+        border: 2px solid black;
+        border-bottom-width: 1px;
+        border-radius: 0px;
+        background: black;
+    }
+    .ui-g {
+        @include wH(100%, 100%);
+    }
+    .st-today-but.ui-button,
+    .st-clear-but.ui-button {
+        @include wH(calc(100% - 2px), 100%);
+        border: 1px solid;
+        border-radius: 0px;
+        outline: 0;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        .ui-button-text {
+            display: block;
+            width: 100%;
+            padding: 0px;
+            color: inherit;
+        }
+    }
+    .st-today-but.ui-button {
+        margin-right: 2px;
+        color: #fff;
+        background: black;
+        border-color: #fff;
+        &:hover,
+        &:focus {
+            color: black;
+            border-color: #fff;
+            background: #fff;
+        }
+    }
+    .st-clear-but.ui-button {
+        margin-left: 2px;
+        color: $appRedHoverColor;
+        background: black;
+        border-color: $appRedHoverColor;
+        &:hover,
+        &:focus {
+            color: #fff;
+            border-color: #fff;
+            background: $appRedHoverColor;
+        }
+    }
+    .ui-datepicker-calendar {
+        margin: 0px 2px;
+        width: calc(100% - 4px);
+        border-collapse: separate;
+        border-spacing: 0;
+        background: black;
+        thead th {
+            background-color: $CaColor;
+            padding: 0px;
+            font-size: 16px;
+            height: 30px;
+            cursor: default;
+            span {
+                display: block;
+                height: 24px;
+                line-height: 24px;
+            }
+        }
+        tbody {
+            td,
+            td.ui-state-default {
+                color: black;
+                border: 1px solid;
+                border-color: #fff;
+                background: #fff;
+                opacity: 1;
+                height: 34px;
+                font-size: 14px;
+                &:not(.ui-state-disabled):hover {
+                    color: #fff;
+                    border-color: black;
+                    background: $appRedColor;
+                }
+                a.ui-state-default {
+                    @include wH(100%, 100%);
+                    background: inherit;
+                    color: inherit;
+                    line-height: 33px;
+                    padding: 0;
+                    border: none;
+                    border-radius: 0px;
+                }
+            }
+            td.ui-state-disabled {
+                color: $disabledColor;
+                background-color: #cacaca;
+                border-color: #cacaca;
+            }
+            td.ui-datepicker-today:not(.ui-datepicker-current-day) {
+                background: black;
+                border-color: black;
+                color: #fff;
+                &:not(.ui-datepicker-current-day):hover {
+                    color: #fff;
+                    background: black;
+                }
+            }
+            td.ui-datepicker-current-day {
+                background: $appRedColor;
+                color: black;
+                border-color: black;
+                &:hover {
+                    color: black;
+                }
+            }
+            td.ui-datepicker-other-month {
+                opacity: 0.9;
+            }
+        }
+    }
+}
+.st-calendar-calendar.open-fixed {
+    @include wH(80vw, 80vh);
+    position: fixed;
+    left: 10vw !important;
+    top: 40px !important;
+    display: block !important;
+    box-shadow: 0px 0px 60px 18px white;
+    .ui-datepicker-calendar {
+        height: calc(100% - 80px);
+    }
+}

@@ -11,11 +11,15 @@ export class ApiEndpointsConfig {
         return this.getApiEndpoint() + url;
     }
 
-    private static getApiEndpoint(): string {
+    public static getAppEndpoint() {
         if (ApiEndpointsConfig.isDebug()) {
-            return 'http://localhost:4577/api/';
-            // return 'http://btv.cloudapp.net:4200/api/';
+            return 'http://localhost:4577/';
+            // return 'http://btv.cloudapp.net:7700/';
         }
-        return 'http://btv.cloudapp.net:4200/api/';
+        return 'http://btv.cloudapp.net:7700/';
+    }
+
+    private static getApiEndpoint(): string {
+        return ApiEndpointsConfig.getAppEndpoint() + 'api/';
     }
 }

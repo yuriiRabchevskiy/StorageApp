@@ -1,3 +1,4 @@
+import { IOrder } from './../../models/storage/order';
 import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { ICancelOrder, CancelOrder } from '../../models/storage';
@@ -18,6 +19,7 @@ export class ReturnComponent implements OnInit {
   reason: FormControl;
 
   @Output() confirm: EventEmitter<IReturnOrder> = new EventEmitter<IReturnOrder>();
+  @Input() order: IOrder;
 
   constructor() { }
 
@@ -38,6 +40,6 @@ export class ReturnComponent implements OnInit {
 
   confirmation(val: boolean) {
     let item = new CancelOrder(this.reason.value);
-    this.confirm.emit({item: item, conf: val});
+    this.confirm.emit({ item: item, conf: val });
   }
 }

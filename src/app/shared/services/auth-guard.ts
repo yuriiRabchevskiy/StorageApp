@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
   static date: Date;
 
   static loadState() {
-    let date = localStorage.getItem('user_auth_state_date');
+    const date = localStorage.getItem('user_auth_state_date');
     AuthGuard.date = date ? new Date(JSON.parse(date)) : new Date(2000, 0, 0);
   }
 
@@ -35,9 +35,9 @@ export class AuthGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     // user not logged in, force to re-login
     if (!this.userService.getLocal()) return this.registerResult(false, state.url);
-    let handler = new AuthConnectionErrorHandler(this, state.url);
+    const handler = new AuthConnectionErrorHandler(this, state.url);
 
-    let rez = this.checkServer(state.url).catch((err) => handler.handleConnectionError(err));
+    const rez = this.checkServer(state.url).catch((err) => handler.handleConnectionError(err));
 
     if (!this.canBeAsync()) { // first request, sync mode
       return rez.take(1);
@@ -82,7 +82,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private getDiffInSeconds(last: Date) {
-    let diff = (new Date().getTime() - last.getTime());
+    const diff = (new Date().getTime() - last.getTime());
     return diff / 1000; // sec
   }
 

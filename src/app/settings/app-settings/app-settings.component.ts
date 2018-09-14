@@ -7,6 +7,8 @@ import { SecuredComponent } from '../../models/component/base-api.component';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { matchOtherValidator } from '../../shared/directive/math-validator';
 import { MessageService } from 'primeng/components/common/messageservice';
+import { MatIconRegistry } from '@angular/material';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-settings',
@@ -23,8 +25,15 @@ export class AppSettingsComponent extends SecuredComponent implements OnInit {
   newPassword: FormControl;
   confirmPassword: FormControl;
 
-  constructor(private router: Router, private apiService: ApiService, private notifi: MessageService) {
-    super();
+  constructor(private router: Router, private apiService: ApiService, notifi: MessageService,
+    iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+    super(notifi);
+    iconRegistry.addSvgIcon(
+      'visibility',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/matSVG/visibility.svg'));
+    iconRegistry.addSvgIcon(
+      'visibility-off',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/matSVG/visibility_off.svg'));
     this.user = this.userService.getLocal();
   }
 
@@ -106,10 +115,10 @@ export class AppSettingsComponent extends SecuredComponent implements OnInit {
     let regex = "a-z і A-Z, 0-9, #?!@$%^_+&*-";
     return this.newPassword.hasError('required') ? "Пароль не введено" :
       this.newPassword.hasError('minlength') ? 'Мінімально 6 символів' :
-      this.newPassword.hasError('pattern') ? 'Пароль повинен містити ' + regex : '';
+        this.newPassword.hasError('pattern') ? 'Пароль повинен містити ' + regex : '';
   }
   getErrorConfirmPass() {
-    return this.confirmPassword.hasError('required') ? "Підтвердження не введено" : 
+    return this.confirmPassword.hasError('required') ? "Підтвердження не введено" :
       this.confirmPassword.invalid ? 'Пароль не підтверджено' : '';
   }
 

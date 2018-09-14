@@ -4,10 +4,9 @@
     left: 4px;
 }
 
-.stock-table {
+.prime-table {
     display: block;
-    width: 100%;
-    height: calc(100% - 52px);
+    @include wH(100%, 100%);
     .ui-datatable {
         height: 100%;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -207,6 +206,23 @@
             }
         }
     }
+    .ui-datatable-scrollable-footer {
+        min-height: 20px;
+        tr {
+            border: none;
+            border-top: 1px solid grey;
+            border-bottom: 2px solid grey;
+            cursor: default;
+            td {
+                color: black;
+                font-weight: 900;
+                text-align: left;
+                padding-left: 4px;
+                padding-right: 4px;
+                border: none;
+            }
+        }
+    }
     .ui-paginator-bottom {
         flex-shrink: 0;
         border: none;
@@ -279,4 +295,9 @@
             background: $appRedHoverColor;
         }
     }
+}
+
+.prime-table.report-table .ui-datatable-scrollable-body {
+    min-height: auto;
+    height: auto !important;
 }

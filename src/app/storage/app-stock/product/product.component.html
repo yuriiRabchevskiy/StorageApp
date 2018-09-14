@@ -1,7 +1,7 @@
 <p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
     <p-header>{{header}}</p-header>
-    <div class="dialog-body flex-col" *ngIf="product">
-        <div class="d-page-wrap flex-col">
+    <div class="dialog-body" *ngIf="product">
+        <div class="d-page-wrap">
             <div class="flex-row flex-wrap">
                 <mat-form-field class="s-input-wrapper">
                     <mat-select placeholder="Категорія" [(ngModel)]="selectedCategory" name="category">

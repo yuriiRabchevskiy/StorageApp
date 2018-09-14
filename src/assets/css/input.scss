@@ -27,45 +27,6 @@
         cursor: default;
     }
 }
-// input.s-input {
-//     @extend .my-input;
-//     @include wH(100%, 40px);
-//     padding: 4px;
-// }
-// textarea.s-area {
-//     @extend .my-input;
-//     height: 112px;
-//     outline: 0;
-//     resize: none;
-// }
-// label.s-label {
-//     @include wH(100%, 18px);
-//     font-size: $fontSize;
-//     margin-bottom: 2px;
-//     color: grey;
-//     font-family: Verdana, Geneva, Tahoma, sans-serif;
-//     &:active {
-//         color: black;
-//     }
-// }
-// p-inputMask:hover + label.s-label,
-// p-inputMask.ui-inputwrapper-focus + label.s-label,
-// textarea.s-area:hover + label.s-label,
-// textarea.s-area:focus + label.s-label,
-// input.s-input:hover + label.s-label,
-// input.s-input:focus + label.s-label,
-// .s-dropdown:hover + label.s-label,
-// .s-dropdown:focus + label.s-label {
-//     color: black;
-// }
-// textarea.s-area:disabled:hover + label.s-label,
-// textarea.s-area:disabled:focus + label.s-label,
-// input.s-input:disabled:hover + label.s-label,
-// input.s-input:disabled:focus + label.s-label,
-// .s-dropdown-disabled:hover + label.s-label,
-// .s-dropdown-disabled:focus + label.s-label {
-//     color: grey;
-// }
 .s-cb {
     .ui-chkbox-box {
         width: 20px;

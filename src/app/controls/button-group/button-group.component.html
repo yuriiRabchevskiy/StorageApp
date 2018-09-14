@@ -1,8 +1,8 @@
-<div class="group-wrap" [ngClass]="{'open': minimized && isShow}">
-    <app-i-button *ngIf="minimized && !isShow" icon="i-open" (iClick)="isShow = true"></app-i-button>
+<div class="group-wrap {{groupWrapClass}}" [ngClass]="{'open': minimized && isShow, 'open-bottom': openBottom && isShow}">
+    <app-i-button [buttClass]="iconClass" *ngIf="minimized && !isShow" icon="i-open" (iClick)="isShow = true"></app-i-button>
     <div class="but-wrap" [ngClass]="{'hidden-content': minimized && !isShow, 'show-content': minimized && isShow}">
         <ng-content></ng-content>
     </div>
-    <app-i-button class="closed" *ngIf="minimized && isShow" icon="i-close" (iClick)="isShow = false"></app-i-button>
+    <app-i-button [buttClass]="iconClass" class="closed" *ngIf="minimized && isShow" icon="i-close" (iClick)="isShow = false"></app-i-button>
 </div>
 <div *ngIf="minimized && isShow" class="overlay" (click)="isShow = false"></div>

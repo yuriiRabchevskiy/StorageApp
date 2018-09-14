@@ -21,5 +21,10 @@ namespace BusinessLogic.Helpers
       }
       _tzOffset = TimeSpan.FromHours(hours);
     }
+
+    public DateTime GetLocal(DateTime d)
+    {
+      return d.Add(_tzOffset);
+    }
   }
 }

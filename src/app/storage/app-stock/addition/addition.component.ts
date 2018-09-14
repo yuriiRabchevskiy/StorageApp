@@ -1,3 +1,4 @@
+import { FormControl, Validators } from '@angular/forms';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
 import { IProduct } from '../../../models/storage';
@@ -21,7 +22,7 @@ export class AdditionComponent {
   count: number;
   expectedCount: number;
   selectLocation: IWarehouse;
-
+  countInp: FormControl;
   private _product: IProduct;
   get product() {
     return this._product;
@@ -65,10 +66,10 @@ export class AdditionComponent {
   }
 
   set addCount(val) {
-    if (val > 0) {
-      this._addCount = val;
+    if (val <= 0) {
+      this._addCount = 0;
     } else {
-      this._addCount = 1;
+      this._addCount = val;
     }
     this.expectedCount = this.count + this._addCount;
   }
@@ -77,6 +78,11 @@ export class AdditionComponent {
   @Output() addition: EventEmitter<ISaveAddition> = new EventEmitter<ISaveAddition>();
 
   constructor(private apiService: ApiService) {
+  }
+
+  ngOnInit() {
+    this.countInp =  new FormControl({value: 1},
+      [Validators.pattern('^[0-9]+$'), Validators.required]);
   }
 
   save() {

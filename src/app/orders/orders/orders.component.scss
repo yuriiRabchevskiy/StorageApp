@@ -47,6 +47,7 @@
     font-weight: bold;
     vertical-align: bottom;
 }
+
 .total-cell {
     background-color: black;
     color: #fff;
@@ -66,5 +67,12 @@
     }
     .check-item-name-td {
         border-bottom: 1px dashed black;
+    }
+}
+
+.cancel-reason {
+    color: gray;
+    b {
+        color: red;
     }
 }

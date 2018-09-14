@@ -5,11 +5,13 @@ import { ApiService } from '../../../shared/services/api.service';
 import { ISUser } from './../../../models/manage';
 import { FormGroup, FormControl, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { matchOtherValidator } from '../../../shared/directive/math-validator';
+import { MatIconRegistry } from '@angular/material';
+import { DomSanitizer } from '@angular/platform-browser';
 
 export function nameValidator(items: ISUser[]): ValidatorFn {
   return (control: AbstractControl): any => {
     const name = items.some(it => it.login === control.value);
-    return name ? {invalid: control.value} : null;
+    return name ? { invalid: control.value } : null;
   };
 }
 
@@ -20,7 +22,6 @@ export function nameValidator(items: ISUser[]): ValidatorFn {
 })
 export class UserComponent implements OnInit {
   hide: boolean = true;
-  confHide: boolean = true;
   userForm: FormGroup;
 
   login: FormControl;
@@ -45,7 +46,14 @@ export class UserComponent implements OnInit {
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() saveUser: EventEmitter<ISUser> = new EventEmitter<ISUser>();
 
-  constructor(private apiService: ApiService, public router: Router) {
+  constructor(private apiService: ApiService, public router: Router,
+    iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+    iconRegistry.addSvgIcon(
+      'visibility',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/matSVG/visibility.svg'));
+    iconRegistry.addSvgIcon(
+      'visibility-off',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/matSVG/visibility_off.svg'));
   }
 
   ngOnInit() {
@@ -63,7 +71,7 @@ export class UserComponent implements OnInit {
     this.notes = new FormControl('');
     this.email = new FormControl('', [
       Validators.required,
-      Validators.pattern('^[^\s@]+@[^\s@]+[.][^\s@]+$')
+      Validators.email
     ]);
     this.password = new FormControl('', [
       Validators.required,
@@ -76,6 +84,10 @@ export class UserComponent implements OnInit {
       matchOtherValidator('password')
     ]);
     this.isAdmin = new FormControl(this.userRoles[1].value, Validators.required);
+  }
+
+  showValue() {
+    this.hide = !this.hide;
   }
 
   createUserForm() {
@@ -125,11 +137,11 @@ export class UserComponent implements OnInit {
 
   getErrorEmail() {
     return this.email.hasError('required') ? 'Емейл не введено' :
-      this.email.hasError('pattern') ? 'Не валідний емейл' : '';
+      this.email.hasError('email') ? 'Не валідний емейл' : '';
   }
   getErrorLogin() {
     return this.login.hasError('required') ? 'Логін не введено' :
-           this.login.invalid ? 'Логін уже існує' : '';
+      this.login.invalid ? 'Логін уже існує' : '';
   }
   getErrorSurName() {
     return this.surName.hasError('required') ? 'Фамілію не введено' : '';
@@ -141,10 +153,10 @@ export class UserComponent implements OnInit {
     let regex = "a-z і A-Z, 0-9, #?!@$%^_+&*-";
     return this.password.hasError('required') ? "Пароль не введено" :
       this.password.hasError('minlength') ? 'Мінімально 6 символів' :
-      this.password.hasError('pattern') ? 'Пароль повинен містити ' + regex : '';
+        this.password.hasError('pattern') ? 'Пароль повинен містити ' + regex : '';
   }
   getErrorConfirmPass() {
-    return this.confirmPassword.hasError('required') ? "Підтвердження не введено" : 
+    return this.confirmPassword.hasError('required') ? "Підтвердження не введено" :
       this.confirmPassword.invalid ? 'Пароль не підтверджено' : '';
   }
 

@@ -1,3 +1,4 @@
+import { MessageService } from 'primeng/components/common/messageservice';
 import { Observable } from 'rxjs/Observable';
 import { SecuredComponent } from './base-api.component';
 import { Input } from '@angular/core';
@@ -19,8 +20,8 @@ export abstract class ListComponent<TCol> extends SecuredComponent {
 
     public filters: Filter<TCol>[] = [this.strFilter]; // filters which can reduce amount of shown items;
 
-    constructor() {
-        super();
+    constructor( notifi: MessageService) {
+        super(notifi);
     }
 
     get searchText() {

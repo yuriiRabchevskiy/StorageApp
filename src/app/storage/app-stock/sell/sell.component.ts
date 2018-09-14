@@ -1,15 +1,9 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
 import { IProduct, IOrder, Order, ISell, Sell } from '../../../models/storage';
 import { IWarehouse } from './../../../models/storage/werehouse';
 import { ErrorStateMatcher } from '@angular/material';
-import { FormControl } from '@angular/forms';
-
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null): boolean {
-    return !!(control && control.value < 1 && (control.dirty || control.touched));
-  }
-}
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-sell',
@@ -17,15 +11,14 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   styleUrls: ['./sell.component.scss']
 })
 
-export class SellComponent {
+export class SellComponent implements OnInit {
   productName: string = '';
   count: number;
   expectedCount: number;
   expectedSalePrice: number;
   totalSell: number;
   selectLocation: IWarehouse;
-
-  validate = new MyErrorStateMatcher();
+  sCount: FormControl;
 
   private _product: IProduct;
   get product() {
@@ -83,17 +76,27 @@ export class SellComponent {
   }
 
   set sellCount(val) {
-    this._sellCount = val;
-    if (val < 0) return;
-    this.expectedCount = this.count - val;
+    if (!val || val < 0) {
+      this._sellCount = 0;
+    } else if (val > this.product.balance[this.selectedLocation]) {
+      this._sellCount = this.product.balance[this.selectedLocation];
+    } else {
+      this._sellCount = val;
+    }
+    this.expectedCount = this.count - this._sellCount;
     if (!this.sell) return;
-    this.totalSell = this.expectedSalePrice * val;
+    this.totalSell = this.expectedSalePrice * this._sellCount;
   }
 
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() sale: EventEmitter<ISell> = new EventEmitter<ISell>();
 
   constructor(private apiService: ApiService) {
+  }
+
+  ngOnInit() {
+    this.sCount =  new FormControl({value: 1, disabled: true},
+      [Validators.pattern('^[0-9]+$'), Validators.required]);
   }
 
   save() {

@@ -18,9 +18,8 @@ export class UsersComponent extends ApiListComponent<ISUser> {
   displayEditDialog: boolean = false;
   showConfirm: boolean = false;
 
-  constructor(private apiService: ApiService, public router: Router,
-    private notifi: MessageService) {
-    super();
+  constructor(private apiService: ApiService, public router: Router, notifi: MessageService) {
+    super(notifi);
   }
 
   onRowClick(val) {

@@ -1,8 +1,9 @@
+import { MessageService } from 'primeng/components/common/messageservice';
 import { Observable } from 'rxjs/Observable';
 import { ReflectiveInjector } from '@angular/core';
 
 import { WorkProgress } from './work-progress';
-import { ApiResponse } from '../api';
+import { ApiResponse, IApiErrorInfo } from '../api';
 import { UserService } from '../../shared/services/user.service';
 import { ViewState } from '../../shared/helpers';
 
@@ -13,19 +14,56 @@ export abstract class SecuredComponent {
   canEdit: boolean = false;
   public userService: UserService;
 
-  constructor() {
-    let injector = ReflectiveInjector.resolveAndCreate([UserService]);
+  constructor(protected notifi?: MessageService) {
+    const injector = ReflectiveInjector.resolveAndCreate([UserService]);
     this.userService = injector.get(UserService);
 
-    let user = this.userService.getLocal();
+    const user = this.userService.getLocal();
     if (!user) return;
     this.canView = user.isAdmin;
   }
 
   cloneModel<T>(source: T): T {
     if (source === undefined) return <any>{};
-    let str = JSON.stringify(source);
+    const str = JSON.stringify(source);
     return JSON.parse(str);
+  }
+
+  showInfoMessage(message: string) {
+    this.notifi.add(
+      {
+        severity: 'info',
+        summary: 'Інформація',
+        detail: message
+      });
+  }
+
+  showSuccessMessage(message: string) {
+    this.notifi.add(
+      {
+        severity: 'success',
+        summary: 'Успіх!',
+        detail: message
+      });
+  }
+
+  showApiErrorMessage(summary: string, errors: IApiErrorInfo[]) {
+    const message = errors.map(it => `${it.field}: ${it.message}\n`).reduce((text, line) => text += line, '');
+    this.notifi.add(
+      {
+        severity: 'error',
+        summary: summary,
+        detail: message
+      });
+  }
+
+  showWebErrorMessage(summary: string, error: string) {
+    this.notifi.add(
+      {
+        severity: 'error',
+        summary: summary,
+        detail: error
+      });
   }
 
 }

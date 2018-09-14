@@ -8,7 +8,19 @@ import { IOrder, OrderStatus } from '../../models/storage';
 import * as moment from 'moment-mini';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { DataTable } from 'primeng/primeng';
+import { UserService } from '../../shared/services/user.service';
 
+interface ITab {
+    label: string;
+    value: OrderStatus;
+}
+interface IExportData {
+    id: number;
+    date: string;
+    itemsName: any;
+    orderNumber: number;
+    seller: string;
+}
 @Component({
     selector: 'app-orders',
     templateUrl: './orders.component.html',
@@ -23,36 +35,81 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     typeFilter: NumberFilter<IOrder> = new NumberFilter<IOrder>();
     stringFilters: StringFilter<IOrder> = new StringFilter<IOrder>();
 
-    tabs = [{ label: 'Прийнятий', value: OrderStatus.Open },
-    { label: 'Відправлений', value: OrderStatus.Processing },
-    { label: 'Отриманий', value: OrderStatus.Closed }
+    isCancelTab: boolean = false;
+    canceledOrders: IOrder[] = [];
+    canceledOrdersIsLoading: boolean = false;
+    private _canceledLoadTimeMs: number = undefined;
+
+    get viewData() {
+        return this.isCancelTab ? this.canceledOrders : this.filteredData;
+    }
+
+    tabs: ITab[] = [{ label: 'Прийняті', value: OrderStatus.Open },
+    { label: 'Відправлені', value: OrderStatus.Processing },
+    { label: 'Отримані', value: OrderStatus.Closed }
     ];
 
-    _selectedTab: any;
+    _selectedTab: ITab;
     get selectedTab() {
         return this._selectedTab;
     }
-    set selectedTab(value: any) {
+    set selectedTab(value: ITab) {
         if (this._selectedTab === value) return;
         this._selectedTab = value;
         this.typeFilter.number = value.value;
-        this.filter();
+        this.isCancelTab = this.selectedTab.value === OrderStatus.Canceled;
+
+        if (this.isCancelTab) {
+            const now = new Date().getTime();
+            const min15 = 15 * 60 * 1000;
+            if (this._canceledLoadTimeMs && (now - this._canceledLoadTimeMs) <= min15) return;
+            this.getCanceledOrders();
+        } else {
+            this.filter();
+        }
     }
-    constructor(private apiService: ApiService, public router: Router,
-        private notifi: MessageService) {
-        super();
+
+    csvFileName: string;
+    headers = {
+        id: '№',
+        orderNumber: 'Номер накладної',
+        date: 'Дата продажу',
+        seller: 'Продавець',
+        products: 'Товари'
+    }
+
+    itemsFormatted = [];
+
+    constructor(private apiService: ApiService, public router: Router, notifi: MessageService) {
+        super(notifi);
+
+        const isAdmin = this.userService.getLocal().isAdmin;
+        if (isAdmin) this.tabs.push({ label: 'Скасовані', value: OrderStatus.Canceled });
         this.selectedTab = this.tabs[0];
         this.typeFilter.getNumber = (it) => it.status;
         this.filters.push(this.typeFilter);
     }
 
     onRowClick(val) {
-        if (this.selectedItem !== val.data) return;
-        this.showToEdit();
+        if (this.selectedItem !== val.data) {
+            this.selectedItem = val.data;
+        } else {
+            this.showToEdit();
+        }
     }
 
     selectTab(event) {
         this.selectedTab = this.tabs[event.index];
+        if (this.filteredData.length < -1) return;
+        this.selectedItem = this.filteredData[0];
+    }
+
+    refresh() {
+        if (this.isCancelTab) {
+            this.getCanceledOrders();
+            return;
+        }
+        super.refresh();
     }
 
     doGetData() {
@@ -97,27 +154,21 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     closeEditDialog(event) {
         this.orderDialog = event;
         if (this.filteredData.length < 1) return;
-        this.selectedItem = this.filteredData[0];
     }
 
     save(val: IOrder) {
         let item = val;
         this.apiService.saveOrder(item).subscribe(
             res => {
-                this.notifi.add({
-                    severity: 'success',
-                    summary: 'Successfully',
-                    detail: 'Зміни збережено'
-                });
-                this.filter();
+                if (res.success) {
+                    this.showSuccessMessage('Зміни збережено');
+                    this.filter();
+                    return;
+                }
+                this.showApiErrorMessage('Не вдалося зберегти зміни', res.errors);
             },
-            err => {
-                this.notifi.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Зміни зберегти не вдалося' + err
-                });
-            }
+            err => this.showWebErrorMessage('Не вдалося зберегти зміни', err)
+
         );
         this.orderDialog = false;
     }
@@ -130,20 +181,14 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
         this.selectedItem.status = OrderStatus.Closed;
         this.apiService.saveOrder(this.selectedItem).subscribe(
             res => {
-                this.notifi.add({
-                    severity: 'success',
-                    summary: 'Successfully',
-                    detail: 'Продажу закрито'
-                });
-                this.filter();
+                if (res.success) {
+                    this.showSuccessMessage('Продажу закрито');
+                    this.filter();
+                    return;
+                }
+                this.showApiErrorMessage('Продажу не закрито', res.errors);
             },
-            err => {
-                this.notifi.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Продажу закрити не вдалося' + err
-                });
-            }
+            err => this.showWebErrorMessage('Продажу не закрито', err)
         );
         this.showConfirm = false;
     }
@@ -155,25 +200,33 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
         }
         this.apiService.сancelOrder(this.selectedItem.id, val.item).subscribe(
             res => {
-                this.notifi.add({
-                    severity: 'success',
-                    summary: 'Successfully',
-                    detail: 'Продажу повернено'
-                });
-                if (this.filteredData.length < 1) return;
-                this.remove(this.selectedItem);
-                this.selectedItem = this.filteredData[0];
+                if (res.success) {
+                    this.showSuccessMessage('Продажу повернено');
+                    if (this.filteredData.length < 1) return;
+                    this.remove(this.selectedItem);
+                    this.selectedItem = this.filteredData[0];
+                    return;
+                }
+                this.showApiErrorMessage('Продажу не повернено', res.errors);
             },
-            err => {
-                this.notifi.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Продажу повернути не вдалося' + err
-                });
-            }
+            err => this.showWebErrorMessage('Продажу не повернено', err)
         );
         this.showConfirmCancel = false;
     }
+
+    getCanceledOrders() {
+        if (this.canceledOrdersIsLoading) return;
+        this.canceledOrdersIsLoading = true;
+        this.apiService.getCanceledOrders().subscribe(
+            res => {
+                this._canceledLoadTimeMs = new Date().getTime();
+                this.canceledOrdersIsLoading = false;
+                this.canceledOrders = res.items;
+            },
+            err => this.canceledOrdersIsLoading = false
+        );
+    }
+
     getDifference(val) {
         let diff = (val.quantity * val.price) - (val.quantity * val.product.recommendedBuyPrice);
         return diff;
@@ -204,5 +257,93 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
 
     collapseOrders() {
         this.dataTable.expandedRows = [];
+    }
+
+    createFileName() {
+        let date = moment(new Date()).format('DD.MM.YYYY HH:mm');
+        this.csvFileName = this.selectedTab.label + ' продажі - ' + date;
+    }
+
+    saveToExcel(data) {
+        this.createFileName();
+        this.formated(data);
+        this.exportCSVFile(this.headers, this.itemsFormatted, this.csvFileName);
+    }
+
+    generateProductList(val) {
+        let str = '';
+        for (let i = 0; i < val.products.length; i++) {
+            let color = val.products[i].product.color;
+            let model = val.products[i].product.model;
+            let type = val.products[i].product.productType;
+            if (str !== '') {
+                str += ';\u00A0';
+            };
+            str += (color || '') + ' ' + (model || '') + ' ' + (type || '');
+        }
+        return str;
+    }
+    formated(val) {
+        this.itemsFormatted = [];
+        val.forEach((item) => {
+            let productList = this.generateProductList(item);
+            this.itemsFormatted.push({
+                id: item.id,
+                orderNumber: item.orderNumber,
+                date: item.date,
+                seller: item.seller,
+                products: productList
+            });
+        });
+    }
+
+    convertToCSV(objArray) {
+        let array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
+        let str = '';
+
+        for (let i = 0; i < array.length; i++) {
+            let line = '';
+            for (let index in array[i]) {
+                if (i === 0) {
+                    if (line !== '') {
+                        line += ',';
+                    };
+                    line += array[i][index];
+                } else {
+                    if (line !== '') {
+                        line += ',';
+                    };
+                    line = line + array[i][index];
+                }
+            }
+            str += line + '\r\n';
+        }
+        return str;
+    }
+
+    exportCSVFile(headers, items, fileTitle) {
+        if (headers) {
+            items.unshift(headers);
+        }
+
+        // Convert Object to JSON
+        let jsonObject = JSON.stringify(items);
+        let csv = this.convertToCSV(jsonObject);
+        let fileName = fileTitle + '.csv' || 'export.csv';
+        let blob = new Blob([csv], { type: 'text/csv; charset=utf-8' });
+        if (navigator.msSaveBlob) {
+            navigator.msSaveBlob(blob, fileName);
+        } else {
+            let link = document.createElement('a');
+            if (link.download !== undefined) {
+                let url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', fileName);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
     }
 }

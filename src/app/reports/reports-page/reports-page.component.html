@@ -1,0 +1,54 @@
+<div class="page-wrap">
+
+    <div class="page-head">
+        <app-button-group [openBottom]="view.isMobile" iconClass="rotate-icon" groupWrapClass="withOverflow" [class.report-but-group]="view.isMobile" [minimized]="view.isMobile">
+            <mat-select class="st-mat-select report-select" [(value)]="selectedItem">
+                <mat-option *ngFor="let report of reports" [value]="report">
+                    {{report.title}}
+                </mat-option>
+            </mat-select>
+            <p-calendar class="r-calendar" *ngIf="selectedItem.key !== ReportType.openOrders" 
+                [(ngModel)]="rangeValue" selectionMode="range" [locale]="uk"
+                dateFormat="dd M yy" [showIcon]="true" [monthNavigator]="true" 
+                [yearNavigator]="true" yearRange="2000:2099" showButtonBar="true"
+                readonlyInput="true" (onClearClick)="setDefaultRange()" 
+                (onClose)="closePopup()" styleClass="st-calendar-wizard"
+                inputStyleClass="st-calendar-input" [panelStyleClass]="calendarClass"
+                todayButtonStyleClass="st-today-but"
+                clearButtonStyleClass="st-clear-but"
+                (onFocus)="openPopup()">
+            </p-calendar>
+        </app-button-group>
+
+        <div class="head-title-wrap flex-col">
+            <span class="title-description">( {{selectedItem.description}} )</span>
+        </div>
+    </div>
+
+    <div class="page-body">
+        <app-sales-per-user class="wh-100" (change)="endRefresh($event)" [refreshData]="refresh" [from]="rangeValue[0]" [to]="rangeValue[1]" *ngIf="selectedItem.key===ReportType.salesPerUser">
+
+        </app-sales-per-user>
+
+        <app-orders-overview class="wh-100" (change)="endRefresh($event)" [refreshData]="refresh" [from]="rangeValue[0]" [to]="rangeValue[1]" *ngIf="selectedItem.key===ReportType.ordersPerUser">
+
+        </app-orders-overview>
+
+        <app-open-orders class="wh-100" *ngIf="selectedItem.key===ReportType.openOrders">
+
+        </app-open-orders>
+
+        <app-open-orders-light class="wh-100" *ngIf="selectedItem.key===ReportType.openOrdersLight">
+
+        </app-open-orders-light>
+
+        <app-sales-per-product class="wh-100" (change)="endRefresh($event)" [refreshData]="refresh" [from]="rangeValue[0]" [to]="rangeValue[1]" *ngIf="selectedItem.key===ReportType.salesPerProduct">
+
+        </app-sales-per-product>
+
+        <app-warehouse-actions class="wh-100" (change)="endRefresh($event)" [refreshData]="refresh" [from]="rangeValue[0]" [to]="rangeValue[1]" *ngIf="selectedItem.key===ReportType.warehouseActions">
+
+        </app-warehouse-actions>
+    </div>
+
+</div>

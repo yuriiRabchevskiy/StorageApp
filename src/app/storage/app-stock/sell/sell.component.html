@@ -2,9 +2,9 @@
     <p-header class="sell-header">
         <div class="d-header-title">Додати до кошика</div>
     </p-header>
-    <div class="dialog-body flex-col" *ngIf="product && locations">
-        <div class="d-page-wrap flex-col">
-            <div class="flex-row">
+    <div class="dialog-body" *ngIf="product && locations">
+        <div class="d-page-wrap">
+            <div class="d-body-header flex-row">
                 <div class="product-name">{{productName}}</div>
             </div>
             <div class="flex-row flex-wrap">
@@ -28,17 +28,19 @@
             </div>
             <div class="flex-row flex-wrap">
                 <mat-form-field class="s-input-wrapper">
-                    <input matInput type="number" placeholder="Кількість" [(ngModel)]="sellCount" name="count" #count="ngModel" min="1" [max]="product.balance[selectedLocation]"
-                        [disabled]="sellCount === undefined || sellCount === 0"
-                        [errorStateMatcher]="validate">
-                        <mat-error *ngIf="sellCount < 1">Не валідне значення</mat-error>
+                    <input matInput type="number" placeholder="Кількість" [(ngModel)]="sellCount" [formControl]="sCount" min="1" [max]="product.balance[selectedLocation]"
+                        [disableControl]="!product.balance[selectedLocation] || product.balance[selectedLocation] === 0"    
+                        [customMin]="0" [customMax]="product.balance[selectedLocation]">
+                        <mat-error *ngIf="sCount.invalid">
+                            Некоректне значення
+                        </mat-error>
                 </mat-form-field>
                 <mat-form-field class="s-input-wrapper">
                     <input matInput type="number" placeholder="Ціна за одиницю" [(ngModel)]="sell.price" name="price" #price="ngModel" min="0"
                         step="0.01" disabled>
                 </mat-form-field>
             </div>
-            <div class="flex-row">
+            <div class="flex-wrap flex-row">
                 <mat-form-field class="s-input-wrapper">
                     <input matInput type="number" placeholder="Сума до оплати" [(ngModel)]="totalSell" name="totalPrice" #totalPrice="ngModel" min="0"
                         step="0.01" disabled>
@@ -47,7 +49,7 @@
         </div>
     </div>
     <p-footer class="s-dialog-foot">      
-        <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save()" label="До кошика" [disabled]="sellCount <= 0"></button>
+        <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save()" label="До кошика" [disabled]="sellCount <= 0 || sCount.invalid"></button>
         <button class="d-s-button-cancel" type="button" pButton icon="fa-close" label="Закрити" (click)="closeDialog()"></button>
     </p-footer>
 </p-dialog>

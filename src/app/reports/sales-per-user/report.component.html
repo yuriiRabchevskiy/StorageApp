@@ -1,0 +1,33 @@
+<p-dataTable class="prime-table report-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem" [loading]="showSpinner"
+    [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true"
+    scrollWidth="100%" scrollHeight="calc(100% - 54px)" [globalFilter]="gb" [immutable]=false>
+    <p-header class="table-head" [ngClass]="{'mobile-t-head': view.isMobile}">
+        <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
+            <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
+        </app-button-group>
+
+        <div class="button-wrap">
+            <input class="s-serche" #gb type="text" placeholder="Пошук">
+        </div>
+    </p-header>
+    <p-column field="category" header="Користувач" [sortable]="true"></p-column>
+    <p-column field="ordersCount" header="Замовлень" [sortable]="true"></p-column>
+    <p-column field="quantity" header="Товарів" [sortable]="true"></p-column>
+    <p-column field="sales" header="Ціна продажі" [sortable]="true"></p-column>
+    <p-column field="buyPrice" header="Ціна закупки" [sortable]="true"></p-column>
+    <p-column field="profit" header="Прибуток" [sortable]="true">
+    </p-column>
+
+    <p-footerColumnGroup>
+        <p-row>
+            <p-column footer="# {{filteredData?.length}}"></p-column>
+            <p-column footer="{{totals?.ordersCount}}"></p-column>
+            <p-column footer="{{totals?.quantity}}"></p-column>
+            <p-column footer="{{totals?.sales}}"></p-column>
+            <p-column footer="{{totals?.buyPrice}}"></p-column>
+            <p-column footer="{{totals?.profit}}"></p-column>
+        </p-row>
+    </p-footerColumnGroup>
+
+</p-dataTable>
+<app-spinner *ngIf="showSpinner"></app-spinner>

@@ -1,4 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
 import { IProduct } from '../../../models/storage';
 import { IWarehouse } from './../../../models/storage/werehouse';
@@ -15,7 +16,7 @@ export interface ISaveAddition {
   styleUrls: ['./removal.component.scss']
 })
 
-export class ProdRemovalComponent {
+export class ProdRemovalComponent implements OnInit {
   @Input() removeNext: boolean = false;
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() removeRequested: EventEmitter<ISaveAddition> = new EventEmitter<ISaveAddition>();
@@ -25,6 +26,7 @@ export class ProdRemovalComponent {
   selectLocation: IWarehouse;
   description: string;
   minCount = 1;
+  countInp: FormControl;
 
   private _product: IProduct;
   get product() {
@@ -70,15 +72,22 @@ export class ProdRemovalComponent {
   }
 
   set removeCount(val) {
-    if (val <= this.count) {
-      this._removeCount = val;
+    if (!val || val < 0) {
+      this._removeCount = 0;
+    } else if (val > this.product.balance[this.selectedLocation]) {
+      this._removeCount = this.product.balance[this.selectedLocation];
     } else {
-      this._removeCount = this.count;
+      this._removeCount = val;
     }
     this.expectedCount = this.count - this._removeCount;
   }
 
   constructor(private apiService: ApiService) {
+  }
+
+  ngOnInit() {
+    this.countInp =  new FormControl({value: 1, disabled: true},
+      [Validators.pattern('^[0-9]+$'), Validators.required]);
   }
 
   save() {

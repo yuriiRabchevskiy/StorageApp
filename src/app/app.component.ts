@@ -1,4 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
+import { TrackerService } from './shared/services/tracker.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,5 @@ import { Component, ViewEncapsulation } from '@angular/core';
   template: `<router-outlet></router-outlet>`
 })
 export class AppComponent {
-  constructor() {}
+  constructor(public trackerService: TrackerService) {  }
 }

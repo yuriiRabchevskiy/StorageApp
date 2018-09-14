@@ -19,6 +19,9 @@ using FluentValidation;
 using BusinessLogic.Models.Api;
 using System.Net.Mail;
 using Storage.Code.Services;
+using BusinessLogic.Repository.Reports;
+using Storage.Code.Hubs;
+using Microsoft.Extensions.Logging;
 
 namespace Storage
 {
@@ -41,6 +44,11 @@ namespace Storage
       services.AddTransient<ICategoriesRepository, CategoriesRepository>();
       services.AddTransient<IWarehouseRepository, WarehousesRepository>();
       services.AddTransient<IOrdersRepository, OrdersRepository>();
+      services.AddTransient<ISalesPerUserRepository, SalesPerUserRepository>();
+      services.AddTransient<ISalesPerProductRepository, SalesPerProductRepository>();
+      services.AddTransient<IOrdersOverviewRepository, OrdersOverviewRepository>();
+      services.AddTransient<IWarehouseActionsRepository, WarehouseActionsRepository>();
+      services.AddTransient<IOpenOrdersRepository, OpenOrdersRepository>();
 
       services.AddTransient<IValidator<ApiProdAction>, ApiProdActionValidator>();
       services.AddTransient<IValidator<ApiProdTransfer>, ApiProdTransferValidator>();
@@ -89,11 +97,12 @@ namespace Storage
       });
 
       services.Configure<IISOptions>(options => { });
+      //services.AddSignalR();
 
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext dbContext)
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext dbContext, ILoggerFactory loggerFactory)
     {
       if (env.IsDevelopment())
       {
@@ -104,11 +113,19 @@ namespace Storage
 
       app.UseCors(builder => builder.WithOrigins("http://localhost:1609", "http://localhost:3000", "http://localhost", "http://localhost:4200",
         "http://btv.cloudapp.net:4201", "http://btv.cloudapp.net").AllowAnyHeader().AllowCredentials().AllowAnyMethod().AllowAnyOrigin());
+
+      //app.UseSignalR(routes =>
+      //{
+      //  routes.MapHub<TrackerHub>("/tracker");
+      //});
+
       app.UseMvc();
+
+      loggerFactory.AddFile("logs/storage-{Date}.txt");
 
       // ===== Create tables ======
       // dbContext.Database.EnsureCreated();
-      dbContext.Database.Migrate();    
+      dbContext.Database.Migrate();
 
       StorageConfiguration.SetupAutoMapper();
     }

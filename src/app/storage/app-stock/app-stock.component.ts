@@ -51,9 +51,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
     this.filter();
   }
 
-  constructor(private apiService: ApiService, public router: Router,
-    private notifi: MessageService) {
-    super();
+  constructor(private apiService: ApiService, public router: Router, notifi: MessageService) {
+    super(notifi);
     this.selectedTab = this.tabs[0];
     this.typeFilter.getNumber = (it) => it.categoryId;
     this.filters.push(this.typeFilter);
@@ -231,27 +230,11 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
       prodOrder: item
     };
     this.sellList.push(sellItem);
-    this.notifi.add({
-      severity: 'success',
-      summary: 'Successfully',
-      detail: 'Продукт додано до кошика'
-    });
+    this.showSuccessMessage('Продукт додано до кошика');
     this.sellDialog = false;
   }
 
-  finishedSale(item: ISaleOrder) {
-    this.apiService.sale(item).subscribe(
-      res => {
-        if (res.success) {
-          this.sellList = [];
-          this.basketDialog = false;
-          return this.showSuccessMessage('Продажу здійснено успішно');
-        }
-        this.showApiErrorMessage('Помилка при здійснені продажі!', res.errors);
-      },
-      err => this.showWebErrorMessage('Не вдалося здійснити продажу', err)
-    );
-  }
+
 
   turnFromBasket(event) {
     let item = event;
@@ -380,7 +363,10 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
   }
 
   closeBasketDialog(event) {
-    this.basketDialog = event;
+    this.basketDialog = false;
+    if (event) {
+      this.sellList = [];
+    }
   }
 
   disabledRow(val: IProduct) {
@@ -389,32 +375,6 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
     return !sum ? 'disabled-row' : '';
   }
 
-  showSuccessMessage(message: string) {
-    this.notifi.add(
-      {
-        severity: 'success',
-        summary: 'Успіх!',
-        detail: message
-      });
-  }
 
-  showApiErrorMessage(summary: string, errors: IApiErrorInfo[]) {
-    const message = errors.map(it => `${it.field}: ${it.message}\n`).reduce((text, line) => text += line, '');
-    this.notifi.add(
-      {
-        severity: 'error',
-        summary: summary,
-        detail: message
-      });
-  }
-
-  showWebErrorMessage(summary: string, error: string) {
-    this.notifi.add(
-      {
-        severity: 'error',
-        summary: summary,
-        detail: error
-      });
-  }
 
 }

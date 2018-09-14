@@ -1,3 +1,4 @@
+import { IApiSalePerUser, IApiWarehouseAction, IApiSale, IApiOrdersOverview } from './../../models/api/reports/sales';
 import { IForgotPassword } from './../../models/api/api/api';
 import { IChangePassword } from './../../models/manage/user';
 import { UserService } from './user.service';
@@ -33,7 +34,12 @@ export class ApiService extends ApiBase {
     getOrders(): Observable<ApiResponse<IOrder>> {
         return this.doGet('order');
     }
-    saveOrder(data): Observable<any> {
+
+    getCanceledOrders(): Observable<ApiResponse<IOrder>> {
+        return this.doGet('order/canceled');
+    }
+
+    saveOrder(data): Observable<ApiResponse<any>> {
         return this.doPost('order', data);
     }
     сancelOrder(id: number, data: ICancelOrder) {
@@ -107,5 +113,35 @@ export class ApiService extends ApiBase {
     // forgot password
     forgotPassword(data) {
         return this.doPost('account/forgot-password', data);
+    }
+
+    /// REPORTS ===================================
+
+    getSalesPerUser(from: Date, to: Date): Observable<ApiResponse<IApiSalePerUser>> {
+        to = to || new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1);
+        return this.doGet('reports/sales-per-user/' + from.getTime() + '/' + to.getTime());
+    }
+
+    getOrdersOverview(from: Date, to: Date): Observable<ApiResponse<IApiOrdersOverview>> {
+        to = to || new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1);
+        return this.doGet('reports/orders-overview/' + from.getTime() + '/' + to.getTime());
+    }
+
+    getWarehouseActions(from: Date, to: Date): Observable<ApiResponse<IApiWarehouseAction>> {
+        to = to || new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1);
+        return this.doGet('reports/warehouse-actions/' + from.getTime() + '/' + to.getTime());
+    }
+
+    getSalesPerProduct(from: Date, to: Date): Observable<ApiResponse<IApiSale>> {
+        to = to || new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1);
+        return this.doGet('reports/sales-per-product/' + from.getTime() + '/' + to.getTime());
+    }
+
+    getOpenOrders(): Observable<ApiResponse<string>> {
+        return this.doGet('reports/open-orders');
+    }
+
+    getOpenOrdersLight(): Observable<ApiResponse<string>> {
+        return this.doGet('reports/open-orders/light');
     }
 }

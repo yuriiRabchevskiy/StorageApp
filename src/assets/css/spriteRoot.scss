@@ -1,4 +1,10 @@
 @import 'globals';
+.app-sprite,
+.fa-calendar,
+.fa-angle-left,
+.fa-angle-right {
+    background-image: $basicIcon;
+}
 .s-logo {
     background-image: $logo;
 }

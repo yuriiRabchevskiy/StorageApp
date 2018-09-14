@@ -2,8 +2,8 @@
     <p-header>Користувач:
         <i>{{user.name}} {{user.surname}}</i>
     </p-header>
-    <form [formGroup]="userForm" class="dialog-body flex-col" novalidate autocomplete="off">
-        <div class="d-page-wrap flex-col">
+    <form [formGroup]="userForm" class="dialog-body" novalidate autocomplete="off">
+        <div class="d-page-wrap">
             <div class="flex-row flex-wrap">
                 <mat-form-field class="s-input-wrapper">
                     <input matInput placeholder="Логін" formControlName="login" required>
