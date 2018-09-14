@@ -5,10 +5,12 @@ import { CommonModule } from '@angular/common';
 import 'hammerjs';
 import { MatTabsModule, MatRadioModule, MatInputModule, MatFormFieldModule,
     MatIconModule, MatSelectModule } from '@angular/material';
-import { EqualValidatorDirective } from './directive/index';
 import { DataTableModule, DialogModule, InputTextModule,
   SpinnerModule, ButtonModule, CheckboxModule, TooltipModule,
   GrowlModule, SharedModule } from 'primeng/primeng';
+import { CustomMaxDirective } from './directive/customMax.directive';
+import { CustomMinDirective } from './directive/customMin.directive';
+import { DisableControlDirective } from './directive/disabled.directive';
 
 
 @NgModule({
@@ -34,8 +36,9 @@ import { DataTableModule, DialogModule, InputTextModule,
     TooltipModule,
     GrowlModule,
     SharedModule,
+    CustomMaxDirective, CustomMinDirective, DisableControlDirective
   ],
-  declarations: [EqualValidatorDirective],
+  declarations: [CustomMaxDirective, CustomMinDirective, DisableControlDirective],
   providers: []
 })
 export class ShareModule { }

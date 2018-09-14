@@ -1,5 +1,6 @@
 using AutoMapper;
 using BusinessLogic.Models.Api;
+using BusinessLogic.Models.Api.Reports;
 using DataAccess.Models;
 
 
@@ -23,6 +24,9 @@ namespace Storage.Code
         cfg.CreateMap<ApiProduct, Product>();
         cfg.CreateMap<Warehouse, ApiWarehouse>();
         cfg.CreateMap<ApiWarehouse, Warehouse>();
+        cfg.CreateMap<ApiWarehouseAction, ProductAction>();
+        cfg.CreateMap<ProductAction, ApiWarehouseAction>();
+        
       });
     }
   }

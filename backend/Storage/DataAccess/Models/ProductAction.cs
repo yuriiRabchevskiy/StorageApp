@@ -12,7 +12,7 @@ namespace DataAccess.Models
     public int ProductId { get; set; }
     public int? OrderId { get; set; }
     public string UserId { get; set; }
-    public int WerehouseId { get; set; }
+    public int WarehouseId { get; set; }
 
     public DateTime Date { get; set; }
     public int Quantity { get; set; }

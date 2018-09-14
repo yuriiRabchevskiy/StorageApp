@@ -32,7 +32,7 @@ export class OrderEditorComponent implements OnInit {
   statuses = [{ label: 'Прийнятий', value: OrderStatus.Open },
   { label: 'Відправлений', value: OrderStatus.Processing },
   { label: 'Отриманий', value: OrderStatus.Closed },
-  // { label: 'Відмінений', value: OrderStatus.Canceled }
+    // { label: 'Відмінений', value: OrderStatus.Canceled }
   ];
 
   constructor() { }
@@ -51,8 +51,14 @@ export class OrderEditorComponent implements OnInit {
     this.clientPhone = new FormControl(this.item.clientPhone,
       [Validators.required, Validators.minLength(9), Validators.pattern('^[0-9]+$')
       ]);
-    this.status = new FormControl({ value: this.item.status || this.statuses[0].value, disabled: !this.item.id });
-    this.payment = new FormControl({ value: this.item.payment || this.payments[1].value, disabled: false });
+    this.status = new FormControl({
+      value: this.item.status !== undefined ? this.item.status : this.statuses[0].value,
+      disabled: !this.item.id
+    });
+    this.payment = new FormControl({
+      value: this.item.payment !== undefined ? this.item.payment : this.payments[1].value,
+      disabled: false
+    });
     this.orderOther = new FormControl(this.item.other);
   }
 
@@ -76,6 +82,6 @@ export class OrderEditorComponent implements OnInit {
   getTelError() {
     return this.clientPhone.hasError('required') ? 'Ви не ввели телефон' :
       this.clientPhone.hasError('minlength') ? 'Не менше 9 символів' :
-      this.clientPhone.hasError('pattern') ? 'Тільки числа' : '';
+        this.clientPhone.hasError('pattern') ? 'Тільки числа' : '';
   }
 }

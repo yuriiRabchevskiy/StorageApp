@@ -37,9 +37,10 @@ export class MainComponent extends SecuredComponent implements OnInit {
     if (!user) return;
     this.canView = user.isAdmin;
     this.pages = [{ title: 'Склад', url: 'storage', view: true },
-      { title: 'Користувачі', url: 'manage', view: user.isAdmin },
-      { title: 'Продажі', url: 'orders', view: true },
-      { title: 'Налаштування', url: 'settings', view: true }
+    { title: 'Продажі', url: 'orders', view: true },
+    { title: 'Звіти', url: 'reports', view: true },
+    { title: 'Користувачі', url: 'manage', view: user.isAdmin },
+    { title: 'Налаштування', url: 'settings', view: true }
     ];
     this.getCurrentUrl(this.router.url);
     this.work = new WorkProgress(() => this.apiService.logout(), (res) => this.onLogoutConfirmed(res), undefined);

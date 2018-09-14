@@ -5,6 +5,10 @@
     <UserSecretsId>17750079-87b8-4c48-a4a7-f3ff3cf56726</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Data\**" />
     <Compile Remove="Models\**" />
@@ -29,7 +33,9 @@
     <PackageReference Include="FluentValidation" Version="7.3.3" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="7.3.3" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.0-preview2-final" />
     <PackageReference Include="Sendgrid" Version="9.9.0" />
+    <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>

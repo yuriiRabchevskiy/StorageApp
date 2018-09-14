@@ -4,6 +4,7 @@ using DataAccess;
 using DataAccess.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using BusinessLogic.Helpers;
@@ -31,10 +32,11 @@ namespace BusinessLogic.Repository
 
     private IServiceProvider _di;
     private ClientTimeZone ClientTyme { get; set; }
+    private static object _lockObj = new object();
 
     public WarehousesRepository(IServiceProvider serviceProvider, IConfiguration configuration)
     {
-      _di = serviceProvider;      
+      _di = serviceProvider;
       ClientTyme = new ClientTimeZone(configuration["ShiftTimeZone"]);
     }
 
@@ -109,10 +111,10 @@ namespace BusinessLogic.Repository
             {
               ProductId = productId,
               Quantity = -info.Quantity,
-              WerehouseId = info.FromId,
+              WarehouseId = info.FromId,
               UserId = userId,
               Date = date,
-              Description = $"Transfering item from warehouse {info.FromId} to warehouse {info.ToId} (Decrease)",
+              Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Зменшення)",
               Operation = OperationDescription.TransferRemove,
               Price = 0,
             });
@@ -122,10 +124,10 @@ namespace BusinessLogic.Repository
             {
               ProductId = productId,
               Quantity = info.Quantity,
-              WerehouseId = info.ToId,
+              WarehouseId = info.ToId,
               UserId = userId,
               Date = date,
-              Description = $"Transfering item from warehouse {info.FromId} to warehouse {info.ToId} (Increase)",
+              Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Збільшення)",
               Operation = OperationDescription.TransferAdd,
               Price = 0,
             });
@@ -147,40 +149,42 @@ namespace BusinessLogic.Repository
     public void SellOrder(string userId, ApiSellOrder info)
     {
       var oi = info;
-      using (var context = _di.GetService<ApplicationDbContext>())
+      lock (_lockObj)
       {
-        using (var transaction = context.Database.BeginTransaction())
+        using (var context = _di.GetService<ApplicationDbContext>())
         {
-          var date = ClientTyme.Now;
-          var order = Mapper.Map<Order>(oi);
-          order.OpenDate = date;
-          order.Status = OrderStatus.Open;
-          order.ResponsibleUserId = userId;
-          order.Transactions = new List<ProductAction>();
-
-
-          foreach (var productOrder in info.ProductOrders)
+          using (var transaction = context.Database.BeginTransaction(IsolationLevel.ReadCommitted))
           {
-            var from = getStockAndVerify(productOrder.IdProduct, productOrder, context);
-            var prodOrder = new ProductAction
+            var date = ClientTyme.Now;
+            var order = Mapper.Map<Order>(oi);
+            order.OpenDate = date;
+            order.Status = OrderStatus.Open;
+            order.ResponsibleUserId = userId;
+            order.Transactions = new List<ProductAction>();
+
+            foreach (var productOrder in info.ProductOrders)
             {
-              Date = date,
-              ProductId = productOrder.IdProduct,
-              Quantity = -productOrder.Quantity,
-              WerehouseId = productOrder.FromId,
-              Description = productOrder.Description,
-              Price = productOrder.Price,
-              UserId = userId,
-              Operation = OperationDescription.Sold,
+              var from = getStockAndVerify(productOrder.IdProduct, productOrder, context);
+              var prodOrder = new ProductAction
+              {
+                Date = date,
+                ProductId = productOrder.IdProduct,
+                Quantity = -productOrder.Quantity,
+                WarehouseId = productOrder.FromId,
+                Description = productOrder.Description,
+                Price = productOrder.Price,
+                BuyPrice = from.Product.RecommendedBuyPrice,
+                UserId = userId,
+                Operation = OperationDescription.Sold
+              };
+              order.Transactions.Add(prodOrder);
+            }
 
-            };
-            order.Transactions.Add(prodOrder);
+            context.Orders.Add(order);
+            context.SaveChanges();
+
+            transaction.Commit();
           }
-
-          context.Orders.Add(order);
-          context.SaveChanges();
-
-          transaction.Commit();
         }
       }
     }
@@ -194,7 +198,7 @@ namespace BusinessLogic.Repository
           var order = await context.Orders.Include(it => it.Transactions)
             .FirstOrDefaultAsync(it => it.Id == id).ConfigureAwait(false);
 
-          if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Current order is already canceled");
+          if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Поточне замовлення уже скасовано");
 
           var warehouses = context.WarehouseProducts.Include(it => it.Product);
 
@@ -211,7 +215,7 @@ namespace BusinessLogic.Repository
           var date = ClientTyme.Now;
           foreach (var action in order.Transactions)
           {
-            var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WerehouseId);
+            var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
             from.Quantity += action.Quantity * -1; // quantity is negative in sale action
 
             var restoreAction = new ProductAction
@@ -219,8 +223,8 @@ namespace BusinessLogic.Repository
               Date = date,
               ProductId = action.ProductId,
               Quantity = -action.Quantity, // quantity is negative in sale action
-              WerehouseId = action.WerehouseId,
-              Description = $"Restored from order {id}",
+              WarehouseId = action.WarehouseId,
+              Description = $"Скасовано замовлення {id}",
               Price = action.Price,
               BuyPrice = from.Product.RecommendedBuyPrice,
               UserId = userId,
@@ -257,7 +261,7 @@ namespace BusinessLogic.Repository
             {
               ProductId = productId,
               Quantity = -info.Quantity,
-              WerehouseId = info.FromId,
+              WarehouseId = info.FromId,
               Description = info.Description,
               UserId = userId,
               Date = date,
@@ -303,10 +307,10 @@ namespace BusinessLogic.Repository
             {
               ProductId = productId,
               Quantity = info.Quantity,
-              WerehouseId = info.FromId,
+              WarehouseId = info.FromId,
               UserId = userId,
               Date = date,
-              Description = $"Items added by user",
+              Description = $"Товар додано адміністратором",
               Operation = OperationDescription.StockRenew,
               Price = 0,
             });
@@ -328,8 +332,8 @@ namespace BusinessLogic.Repository
     private static WarehouseProducts getStockAndVerify(int productId, ApiProdAction info, ApplicationDbContext context)
     {
       var from = context.WarehouseProducts.Include(it => it.Product).FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.FromId);
-      if (from == null) throw new ArgumentException($"No product with ID {productId} found on requested warehouse");
-      if (from.Quantity < info.Quantity) throw new ArgumentException($"There is no enough items to trasfer in stock (ProductID: {from.Product.ProductType } - {from.Product.Model})");
+      if (from == null) throw new ArgumentException($"Товар з ID {productId} не знайдено на складі");
+      if (from.Quantity < info.Quantity) throw new ArgumentException($"Не достатньо товарів на складі для здійстення продажі (ProductID: {from.Product.ProductType } - {from.Product.Model})");
       from.Quantity -= info.Quantity;
       return from;
     }

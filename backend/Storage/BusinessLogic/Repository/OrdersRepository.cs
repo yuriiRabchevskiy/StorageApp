@@ -14,7 +14,8 @@ namespace DataAccess.Repository
 {
   public interface IOrdersRepository
   {
-    List<ApiOrder> Get(string userId, bool isAdmin);
+    Task<List<ApiOrder>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till);
+    Task<List<ApiOrder>> GetCanceledOrdersAsync(string userId, bool isAdmin, DateTime from, DateTime till);
     void Update(ApiOrder product);
   }
 
@@ -22,35 +23,39 @@ namespace DataAccess.Repository
   {
 
     private IServiceProvider _di;
-    private ClientTimeZone ClientTyme { get; set; }
+    private ClientTimeZone ClientTime { get; set; }
 
     public OrdersRepository(IServiceProvider serviceProvider, IConfiguration configuration)
     {
       _di = serviceProvider;
-      ClientTyme = new ClientTimeZone(configuration["ShiftTimeZone"]);
+      ClientTime = new ClientTimeZone(configuration["ShiftTimeZone"]);
     }
 
-    public List<ApiOrder> Get(string userId, bool isAdmin)
+    public async Task<List<ApiOrder>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
       using (var context = _di.GetService<ApplicationDbContext>())
       {
-        return context.Orders.Where(it => it.Status != OrderStatus.Canceled && (isAdmin || it.ResponsibleUserId == userId)).Include(ord => ord.ResponsibleUser)
-          .Include(ord => ord.Transactions).ThenInclude(y => y.Product).ToList().Select(ord =>
-        {
-          var api = Mapper.Map<ApiOrder>(ord);
-          var prefix = string.IsNullOrEmpty(ord.ResponsibleUser.Surname) ? "" : ord.ResponsibleUser.Surname + " ";
-          api.Seller = prefix + ord.ResponsibleUser.Name;
-          api.TotalPrice = ord.Transactions.Sum(trn => -trn.Price * trn.Quantity);
-          api.Products = ord.Transactions.Select(it => new ApiProdOrder
-          {
-            Price = it.Price,
-            Quantity = -it.Quantity,
-            BuyPrice = it.BuyPrice,
-            Product = Mapper.Map<ApiProduct>(it.Product),
-            TotalPrice = -it.Price * it.Quantity
-          });
-          return api;
-        }).ToList();
+        var data = await context.Orders
+          .Where(it => isAdmin || it.ResponsibleUserId == userId)
+          .Where(it => it.Status != OrderStatus.Canceled)
+          .Include(ord => ord.ResponsibleUser)
+          .Include(ord => ord.Transactions).ThenInclude(y => y.Product).ToListAsync().ConfigureAwait(false);
+        return data.ToApi();
+      }
+    }
+
+    public async Task<List<ApiOrder>> GetCanceledOrdersAsync(string userId, bool isAdmin, DateTime from, DateTime till)
+    {
+      using (var context = _di.GetService<ApplicationDbContext>())
+      {
+        var data = await context.Orders
+          .Where(it => isAdmin || it.ResponsibleUserId == userId)
+          .Where(it => it.Status == OrderStatus.Canceled && it.CloseDate >= from && it.CloseDate <= till)
+          .Include(ord => ord.ResponsibleUser)
+          .Include(ord => ord.CanceledByUser)
+          .Include(ord => ord.Transactions).ThenInclude(y => y.Product).ToListAsync().ConfigureAwait(false);
+        data.ForEach(it => it.Transactions = it.Transactions.Where(tr => tr.Quantity < 0).ToList());
+        return data.ToApi();
       }
     }
 
@@ -62,7 +67,7 @@ namespace DataAccess.Repository
 
         if (order != null)
         {
-          if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Current order is already canceled");
+          if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
           order.ClientName = it.ClientName;
           order.ClientAddress = it.ClientAddress;
           order.ClientPhone = it.ClientPhone;
@@ -70,7 +75,8 @@ namespace DataAccess.Repository
           order.Other = it.Other;
           order.Status = it.Status ?? OrderStatus.Open;
           order.Payment = it.Payment;
-          if (it.Status == OrderStatus.Closed && order.CloseDate == null) order.CloseDate = DateTime.Now;
+          if (it.Status == OrderStatus.Closed && order.CloseDate == null) order.CloseDate = ClientTime.Now;
+          if (it.Status == OrderStatus.Canceled && order.CanceledDate == null) order.CanceledDate = ClientTime.Now;
         }
         context.SaveChanges();
       }

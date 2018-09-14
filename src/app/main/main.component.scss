@@ -91,11 +91,12 @@
     color: #cacaca;
     font-size: 20px;
     box-sizing: border-box;
-    border-bottom: 2px solid transparent;
+    border-bottom: 2px solid;
+    border-color: transparent;
     text-decoration: none;
     &:hover {
         color: #fff;
-        border-bottom: 2px solid red;
+        border-color: $appRedHoverColor;
     }
     @include customMaxWidth(1023px) {
         line-height: 40px;
@@ -108,7 +109,7 @@
 
 .link-active {
     color: #fff;
-    border-bottom: 2px solid red;
+    border-color: $appRedHoverColor;
 }
 
 .u-link {

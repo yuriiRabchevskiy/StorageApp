@@ -1,8 +1,8 @@
 <p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
     <p-header>Забрати товар зі складу</p-header>
-    <div class="dialog-body flex-col" *ngIf="product">
-        <div class="d-page-wrap flex-col">
-            <div class="flex-row">
+    <div class="dialog-body" *ngIf="product">
+        <div class="d-page-wrap">
+            <div class="d-body-header flex-row">
                 <div class="product-name">{{product.size}} {{product.color}} {{product.productType}} - {{product.model}} {{product.producer}}</div>
             </div>
             <div class="flex-row flex-wrap">
@@ -24,10 +24,13 @@
                     </div>
                 </div>
             </div>
-            <div class="flex-row">
+            <div class="flex-row flex-wrap">
                 <mat-form-field class="s-input-wrapper">
-                    <input matInput type="number" placeholder="Кількість" [(ngModel)]="removeCount" name="count" #countInp="ngModel" [min]="minCount"
-                    [max]="count">
+                    <input matInput type="number" placeholder="Кількість" [(ngModel)]="removeCount" [formControl]="countInp" [min]="minCount"
+                    [max]="count" [customMin]="minCount" [customMax]="count" [disableControl]="!product.balance[selectedLocation] || product.balance[selectedLocation] === 0">
+                    <mat-error *ngIf="countInp.invalid">
+                        Некоректне значення
+                    </mat-error>
                 </mat-form-field>
             </div>
             <div class="flex-row flex-wrap flex-area-wrap">
@@ -41,7 +44,7 @@
         </div>
     </div>
     <p-footer class="s-dialog-foot">
-        <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save()" label="Зберегти"></button>
+        <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save()" label="Зберегти" [disabled]="removeCount <= 0 || countInp.invalid"></button>
         <button class="d-s-button-cancel" type="button" pButton icon="fa-close" label="Закрити" (click)="closeDialog()"></button>
     </p-footer>
 </p-dialog>

@@ -23,6 +23,8 @@ import { MessageService } from 'primeng/components/common/messageservice';
 import { DataTableModule, DialogModule, InputTextModule,
   SpinnerModule, ButtonModule, CheckboxModule, TooltipModule,
   GrowlModule, SharedModule } from 'primeng/primeng';
+import { HttpClientModule } from '@angular/common/http';
+import { TrackerService } from './shared/services/tracker.service';
 
 
 
@@ -35,6 +37,7 @@ import { DataTableModule, DialogModule, InputTextModule,
     BrowserAnimationsModule,
     FormsModule,
     HttpModule,
+    HttpClientModule,
     routing,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -56,6 +59,7 @@ import { DataTableModule, DialogModule, InputTextModule,
   ],
   providers: [
     ApiService,
+    TrackerService,
     UserService,
     AuthGuard,
     MessageService,

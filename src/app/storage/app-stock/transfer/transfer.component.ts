@@ -1,5 +1,6 @@
+import { FormControl, Validators } from '@angular/forms';
 import { IWarehouse } from './../../../models/storage/werehouse';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
 import { SelectItem } from 'primeng/primeng';
 import { IProduct } from '../../../models/storage';
@@ -12,7 +13,7 @@ import * as moment from 'moment-mini';
   styleUrls: ['./transfer.component.scss']
 })
 
-export class TransferComponent {
+export class TransferComponent implements OnInit {
   locationFrom: IWarehouse;
   locationTo: IWarehouse;
   fromCount: number;
@@ -22,7 +23,7 @@ export class TransferComponent {
   date: Date;
   dateNow: string;
   disabled: boolean = true;
-
+  trCount: FormControl;
   private _product: IProduct;
   get product() {
     return this._product;
@@ -75,15 +76,21 @@ export class TransferComponent {
     this.locationTo = this.locations[value - 1];
   }
 
-  _transferCount: number;
+  _transferCount: number = 0;
   get transferCount() {
     return this._transferCount;
   }
 
   set transferCount(val) {
-    this._transferCount = val;
-    this.expectedFromCount = this.fromCount - val;
-    this.expectedToCount = this.toCount + val;
+    if (!val || val < 0) {
+      this._transferCount = 0;
+    } else if (val > this.fromCount) {
+      this._transferCount = this.fromCount;
+    } else {
+      this._transferCount = val;
+    }
+    this.expectedFromCount = this.fromCount - this._transferCount;
+    this.expectedToCount = this.toCount + this._transferCount;
   }
 
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -92,6 +99,11 @@ export class TransferComponent {
   constructor(private apiService: ApiService) {
     let date = Date.now();
     this.dateNow = moment(new Date(Number(date))).format('DD/MM/YYYY');
+  }
+
+  ngOnInit() {
+    this.trCount =  new FormControl({value: 1, disabled: true},
+      [Validators.pattern('^[0-9]+$'), Validators.required]);
   }
 
   updateSelection(value) {

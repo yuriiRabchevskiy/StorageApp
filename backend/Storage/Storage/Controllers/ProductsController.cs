@@ -17,7 +17,6 @@ namespace Storage.Controllers
   public class ProductController : Controller
   {
     private IProductsRepository _repo;
-    private IOrdersRepository _ordersRepo;
     private IWarehouseRepository _houseRepo;
     private UserManager<ApplicationUser> _userManager;
     Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
@@ -28,7 +27,6 @@ namespace Storage.Controllers
                         UserManager<ApplicationUser> userManager)
     {
       _repo = repo;
-      _ordersRepo = ordersRepo;
       _houseRepo = houseRepo;
       _userManager = userManager;
     }

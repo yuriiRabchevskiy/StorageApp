@@ -1,25 +1,28 @@
-<div class="page-wrap flex-col">
-    <div class="settings-header flex-row">{{user.userName}}</div>
-    <form [formGroup]="userForm" class="settings-body flex-col" novalidate autocomplete="off">
-
-        <div class="flex-col" >
-            <mat-form-field class="s-input-wrapper">
-                <input matInput formControlName="curentPassword" placeholder="Старий пароль" required [type]="hide ? 'password' : 'text'" autocomplete="new-password">
-                <mat-icon matSuffix (click)="showValue()">{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
+<div class="page-wrap">
+    <div class="page-head">
+        <div class="settings-header">{{user.userName}}</div>
+    </div>
+    <form [formGroup]="userForm" class="page-body-with-foot flex-col" novalidate autocomplete="off">
+        <div class="wh-100 flex-col">
+            <mat-form-field class="s-input-wrapper mat-input-with-error">
+                <input matInput formControlName="curentPassword" placeholder="Старий пароль" required [type]="hide ? 'password' : 'text'"
+                    autocomplete="new-password">
+                <mat-icon [svgIcon]="hide ? 'visibility' : 'visibility-off'" matSuffix (click)="showValue()"></mat-icon>
                 <mat-error *ngIf="curentPassword.errors && (curentPassword.dirty || curentPassword.touched)">{{getErrorPass()}}</mat-error>
             </mat-form-field>
-            <mat-form-field formGroupName="pass" class="s-input-wrapper">
+            <mat-form-field formGroupName="pass" class="s-input-wrapper mat-input-with-error">
                 <input matInput formControlName="newPassword" placeholder="Новий пароль" type="password" required autocomplete="new-password">
                 <mat-error *ngIf="newPassword.errors && (newPassword.dirty || newPassword.touched)">{{getNewErrorPass()}}</mat-error>
             </mat-form-field>
-            <mat-form-field formGroupName="pass" class="s-input-wrapper">
+            <mat-form-field formGroupName="pass" class="s-input-wrapper mat-input-with-error">
                 <input matInput formControlName="confirmPassword" placeholder="Підтвердження паролю" type="password" required autocomplete="new-password">
                 <mat-error *ngIf="confirmPassword.errors && (confirmPassword.dirty || confirmPassword.touched)">{{getErrorConfirmPass()}}</mat-error>
             </mat-form-field>
         </div>
 
     </form>
-    <div class="settings-foot flex-row">
-        <button *ngIf="userForm.touched" class="d-s-button" type="submit" pButton icon="fa-check" label="Змінити пароль" (click)="save($event)" [disabled]="userForm.invalid"></button>
+    <div class="page-foot">
+        <button *ngIf="userForm.touched" class="d-s-button" type="submit" pButton icon="fa-check" label="Змінити пароль" (click)="save($event)"
+            [disabled]="userForm.invalid"></button>
     </div>
 </div>

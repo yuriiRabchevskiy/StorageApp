@@ -5,6 +5,7 @@ import { IProduct, IOrder, Order, ISell, Sell, ISaleOrder, IProdOrder, IWarehous
 import { ViewState } from '../../../shared/helpers/index';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { OrderEditorComponent } from '../../../controls/index';
+import { SecuredComponent } from '../../../models/component';
 
 @Component({
   selector: 'app-basket',
@@ -12,7 +13,7 @@ import { OrderEditorComponent } from '../../../controls/index';
   styleUrls: ['./basket.component.scss']
 })
 
-export class BasketComponent {
+export class BasketComponent extends SecuredComponent {
   view: ViewState = new ViewState();
   @ViewChild('orderEditor') orderEditor: OrderEditorComponent;
   page: number = 1;
@@ -22,6 +23,7 @@ export class BasketComponent {
   clientPage: number = 2;
   lastPage: number = 2;
   order: ISaleOrder = new SaleOrder();
+  isSaving: boolean = false;
 
   _items: IProdOrder[];
   get items() {
@@ -43,23 +45,18 @@ export class BasketComponent {
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() sale: EventEmitter<ISaleOrder> = new EventEmitter<ISaleOrder>();
   @Output() removeItem: EventEmitter<any> = new EventEmitter<any>();
-  constructor(private apiService: ApiService,
-    private notifi: MessageService) {
+  constructor(private apiService: ApiService, notifi: MessageService) {
+    super(notifi);
   }
 
   getLocationName(id: number) {
-    let location =  this.locations.find(i => i.id === id);
+    let location = this.locations.find(i => i.id === id);
     return location.name;
   }
 
   remove(val) {
     this.items.splice(this.items.indexOf(val), 1);
-    this.notifi.add(
-      {
-        severity: 'info',
-        summary: 'Info',
-        detail: 'Товар видалено з кошика'
-      });
+    this.showInfoMessage('Товар видалено з кошика');
     this.removeItem.emit(val);
   }
 
@@ -71,12 +68,12 @@ export class BasketComponent {
     this.order.status = this.orderEditor.status.value;
     this.order.other = this.orderEditor.orderEditForm.value.orderOther;
     this.order.payment = this.orderEditor.payment.value;
-    this.order.productOrders = this.items.map( it => it.prodOrder );
+    this.order.productOrders = this.items.map(it => it.prodOrder);
   }
 
   save() {
     this.createOrder();
-    this.sale.emit(this.order);
+    this.finisSale(this.order);
   }
 
   closeDialog() {
@@ -93,6 +90,24 @@ export class BasketComponent {
     if (this.page < this.pageNames.length) {
       this.page++;
     }
+  }
+
+  finisSale(item: ISaleOrder) {
+    this.isSaving = true;
+    this.apiService.sale(item).subscribe(
+      res => {
+        this.isSaving = false;
+        if (res.success) {
+          this.onCloseDialog.emit(true);
+          return this.showSuccessMessage('Продажу здійснено успішно');
+        }
+        this.showApiErrorMessage('Помилка при здійснені продажі!', res.errors);
+      },
+      err => {
+        this.isSaving = false;
+        this.showWebErrorMessage('Не вдалося здійснити продажу', err);
+      }
+    );
   }
 
 }

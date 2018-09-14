@@ -10,13 +10,13 @@
     right: 0px;
 }
 .card-wrapper {
+    @include wH(100%, calc(100% - 40px));
     margin: 0px;
     padding: 0px 4px;
     list-style-type: none;
     overflow-y: auto;
-    height: calc(100% - 40px);
-    width: 100%;
     flex-grow: 1;
+    justify-content: center;
 }
 
 .card {
@@ -25,9 +25,7 @@
     padding: 4px;
     box-sizing: border-box;
     background-color: #fffefa;
-    width: 240px;
-    height: 164px;
-    float: left;
+    @include wH(240px, 164px);
     box-shadow: 0px 0px 12px -2px black;
     border-radius: 2px;
     &:hover .clear-button {
@@ -65,8 +63,7 @@
     overflow: hidden;
 }
 .clear-button {
-    width: 24px;
-    height: 24px;
+    @include wH(24px, 124px);
     margin: 0px;
     position: absolute;
     right: -4px;
@@ -96,8 +93,7 @@
 }
 
 .card-price {
-    width: 100%;
-    height: 100%;
+    @include wH(100%, 100%);
     line-height: 38px;
     text-align: right;
     font-size: 18px;
@@ -106,8 +102,7 @@
 }
 
 .smile-wrap {
-    width: 100%;
-    height: 100%;
+    @include wH(100%, 100%);
     flex-grow: 1;
     overflow: hidden;
     flex-shrink: 1;
@@ -121,11 +116,9 @@
 
 .smile-icon {
     background-image: $badSmile;
-    max-width: 200px;
-    min-height: 160px;
+    @include wH(80%, 160px);
     min-width: 100px;
-    width: 80%;
-    height: 80%;
+    max-width: 200px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: 20px 0px;

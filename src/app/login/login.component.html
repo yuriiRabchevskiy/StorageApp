@@ -2,10 +2,10 @@
     <div class="loginHeader flex-row">
         <div class="project-wrap">
             <div class="s-logo"></div>
-            <div class="app-name">Zakupol</div>
+            <div class="app-name">SweetKeys</div>
         </div>
         <div class="zacupolLinks">
-            <a href="https://zakupol.prom.ua/" target="_blank">Go to Zakupol.prom.ua</a>
+            <a href="https://sweetkeys.com.ua/" target="_blank">Go to SweetKeys</a>
         </div>
     </div>
     <div class="form-wrapper flex-row">
@@ -17,11 +17,11 @@
                         <br/> Перевірте підключення до Інтернету.</mat-error>
                 </div>
                 <div class="login-form-input-wrapper flex-col">
-                    <mat-form-field class="mat-input-wrap" [hideRequiredMarker]="true">
+                    <mat-form-field class="s-input-wrapper mat-input-with-error" [hideRequiredMarker]="true">
                         <input matInput placeholder="Логін" type="text" [formControl]="loginForm.controls['login']" required>
                         <mat-error *ngIf="loginForm.controls['login'].invalid">Ви не ввели логін</mat-error>
                     </mat-form-field>
-                    <mat-form-field class="mat-input-wrap" [hideRequiredMarker]="true">
+                    <mat-form-field class="s-input-wrapper mat-input-with-error" [hideRequiredMarker]="true">
                         <input matInput placeholder="Пароль" [formControl]="loginForm.controls['password']" type="password" required autocomplete="new-password">
                         <mat-error *ngIf="loginForm.controls['password'].invalid">Ви не ввели пароль</mat-error>
                     </mat-form-field>
@@ -34,7 +34,7 @@
     </div>
     <div class="loginFooter flex-row">
         <div class="zacupolLinks">
-            <a href="https://zakupol.prom.ua/" target="_blank">Go to Zakupol.prom.ua</a>
+            <a href="https://sweetkeys.com.ua/" target="_blank">Go to SweetKeys</a>
         </div>
         <span class="copyright">&copy; ALL RIGHTS RESERVED</span>
     </div>

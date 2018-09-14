@@ -4,6 +4,9 @@
     width: auto;
     overflow: hidden;
 }
+.withOverflow {
+    overflow: unset;
+}
 .open {
     align-items: flex-start;
     @include wH(auto, auto);
@@ -16,11 +19,22 @@
     background: silver;
     box-sizing: border-box;
     padding: 0px 0px 0px 44px;
+    box-shadow: -8px 8px 12px -6px rgba(255,255,255,1);
 }
+
 .closed {
     position: absolute;
     left: 0px;
 }
+
+.open-bottom {
+    padding: 44px 2px 2px 2px;
+    max-width: 272px;
+    .closed {
+        top: 0px;
+    }
+}
+
 .but-wrap {
     display: flex;
     flex-wrap: nowrap;

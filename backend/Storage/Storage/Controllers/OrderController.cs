@@ -1,3 +1,4 @@
+using System;
 using DataAccess.Repository;
 using Microsoft.AspNetCore.Mvc;
 using SharedDataContracts.Api.Response;
@@ -34,7 +35,18 @@ namespace Storage.Controllers
     public async Task<ApiResponse<ApiOrder>> Get()
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
-      return new ApiResponse<ApiOrder>(_repo.Get(user.Id, _userManager.IsInRoleAsync(user, UserRole.Admin).Result));
+      var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
+      var data = await _repo.GetAsync(user.Id, isAdmin, DateTime.Now.AddDays(-30), DateTime.Now).ConfigureAwait(false);
+      return new ApiResponse<ApiOrder>(data);
+    }
+
+    [HttpGet("canceled")]
+    public async Task<ApiResponse<ApiOrder>> GetClosedOrders()
+    {
+      var user = await GetCurrentUserAsync().ConfigureAwait(false);
+      var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
+      var data = await _repo.GetCanceledOrdersAsync(user.Id, isAdmin, DateTime.Now.AddDays(-30), DateTime.Now).ConfigureAwait(false);
+      return new ApiResponse<ApiOrder>(data);
     }
 
 
@@ -52,6 +64,7 @@ namespace Storage.Controllers
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       if (string.IsNullOrEmpty(model.Reason)) return new ApiResponse<bool>(OperationError.ApiModelValidation, "Не можна скасувати замовлення без вказування причини.");
+      if (model.Reason.Length < 6) return new ApiResponse<bool>(OperationError.ApiModelValidation, "Причина повинна містити принаймні 6 символів");
       await _houseRepo.CancelOrderAsync(user.Id, id, model.Reason);
       return new ApiResponse<bool>(true);
     }

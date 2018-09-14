@@ -1,8 +1,8 @@
 <p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
     <p-header>Перемістити</p-header>
-    <div class="dialog-body flex-col" *ngIf="product">
-        <div class="d-page-wrap flex-col">
-            <div class="flex-row">
+    <div class="dialog-body" *ngIf="product">
+        <div class="d-page-wrap">
+            <div class="d-body-header flex-row">
                 <div class="product-name">{{product.size}} {{product.color}} {{product.productType}} - {{product.model}} {{product.producer}}</div>
             </div>
             <div class="flex-row flex-wrap">
@@ -26,8 +26,7 @@
             </div>
             <div class="flex-row flex-wrap">
                 <mat-form-field class="s-input-wrapper">
-                    <mat-select placeholder="Склад" [ngModel]="selectedTo" name="from"
-                    (ngModelChange)="updateSelection($event)" disabled>
+                    <mat-select placeholder="Склад" [ngModel]="selectedTo" name="from" (ngModelChange)="updateSelection($event)" disabled>
                         <mat-option *ngFor="let item of locations" [value]="item.id">
                             {{item.name}}
                         </mat-option>
@@ -44,16 +43,20 @@
                     </div>
                 </div>
             </div>
-            <div class="flex-row">
+            <div class="flex-row flex-wrap">
                 <mat-form-field class="s-input-wrapper">
-                    <input matInput type="number" placeholder="Кількість" [(ngModel)]="transferCount" name="transferFrom"
-                        #transferFrom="ngModel" min="1" [max]="product.balance[selectedFrom]" [disabled]="fromCount === 0">
+                    <input matInput type="number" placeholder="Кількість" [(ngModel)]="transferCount" [formControl]="trCount"
+                        min="0" [max]="product.balance[selectedFrom]" [customMin]="0" [customMax]="product.balance[selectedFrom]"
+                        [disableControl]="!product.balance[selectedFrom] || product.balance[selectedFrom] === 0">
+                    <mat-error *ngIf="trCount.invalid">
+                        Некоректне значення
+                    </mat-error>
                 </mat-form-field>
             </div>
         </div>
     </div>
     <p-footer class="s-dialog-foot">
-        <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save()" label="Зберегти" [disabled]="fromCount === 0"></button>
+        <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save()" label="Зберегти" [disabled]="fromCount === 0 || trCount.invalid"></button>
         <button class="d-s-button-cancel" type="button" pButton icon="fa-close" label="Закрити" (click)="closeDialog()"></button>
     </p-footer>
 </p-dialog>

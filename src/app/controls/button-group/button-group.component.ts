@@ -8,6 +8,9 @@ import { Component, Input } from '@angular/core';
 export class ButtonGroupComponent {
   isShow: boolean = false;
   @Input() minimized: boolean = false;
+  @Input() groupWrapClass: string = '';
+  @Input() openBottom: boolean = false;
+  @Input() iconClass: string = '';
   constructor() { }
 
 }

@@ -12,6 +12,7 @@ const routes: Routes = [{
         { path: 'manage', loadChildren: 'app/manage/manage.module#ManageModule' },
         { path: 'storage', loadChildren: 'app/storage/storage.module#StorageModule' },
         { path: 'orders', loadChildren: 'app/orders/orders.module#OrdersModule' },
+        { path: 'reports', loadChildren: 'app/reports/reports.module#ReportsModule' },
         { path: 'settings', loadChildren: 'app/settings/settings.module#SettingsModule' },
         // Unexpected URL handling.
         { path: '', redirectTo: 'storage', pathMatch: 'full' },

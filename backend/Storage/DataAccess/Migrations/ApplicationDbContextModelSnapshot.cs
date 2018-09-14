@@ -213,9 +213,7 @@ namespace DataAccess.Migrations
 
                     b.Property<string>("UserId");
 
-                    b.Property<int?>("WarehouseId");
-
-                    b.Property<int>("WerehouseId");
+                    b.Property<int>("WarehouseId");
 
                     b.HasKey("Id");
 
@@ -422,7 +420,8 @@ namespace DataAccess.Migrations
 
                     b.HasOne("DataAccess.Models.Warehouse", "Warehouse")
                         .WithMany()
-                        .HasForeignKey("WarehouseId");
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("DataAccess.Models.WarehouseProducts", b =>

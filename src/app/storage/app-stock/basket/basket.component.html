@@ -4,9 +4,9 @@
         <div class="d-header-title">{{pageNames[page - 1]}}</div>
         <app-i-button class="nav-button nav-next" *ngIf="items.length > 0 && view.isMobile" icon="i-open" (iClick)="next()" [disabled]="sellCount === 0 || page === lastPage"></app-i-button>
     </p-header>
-    <div class="dialog-body flex-col">
-        <div class="d-page-wrap flex-col" [class.s-hidden]="page !== productPage">
-            <ul class="card-wrapper" *ngIf="items.length > 0">
+    <div class="dialog-body">
+        <div class="d-page-wrap" [class.s-hidden]="page !== productPage">
+            <ul class="card-wrapper flex-row flex-wrap" *ngIf="items.length > 0">
                 <li *ngFor="let item of items" class="card">
                     <div class="card-head">
                         <span class="card-name">{{item.product.productType}} {{item.product.model}}</span>
@@ -42,18 +42,18 @@
                 <div class="smile-label">Кошик пустий</div>
             </div>
         </div>
-        <app-order-editor #orderEditor [item]="order" class="d-page-wrap flex-col" [class.s-hidden]="page !== clientPage"></app-order-editor>
+        <app-order-editor #orderEditor [item]="order" class="d-page-wrap" [class.s-hidden]="page !== clientPage"></app-order-editor>
     </div>
     <p-footer class="s-dialog-foot">
         <div class="foot-group step-grop-footer" *ngIf="!view.isMobile || items.length > 0">
-            <button *ngIf="items.length > 0" class="d-s-button" pButton type="button" (click)="back()" [disabled]="sellCount === 0 || page === 1"
+            <button *ngIf="items.length > 0 && page !== 1" class="d-s-button" pButton type="button" (click)="back()" [disabled]="sellCount === 0 || page === 1"
                 label="Назад"></button>
-            <button *ngIf="items.length > 0" class="d-s-button" pButton type="button" (click)="next()" [disabled]="sellCount === 0 || page === lastPage"
+            <button *ngIf="items.length > 0 && page !== lastPage" class="d-s-button" pButton type="button" (click)="next()" [disabled]="sellCount === 0 || page === lastPage"
                 label="Далі"></button>
         </div>
         <div class="foot-group">
-            <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save()" label="Зберегти" [disabled]="(items.length <= 0) || orderEditor.invalid"></button>
-            <button class="d-s-button-cancel" type="button" pButton icon="fa-close" label="Закрити" (click)="closeDialog()"></button>
+            <button class="d-s-button" type="button" pButton icon="fa-check" (click)="save()" label="Зберегти" [disabled]="(items.length <= 0) || orderEditor.invalid || isSaving"></button>
+            <button class="d-s-button-cancel" type="button" pButton icon="fa-close" label="Закрити" (click)="closeDialog()" [disabled]="isSaving"></button>
         </div>
     </p-footer>
 </p-dialog>
