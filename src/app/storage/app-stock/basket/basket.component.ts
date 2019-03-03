@@ -33,6 +33,8 @@ export class BasketComponent extends SecuredComponent {
     this._items = val;
   }
 
+  @Input() canEdit: boolean;
+
   _locations: IWarehouse[] = [];
   @Input() set locations(val: IWarehouse[]) {
     if (!val) return;

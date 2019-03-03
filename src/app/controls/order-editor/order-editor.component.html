@@ -6,7 +6,7 @@
             <mat-error *ngIf="orderNumber.errors && (orderNumber.dirty || orderNumber.touched)">{{getNumberError()}}</mat-error>
         </mat-form-field>
         <mat-form-field class="s-input-wrapper">
-            <mat-select placeholder="Статус" formControlName="status">
+            <mat-select placeholder="Статус" formControlName="status" [disabled]="!canEdit">
                 <mat-option *ngFor="let item of statuses" [value]="item.value">
                     {{item.label}}
                 </mat-option>

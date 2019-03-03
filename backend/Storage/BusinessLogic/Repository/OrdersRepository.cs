@@ -82,7 +82,9 @@ namespace DataAccess.Repository
             order.CanceledByUserId = userId;
           }
           var note = order.ResponsibleUserId != userId ? "Відредаговано іншим продавцем" : null;
-          order.OrderEditions.Add(new OrderAction { Date = ClientTime.Now, OrderId = order.Id, UserId = userId, Note = note });
+          order.OrderEditions = new List<OrderAction>(new[] {
+            new OrderAction { Date = ClientTime.Now, OrderId = order.Id, UserId = userId, Note = note }
+            });
         }
         await context.SaveChangesAsync().ConfigureAwait(false);
       }

@@ -14,7 +14,8 @@
                 <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
                     <app-i-button *ngIf="selectedTab.value !== 1 && !isCancelTab" [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="edit-icon" title="Редагувати продажу"
                         (iClick)="showToEdit()"></app-i-button>
-                    <app-i-button *ngIf="selectedTab.value !== 1 && !isCancelTab" [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="i-closeOrder" title="Закрити продажу"
+                    <app-i-button *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView" 
+                        [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="i-closeOrder" title="Закрити продажу"
                         (iClick)="confirmation()"></app-i-button>
                     <app-i-button *ngIf="canView && !isCancelTab" icon="i-returnOrder" title="Повернути замовлення" (iClick)="confCancel()" [disabled]="viewData.length < 1 || selectedItems.length > 1"></app-i-button>
                     <app-i-button *ngIf="canView" icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()" [disabled]="viewData.length < 1 || selectedItems.length > 1"></app-i-button>
@@ -132,7 +133,7 @@
 
 
 </div>
-<app-order *ngIf="orderDialog" [order]="selectedItem" (iSave)="save($event)" (onCloseDialog)="closeEditDialog($event)"></app-order>
+<app-order *ngIf="orderDialog" [order]="selectedItem" (iSave)="save($event)" (onCloseDialog)="closeEditDialog($event)" [canEdit]="canEdit"></app-order>
 
 <app-confirm (confirm)="confirmCloseOrder($event)" *ngIf="showConfirm">
     <span header class="confirm-title">Ви впевнені, що бажаєте закрити продажу №:
