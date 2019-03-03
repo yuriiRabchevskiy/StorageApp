@@ -68,8 +68,9 @@ namespace Storage.Controllers
     public async Task<ApiResponse<Boolean>> Auth([FromBody] LoginDto model)
     {
       var result = await GetCurrentUserAsync().ConfigureAwait(false);
+      if (result == null) return new ApiResponse<bool>(false);
       if (!result.IsActive) throw new AuthenticationException("User is deactivated");
-      return new ApiResponse<bool>(result != null);
+      return new ApiResponse<bool>(true);
     }
 
     [HttpPost("forgot-password")]

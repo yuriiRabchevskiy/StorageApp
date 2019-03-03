@@ -25,6 +25,7 @@ namespace DataAccess.Models
     public string CanceledByUserId { get; set; }
 
     public List<ProductAction> Transactions { get; set; }
+    public ICollection<OrderAction> OrderEditions { get; set; }
     public ApplicationUser ResponsibleUser { get; set; }
     public ApplicationUser CanceledByUser { get; set; }
   }

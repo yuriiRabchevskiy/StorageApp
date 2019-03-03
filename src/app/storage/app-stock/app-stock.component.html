@@ -6,9 +6,10 @@
         </mat-tab-group>
     </div>
     <div class="page-body">
-        <p-dataTable class="prime-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem" [loading]="showSpinner"
-            [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [rows]="100" [pageLinks]="4" [responsive]="true" (onRowClick)="onRowClick($event)"
-            [rowStyleClass]="disabledRow" scrollable="true" scrollWidth="100%" scrollHeight="100%" [globalFilter]="gb">
+        <p-dataTable class="prime-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem"
+            [loading]="showSpinner" [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [rows]="100" [pageLinks]="4"
+            [responsive]="true" (onRowClick)="onRowClick($event)" [rowStyleClass]="disabledRow" scrollable="true"
+            scrollWidth="100%" scrollHeight="100%" [globalFilter]="gb">
             <p-header class="table-head" [ngClass]="{'mobile-t-head': view.isMobile}">
                 <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile && canView">
                     <app-i-button *ngIf="canView" icon="add-icon" title="Додати Продукт" (iClick)="showDialogToAdd()"></app-i-button>
@@ -17,23 +18,23 @@
                     <app-i-button *ngIf="canView" icon="del-icon" title="Видалити Продукт" (iClick)="confirmation()"></app-i-button>
                     <app-i-button *ngIf="canView" icon="addition-icon" title="Поповнити склад" (iClick)="showAdditionDialog(true)"></app-i-button>
                     <app-i-button *ngIf="canView" icon="withdrawal-icon" title="Забрати зі складу" (iClick)="showRemovalDialog(true)"></app-i-button>
-                    <app-i-button *ngIf="canView && wereHouses.length > 2" icon="transfer-icon" title="Перемістити продукт" (iClick)="showTransferDialog()" [disabled]="!selectedItem || !isBalance"></app-i-button>
+                    <app-i-button *ngIf="canView && wereHouses.length > 2" icon="transfer-icon" title="Перемістити продукт"
+                        (iClick)="showTransferDialog()" [disabled]="!selectedItem || !isBalance"></app-i-button>
                     <app-i-button icon="sell-icon" title="Додати до кошика" (iClick)="showSellDialog()" [disabled]="!selectedItem || !isBalance"></app-i-button>
                     <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
                 </app-button-group>
                 <div class="button-wrap">
-                    <app-i-button *ngIf="sellList.length > 0" icon="i-basket" title="Оформити замовлення" (iClick)="showBasketDialog()"></app-i-button>
+                    <app-i-button *ngIf="sellList.length > 0" icon="i-basket" title="Оформити замовлення" (iClick)="showBasketDialog()"></app-i-button>                    
                     <input class="s-serche" #gb type="text" placeholder="Пошук">
                 </div>
             </p-header>
-            <p-column field="productType" header="Ім'я" [sortable]="true"></p-column>
-            <p-column field="producer" header="Виробник" [sortable]="true"></p-column>
-            <p-column field="model" header="Модель" [sortable]="true" [style]="{'width':'80px'}"></p-column>
-            <p-column field="size" header="Розмір" [sortable]="true"></p-column>
-            <p-column field="color" header="Колір" [sortable]="true"></p-column>
-            <p-column field="freeNote" header="Нотатки" [sortable]="true" [style]="{'width':'300px'}"></p-column>
-            <p-column field="recommendedBuyPrice" header="Ціна покупки" [sortable]="true" [style]="{'width': '110px'}">
-
+            <p-column field="productType" header="Ім'я" [sortable]="true" [filter]="true"></p-column>
+            <p-column field="producer" header="Виробник" [sortable]="true" [filter]="true"></p-column>
+            <p-column field="model" header="Модель" [sortable]="true" [style]="{'width':'80px'}" [filter]="true"></p-column>
+            <p-column field="size" header="Розмір" [sortable]="true" [filter]="true"></p-column>
+            <p-column field="color" header="Колір" [sortable]="true" [filter]="true"></p-column>
+            <p-column field="freeNote" header="Нотатки" [sortable]="true" [style]="{'width':'300px'}" [filter]="true"></p-column>
+            <p-column *ngIf="canView" field="recommendedBuyPrice" header="Ціна покупки" [sortable]="true" [style]="{'width': '110px'}">
             </p-column>
             <p-column field="recommendedSalePrice" header="Ціна продажу" [sortable]="true" [style]="{'width': '110px'}">
             </p-column>

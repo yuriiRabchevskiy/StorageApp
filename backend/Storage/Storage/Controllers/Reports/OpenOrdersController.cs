@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using SharedDataContracts.Api.Response;
-using BusinessLogic.Models.Api;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using BusinessLogic.Models.User;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using BusinessLogic.Repository.Reports;
-using System.Linq;
 using Storage.Controllers.Reports;
 using Microsoft.Extensions.Configuration;
 using BusinessLogic.Helpers;
@@ -18,8 +16,7 @@ namespace Storage.Controllers
   [Authorize(Roles = UserRole.Admin)]
   public class OpenOrdersController : ReportsControllerBase
   {
-    private IOpenOrdersRepository _repo;
-
+    private readonly IOpenOrdersRepository _repo;
 
     public OpenOrdersController(IOpenOrdersRepository repo,
       UserManager<ApplicationUser> userManager, IConfiguration configuration) : base(userManager, configuration)
@@ -28,11 +25,11 @@ namespace Storage.Controllers
     }
 
     // GET api/values
-    [HttpGet()]
+    [HttpGet]
     public async Task<ApiResponse<string>> Get(long from, long to)
     {
-      var dFrom = ClientTyme.GetLocal(from.ToDateTime());
-      var dTo = ClientTyme.GetLocal(to.ToDateTime());
+      var dFrom = ClientTime.GetLocal(from.ToDateTime());
+      var dTo = ClientTime.GetLocal(to.ToDateTime());
 
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await GetIsAdminAsync(user);
@@ -42,11 +39,11 @@ namespace Storage.Controllers
 
 
     [HttpGet("light")]
-    public async Task<ApiResponse<string>> GetOnlyOrderNUmbers()
+    public async Task<ApiResponse<string>> GetOnlyOrderNumbers()
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await GetIsAdminAsync(user);
-      var now = ClientTyme.Now;
+      var now = ClientTime.Now;
       var data = await _repo.GetLightweightAsync(user.Id, isAdmin, now.AddDays(-30), now).ConfigureAwait(false);
       return new ApiResponse<string>(data);
     }

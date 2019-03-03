@@ -1,4 +1,3 @@
-
 using BusinessLogic.Helpers;
 using BusinessLogic.Models.User;
 using DataAccess.Models;
@@ -12,15 +11,15 @@ namespace Storage.Controllers.Reports
   public class ReportsControllerBase : Controller
   {
 
-    private UserManager<ApplicationUser> _userManager;
+    private readonly UserManager<ApplicationUser> _userManager;
     protected Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
-    protected ClientTimeZone ClientTyme { get; set; }
+    protected ClientTimeZone ClientTime { get; }
 
     public ReportsControllerBase(UserManager<ApplicationUser> userManager, IConfiguration configuration)
     {
       _userManager = userManager;
-      ClientTyme = new ClientTimeZone(configuration["ShiftTimeZone"]);
+      ClientTime = new ClientTimeZone(configuration["ShiftTimeZone"]);
     }
 
     protected Task<bool> GetIsAdminAsync(ApplicationUser user)

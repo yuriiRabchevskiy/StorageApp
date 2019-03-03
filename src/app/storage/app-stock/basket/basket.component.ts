@@ -71,6 +71,11 @@ export class BasketComponent extends SecuredComponent {
     this.order.productOrders = this.items.map(it => it.prodOrder);
   }
 
+  getOrderTotal() {
+    if (!this.items) return;
+    return this.items.map((it) => it.prodOrder.price * it.prodOrder.quantity).reduce((a, b) => a + b);
+  }
+
   save() {
     this.createOrder();
     this.finisSale(this.order);
