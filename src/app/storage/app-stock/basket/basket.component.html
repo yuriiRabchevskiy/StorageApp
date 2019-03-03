@@ -41,14 +41,14 @@
                 </li>
             </ul>
             <div *ngIf="items.length > 0" class="flex-col">
-                <div class="smile-label">Сума замовлення <span class="card-price">{{getOrderTotal()}}</span></div>
+                <div class="smile-label">Сума замовлення <span class="card-price">{{getOrderTotal()}}</span> грн</div>
             </div>
             <div *ngIf="items.length <= 0" class="smile-wrap flex-col">
                 <div class="smile-icon"></div>
                 <div class="smile-label">Кошик пустий</div>
             </div>
         </div>
-        <app-order-editor #orderEditor [item]="order" class="d-page-wrap" [class.s-hidden]="page !== clientPage">
+        <app-order-editor #orderEditor [item]="order" class="d-page-wrap" [class.s-hidden]="page !== clientPage" [canEdit]="canEdit">
         </app-order-editor>
     </div>
     <p-footer class="s-dialog-foot">

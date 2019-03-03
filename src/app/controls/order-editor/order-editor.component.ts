@@ -1,7 +1,7 @@
-import { PaymentKind } from './../../models/storage/order';
-import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IOrder, OrderStatus } from './../../models/storage';
+import { PaymentKind } from './../../models/storage/order';
 
 @Component({
   selector: 'app-order-editor',
@@ -24,6 +24,7 @@ export class OrderEditorComponent implements OnInit {
   }
 
   @Input() item: IOrder = { id: 0 };
+  @Input() canEdit: boolean;
 
   payments = [{ label: 'Оплачено', value: PaymentKind.payed },
   { label: 'Наложений платіж', value: PaymentKind.cashOnDelivery }

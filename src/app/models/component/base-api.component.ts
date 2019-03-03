@@ -21,6 +21,7 @@ export abstract class SecuredComponent {
     const user = this.userService.getLocal();
     if (!user) return;
     this.canView = user.isAdmin;
+    this.canEdit = user.isAdmin;
   }
 
   cloneModel<T>(source: T): T {

@@ -1,7 +1,6 @@
-import { IOrder } from './../../../models/storage';
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
+import { IOrder } from './../../../models/storage';
 
 @Component({
     selector: 'app-order',
@@ -10,13 +9,11 @@ import { ApiService } from '../../../shared/services/api.service';
 })
 export class OrderComponent {
     @ViewChild('orderEditor') orderEditor;
-    _order: IOrder;
-    get order() {
-        return this._order;
-    }
-    @Input() set order(val: IOrder) {
-        this._order = val;
-    }
+
+    private _order: IOrder;
+    get order() { return this._order; }
+    @Input() set order(val: IOrder) { this._order = val; }
+    @Input() canEdit: boolean;
 
     @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Output() iSave: EventEmitter<IOrder> = new EventEmitter<IOrder>();
