@@ -1,17 +1,15 @@
-import { ISaleOrder } from './../../models/storage/order';
-import { IAddition } from './../../models/storage/addition';
-import { IWarehouse } from './../../models/storage/werehouse';
-import { NumberFilter } from './../../models/filtering/filters';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from '../../shared/services/api.service';
-import { IProduct, Product, ITransfer, Sell, ISell } from '../../models/storage';
-import { ApiListComponent } from '../../models/component/list-api.component';
-import { ICategory } from '../../models/storage/categories';
-import { ISaveResult } from './product/product.component';
-import { ISaveAddition } from './addition/addition.component';
-import { ApiResponse, IApiErrorInfo } from '../../models/api';
 import { MessageService } from 'primeng/components/common/messageservice';
+import { ApiResponse } from '../../models/api';
+import { ApiListComponent } from '../../models/component/list-api.component';
+import { IProduct, ISell, ITransfer, Product, Sell } from '../../models/storage';
+import { ICategory } from '../../models/storage/categories';
+import { ApiService } from '../../shared/services/api.service';
+import { NumberFilter } from './../../models/filtering/filters';
+import { IWarehouse } from './../../models/storage/werehouse';
+import { ISaveAddition } from './addition/addition.component';
+import { ISaveResult } from './product/product.component';
 
 @Component({
   selector: 'app-all-stock',
@@ -293,10 +291,6 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
       res => {
         if (res.success) {
           this.wereHouses = res.items;
-          if (this.canView) return;
-          let localToHidden = this.wereHouses.find(it => it.id === 2);
-          let indexToRemove = this.wereHouses.indexOf(localToHidden);
-          this.wereHouses.splice(indexToRemove, 1);
         }
       },
       err => console.log(err));

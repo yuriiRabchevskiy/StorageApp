@@ -17,10 +17,9 @@ using DataAccess.Models;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using BusinessLogic.Models.Api;
-using System.Net.Mail;
 using Storage.Code.Services;
 using BusinessLogic.Repository.Reports;
-using Storage.Code.Hubs;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Logging;
 
 namespace Storage
@@ -38,23 +37,8 @@ namespace Storage
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-      var connectionString = Configuration.GetConnectionString("appConnectionString");
-      services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Transient);
-      services.AddTransient<IProductsRepository, ProductsRepository>();
-      services.AddTransient<ICategoriesRepository, CategoriesRepository>();
-      services.AddTransient<IWarehouseRepository, WarehousesRepository>();
-      services.AddTransient<IOrdersRepository, OrdersRepository>();
-      services.AddTransient<ISalesPerUserRepository, SalesPerUserRepository>();
-      services.AddTransient<ISalesPerProductRepository, SalesPerProductRepository>();
-      services.AddTransient<IOrdersOverviewRepository, OrdersOverviewRepository>();
-      services.AddTransient<IWarehouseActionsRepository, WarehouseActionsRepository>();
-      services.AddTransient<IOpenOrdersRepository, OpenOrdersRepository>();
 
-      services.AddTransient<IValidator<ApiProdAction>, ApiProdActionValidator>();
-      services.AddTransient<IValidator<ApiProdTransfer>, ApiProdTransferValidator>();
-      services.AddTransient<IValidator<ApiProdSell>, ApiProdSellValidator>();
-
-      services.AddTransient<IEmailSender, EmailSender>();
+      setupDependencyInjectionServices(services);
 
       services.AddIdentity<ApplicationUser, IdentityRole>(cfg =>
         {
@@ -86,6 +70,10 @@ namespace Storage
         });
 
       // ==============================
+
+      // In production, the Angular files will be served from this directory
+      services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
+
       services.AddCors();
       services.AddMvc(cfg =>
         {
@@ -97,8 +85,31 @@ namespace Storage
       });
 
       services.Configure<IISOptions>(options => { });
+      services.AddResponseCompression();
       //services.AddSignalR();
 
+    }
+
+    private void setupDependencyInjectionServices(IServiceCollection services)
+    {
+      var connectionString = Configuration.GetConnectionString("appConnectionString");
+      services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString),
+        ServiceLifetime.Transient);
+      services.AddTransient<IProductsRepository, ProductsRepository>();
+      services.AddTransient<ICategoriesRepository, CategoriesRepository>();
+      services.AddTransient<IWarehouseRepository, WarehousesRepository>();
+      services.AddTransient<IOrdersRepository, OrdersRepository>();
+      services.AddTransient<ISalesPerUserRepository, SalesPerUserRepository>();
+      services.AddTransient<ISalesPerProductRepository, SalesPerProductRepository>();
+      services.AddTransient<IOrdersOverviewRepository, OrdersOverviewRepository>();
+      services.AddTransient<IWarehouseActionsRepository, WarehouseActionsRepository>();
+      services.AddTransient<IOpenOrdersRepository, OpenOrdersRepository>();
+
+      services.AddTransient<IValidator<ApiProdAction>, ApiProdActionValidator>();
+      services.AddTransient<IValidator<ApiProdTransfer>, ApiProdTransferValidator>();
+      services.AddTransient<IValidator<ApiProdSell>, ApiProdSellValidator>();
+
+      services.AddTransient<IEmailSender, EmailSender>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -110,6 +121,9 @@ namespace Storage
       }
 
       app.UseAuthentication();
+      app.UseStaticFiles();
+      app.UseSpaStaticFiles();
+    
 
       app.UseCors(builder => builder.WithOrigins("http://localhost:1609", "http://localhost:3000", "http://localhost", "http://localhost:4200",
         "http://btv.cloudapp.net:4201", "http://btv.cloudapp.net").AllowAnyHeader().AllowCredentials().AllowAnyMethod().AllowAnyOrigin());
@@ -120,6 +134,19 @@ namespace Storage
       //});
 
       app.UseMvc();
+      app.UseSpa(spa =>
+      {
+        // To learn more about options for serving an Angular SPA from ASP.NET Core,
+        // see https://go.microsoft.com/fwlink/?linkid=864501
+
+        spa.Options.SourcePath = "../../";
+
+        if (env.IsDevelopment())
+        {
+          spa.UseAngularCliServer(npmScript: "start");
+        }
+      });
+      app.UseResponseCompression();
 
       loggerFactory.AddFile("logs/storage-{Date}.txt");
 

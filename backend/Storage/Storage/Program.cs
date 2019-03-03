@@ -13,7 +13,7 @@ namespace Storage
 
     }
 
-    // do  notrename
+    // do  not rename
     private static IWebHost BuildWebHost(string[] args) =>
           WebHost.CreateDefaultBuilder(args)
               .UseStartup<Startup>()

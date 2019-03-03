@@ -1,14 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ApiService } from '../../shared/services/api.service';
-import { ApiListComponent } from '../../models/component/list-api.component';
-import { ApiResponse } from '../../models/api';
+import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { NumberFilter, StringFilter } from '../../models/filtering/filters';
-import { IOrder, OrderStatus } from '../../models/storage';
 import * as moment from 'moment-mini';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { DataTable } from 'primeng/primeng';
-import { UserService } from '../../shared/services/user.service';
+import { ApiResponse } from '../../models/api';
+import { ApiListComponent } from '../../models/component/list-api.component';
+import { NumberFilter, StringFilter } from '../../models/filtering/filters';
+import { IOrder, OrderStatus } from '../../models/storage';
+import { ApiService } from '../../shared/services/api.service';
 
 interface ITab {
     label: string;
@@ -76,7 +75,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
         date: 'Дата продажу',
         seller: 'Продавець',
         products: 'Товари'
-    }
+    };
 
     itemsFormatted = [];
 
@@ -128,7 +127,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     }
 
     getItemsName(val) {
-        let items = [];
+        const items = [];
         let name = '';
         for (let i = 0; i < val.length; i++) {
             if (i === 0) {
@@ -142,8 +141,8 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     }
 
     orderByDate(a, b) {
-        let dateA = new Date(a.date).getFullYear();
-        let dateB = new Date(b.date).getFullYear();
+        const dateA = new Date(a.date).getFullYear();
+        const dateB = new Date(b.date).getFullYear();
         return dateA - dateB;
     }
 
@@ -157,7 +156,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     }
 
     save(val: IOrder) {
-        let item = val;
+        const item = val;
         this.apiService.saveOrder(item).subscribe(
             res => {
                 if (res.success) {
@@ -228,7 +227,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     }
 
     getDifference(val) {
-        let diff = (val.quantity * val.price) - (val.quantity * val.product.recommendedBuyPrice);
+        const diff = (val.quantity * val.price) - (val.quantity * val.product.recommendedBuyPrice);
         return diff;
     }
     getProfit(val) {
@@ -248,10 +247,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     }
 
     expandOrders() {
-        let data = [];
-        this.filteredData.forEach(it => {
-            data.push(it);
-        });
+        const data = this.filteredData.map(it => it);
         this.dataTable.expandedRows = data;
     }
 
@@ -260,7 +256,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     }
 
     createFileName() {
-        let date = moment(new Date()).format('DD.MM.YYYY HH:mm');
+        const date = moment(new Date()).format('DD.MM.YYYY HH:mm');
         this.csvFileName = this.selectedTab.label + ' продажі - ' + date;
     }
 
@@ -273,12 +269,12 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     generateProductList(val) {
         let str = '';
         for (let i = 0; i < val.products.length; i++) {
-            let color = val.products[i].product.color;
-            let model = val.products[i].product.model;
-            let type = val.products[i].product.productType;
+            const color = val.products[i].product.color;
+            const model = val.products[i].product.model;
+            const type = val.products[i].product.productType;
             if (str !== '') {
                 str += ';\u00A0';
-            };
+            }
             str += (color || '') + ' ' + (model || '') + ' ' + (type || '');
         }
         return str;
@@ -286,7 +282,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     formated(val) {
         this.itemsFormatted = [];
         val.forEach((item) => {
-            let productList = this.generateProductList(item);
+            const productList = this.generateProductList(item);
             this.itemsFormatted.push({
                 id: item.id,
                 orderNumber: item.orderNumber,
@@ -298,21 +294,21 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     }
 
     convertToCSV(objArray) {
-        let array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
+        const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
         let str = '';
 
         for (let i = 0; i < array.length; i++) {
             let line = '';
-            for (let index in array[i]) {
+            for (const index in array[i]) {
                 if (i === 0) {
                     if (line !== '') {
                         line += ',';
-                    };
+                    }
                     line += array[i][index];
                 } else {
                     if (line !== '') {
                         line += ',';
-                    };
+                    }
                     line = line + array[i][index];
                 }
             }
@@ -327,16 +323,16 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
         }
 
         // Convert Object to JSON
-        let jsonObject = JSON.stringify(items);
-        let csv = this.convertToCSV(jsonObject);
-        let fileName = fileTitle + '.csv' || 'export.csv';
-        let blob = new Blob([csv], { type: 'text/csv; charset=utf-8' });
+        const jsonObject = JSON.stringify(items);
+        const csv = this.convertToCSV(jsonObject);
+        const fileName = fileTitle + '.csv' || 'export.csv';
+        const blob = new Blob([csv], { type: 'text/csv; charset=utf-8' });
         if (navigator.msSaveBlob) {
             navigator.msSaveBlob(blob, fileName);
         } else {
-            let link = document.createElement('a');
+            const link = document.createElement('a');
             if (link.download !== undefined) {
-                let url = URL.createObjectURL(blob);
+                const url = URL.createObjectURL(blob);
                 link.setAttribute('href', url);
                 link.setAttribute('download', fileName);
                 link.style.visibility = 'hidden';

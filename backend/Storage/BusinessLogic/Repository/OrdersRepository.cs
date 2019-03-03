@@ -16,7 +16,7 @@ namespace DataAccess.Repository
   {
     Task<List<ApiOrder>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till);
     Task<List<ApiOrder>> GetCanceledOrdersAsync(string userId, bool isAdmin, DateTime from, DateTime till);
-    void Update(ApiOrder product);
+    Task UpdateAsync(string userId, bool isAdmin, ApiOrder product);
   }
 
   public class OrdersRepository : IOrdersRepository
@@ -35,8 +35,8 @@ namespace DataAccess.Repository
     {
       using (var context = _di.GetService<ApplicationDbContext>())
       {
+        // Where(it => isAdmin || it.ResponsibleUserId == userId)
         var data = await context.Orders
-          .Where(it => isAdmin || it.ResponsibleUserId == userId)
           .Where(it => it.Status != OrderStatus.Canceled)
           .Include(ord => ord.ResponsibleUser)
           .Include(ord => ord.Transactions).ThenInclude(y => y.Product).ToListAsync().ConfigureAwait(false);
@@ -59,7 +59,7 @@ namespace DataAccess.Repository
       }
     }
 
-    public void Update(ApiOrder it)
+    public async Task UpdateAsync(string userId, bool isAdmin, ApiOrder it)
     {
       using (var context = _di.GetService<ApplicationDbContext>())
       {
@@ -76,9 +76,15 @@ namespace DataAccess.Repository
           order.Status = it.Status ?? OrderStatus.Open;
           order.Payment = it.Payment;
           if (it.Status == OrderStatus.Closed && order.CloseDate == null) order.CloseDate = ClientTime.Now;
-          if (it.Status == OrderStatus.Canceled && order.CanceledDate == null) order.CanceledDate = ClientTime.Now;
+          if (it.Status == OrderStatus.Canceled && order.CanceledDate == null)
+          {
+            order.CanceledDate = ClientTime.Now;
+            order.CanceledByUserId = userId;
+          }
+          var note = order.ResponsibleUserId != userId ? "Відредаговано іншим продавцем" : null;
+          order.OrderEditions.Add(new OrderAction { Date = ClientTime.Now, OrderId = order.Id, UserId = userId, Note = note });
         }
-        context.SaveChanges();
+        await context.SaveChangesAsync().ConfigureAwait(false);
       }
     }
   }

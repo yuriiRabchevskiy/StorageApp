@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../shared/services/user.service';
-import { WorkProgress } from '../models/component/work-progress';
-import { SecuredComponent } from '../models/component/base-api.component';
-import { ApiService } from '../shared/services/api.service';
 import { Router } from '@angular/router';
 import { Message } from 'primeng/components/common/api';
+import { SecuredComponent } from '../models/component/base-api.component';
+import { WorkProgress } from '../models/component/work-progress';
+import { ApiService } from '../shared/services/api.service';
 
 @Component({
   selector: 'app-main',
@@ -33,14 +32,15 @@ export class MainComponent extends SecuredComponent implements OnInit {
 
   constructor(private router: Router, private apiService: ApiService) {
     super();
-    let user = this.userService.getLocal();
+    const user = this.userService.getLocal();
     if (!user) return;
     this.canView = user.isAdmin;
-    this.pages = [{ title: 'Склад', url: 'storage', view: true },
-    { title: 'Продажі', url: 'orders', view: true },
-    { title: 'Звіти', url: 'reports', view: true },
-    { title: 'Користувачі', url: 'manage', view: user.isAdmin },
-    { title: 'Налаштування', url: 'settings', view: true }
+    this.pages = [
+      { title: 'Склад', url: 'storage', view: true },
+      { title: 'Продажі', url: 'orders', view: true },
+      { title: 'Звіти', url: 'reports', view: user.isAdmin },
+      { title: 'Користувачі', url: 'manage', view: user.isAdmin },
+      { title: 'Налаштування', url: 'settings', view: true }
     ];
     this.getCurrentUrl(this.router.url);
     this.work = new WorkProgress(() => this.apiService.logout(), (res) => this.onLogoutConfirmed(res), undefined);
@@ -51,7 +51,7 @@ export class MainComponent extends SecuredComponent implements OnInit {
   }
 
   getUserFromLocal() {
-    let user = this.userService.getLocal();
+    const user = this.userService.getLocal();
     this.userLogin = user ? user.userName : 'loading...';
   }
 
@@ -71,7 +71,7 @@ export class MainComponent extends SecuredComponent implements OnInit {
   }
 
   getCurrentUrl(page: string) {
-    let url = page.split('/')[1];
+    const url = page.split('/')[1];
     this.selectedPage = url;
   }
 
@@ -83,7 +83,7 @@ export class MainComponent extends SecuredComponent implements OnInit {
   }
 
   private redirectToLogin() {
-    let queryParams = { return: location.hash };
+    const queryParams = { return: location.hash };
     this.router.navigate(['./login'], { queryParams: queryParams });
   }
 }

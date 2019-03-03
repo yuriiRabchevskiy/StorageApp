@@ -52,9 +52,11 @@ namespace Storage.Controllers
 
     // POST api/values
     [HttpPost]
-    public ApiResponseBase Post([FromBody] ApiOrder product)
+    public async Task<ApiResponseBase> Post([FromBody] ApiOrder product)
     {
-      _repo.Update(product);
+      var user = await GetCurrentUserAsync().ConfigureAwait(false);
+      var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
+      await _repo.UpdateAsync(user.Id, isAdmin, product);
       return new ApiResponseBase();
     }
 

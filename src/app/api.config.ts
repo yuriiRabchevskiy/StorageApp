@@ -16,7 +16,10 @@ export class ApiEndpointsConfig {
             return 'http://localhost:4577/';
             // return 'http://btv.cloudapp.net:7700/';
         }
-        return 'http://btv.cloudapp.net:7700/';
+
+        const path = location.pathname;
+        const url = location.protocol + '//' + location.host + path;
+        return url;
     }
 
     private static getApiEndpoint(): string {
