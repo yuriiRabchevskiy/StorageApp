@@ -6,11 +6,11 @@
         </mat-tab-group>
     </div>
     <div class="page-body">
-        <p-dataTable #dt class="prime-table" [value]="viewData" selectionMode="multiple" [(selection)]="selectedItems"
+        <p-table class="prime-table" [value]="viewData" selectionMode="multiple" [(selection)]="selectedItems"
             dataKey="id" [loading]="showSpinner" [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4"
             [rows]="100" [responsive]="true" (onRowClick)="onRowClick($event)" scrollable="true" scrollWidth="100%"
-            scrollHeight="100%" [globalFilter]="gb" sortField="openDate" sortOrder="1" rowGroupMode="subheader"
-            groupField="date" expandableRows="true" exportFilename="Продажі">
+            scrollHeight="100%" sortField="openDate" sortOrder="1" rowGroupMode="subheader"
+            groupField="date" expandableRows="true" exportFilename="Продажі" #dt>
             <p-header class="table-head" [ngClass]="{'mobile-t-head': view.isMobile}">
                 <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
                     <app-i-button *ngIf="selectedTab.value !== 1 && !isCancelTab"
@@ -36,7 +36,7 @@
                 </app-button-group>
 
                 <div class="button-wrap">
-                    <input class="s-serche" #gb type="text" placeholder="Пошук">
+                    <input class="s-serche" type="text" placeholder="Пошук" (input)="dt.filterGlobal($event.target.value, 'contains')">
                 </div>
             </p-header>
             <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['date']}}</ng-template>
@@ -147,7 +147,7 @@
                     </table>
                 </div>
             </ng-template>
-        </p-dataTable>
+        </p-table>
     </div>
 
 

@@ -1,8 +1,9 @@
+import { Dictionary } from './../../models/dictionary';
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import * as moment from 'moment-mini';
 import { MessageService } from 'primeng/components/common/messageservice';
-import { DataTable } from 'primeng/primeng';
+import { Table } from 'primeng/table';
 import { ApiResponse } from '../../models/api';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { NumberFilter, StringFilter } from '../../models/filtering/filters';
@@ -26,7 +27,7 @@ interface IExportData {
     styleUrls: ['./orders.component.scss']
 })
 export class OrdersComponent extends ApiListComponent<IOrder> {
-    @ViewChild('dt') dataTable: DataTable;
+    @ViewChild('dt', { static: true }) dataTable: Table;
     selectedItem: IOrder;
     orderDialog: boolean = false;
     showConfirm: boolean = false;
@@ -247,12 +248,13 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     }
 
     expandOrders() {
-        const data = this.filteredData.map(it => it);
-        this.dataTable.expandedRows = data;
+        const dictionary = new Dictionary<boolean>();
+        this.filteredData.map(it => dictionary[it.id.toString()] = true);
+        this.dataTable.expandedRowKeys = dictionary;
     }
 
     collapseOrders() {
-        this.dataTable.expandedRows = [];
+        this.dataTable.expandedRowKeys = {};
     }
 
     createFileName() {

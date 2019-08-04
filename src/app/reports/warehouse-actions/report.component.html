@@ -1,13 +1,13 @@
-<p-dataTable class="prime-table report-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem" [loading]="showSpinner"
+<p-table class="prime-table report-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem" [loading]="showSpinner"
     [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true"
-    scrollWidth="100%" scrollHeight="calc(100% - 54px)" [globalFilter]="gb" [immutable]=false>
-    <p-header class="table-head" [ngClass]="{'mobile-t-head': view.isMobile}">
+    scrollWidth="100%" scrollHeight="calc(100% - 54px)" [immutable]=false>
+    <p-header class="table-head" [ngClass]="{'mobile-t-head': view.isMobile}" #dt>
         <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
             <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
         </app-button-group>
 
         <div class="button-wrap">
-            <input class="s-serche" #gb type="text" placeholder="Пошук">
+            <input class="s-serche" type="text" placeholder="Пошук" (input)="dt.filterGlobal($event.target.value, 'contains')">
         </div>
     </p-header>
     <p-column field="date" header="Дата" [sortable]="true" [style]="{'width':'130px'}">
@@ -23,5 +23,5 @@
     <p-column field="quantity" header="Кількість" [sortable]="true" [style]="{'width':'120px'}"></p-column>
     <p-column field="description" header="Опис" [sortable]="true"></p-column>
 
-</p-dataTable>
+</p-table>
 <app-spinner *ngIf="showSpinner"></app-spinner>

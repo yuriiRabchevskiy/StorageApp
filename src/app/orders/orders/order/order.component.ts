@@ -8,7 +8,7 @@ import { IOrder } from './../../../models/storage';
     styleUrls: ['./order.component.scss']
 })
 export class OrderComponent {
-    @ViewChild('orderEditor') orderEditor;
+    @ViewChild('orderEditor', {static: true}) orderEditor;
 
     private _order: IOrder;
     get order() { return this._order; }

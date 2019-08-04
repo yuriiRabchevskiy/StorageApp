@@ -1,7 +1,7 @@
 import { SaleOrder } from './../../../models/storage/order';
 import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
-import { IProduct, IOrder, Order, ISell, Sell, ISaleOrder, IProdOrder, IWarehouse } from '../../../models/storage';
+import { ISaleOrder, IProdOrder, IWarehouse } from '../../../models/storage';
 import { ViewState } from '../../../shared/helpers/index';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { OrderEditorComponent } from '../../../controls/index';
@@ -15,7 +15,7 @@ import { SecuredComponent } from '../../../models/component';
 
 export class BasketComponent extends SecuredComponent {
   view: ViewState = new ViewState();
-  @ViewChild('orderEditor') orderEditor: OrderEditorComponent;
+  @ViewChild('orderEditor', {static: true}) orderEditor: OrderEditorComponent;
   page: number = 1;
   pages: string[] = ['Список товарів', 'Персональні дані'];
   pageNames: string[] = this.pages;

@@ -10,7 +10,7 @@ import { OrdersOverviewComponent } from './orders-overview/report.component';
 import { SalesPerUsersComponent } from './sales-per-user/report.component';
 import { SalesPerProductComponent } from './sales-per-product/report.component';
 import { WarehouseActionsComponent } from './warehouse-actions/report.component';
-import {CalendarModule} from 'primeng/calendar';
+import { CalendarModule } from 'primeng/calendar';
 
 @NgModule({
   imports: [

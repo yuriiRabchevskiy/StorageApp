@@ -160,7 +160,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
     this.selectedItem = this.filteredData[0];
   }
 
-  //for update field in p-datatable
+  //for update field in p-table
   updateField(user: ISUser, val) {
     Object.keys(val).map(key => user[key] = val[key]);
   }
