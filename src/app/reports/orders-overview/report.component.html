@@ -1,6 +1,6 @@
-<p-dataTable class="prime-table report-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem"
+<p-table class="prime-table report-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem"
     [loading]="showSpinner" [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4" [rows]="100"
-    [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" [globalFilter]="gb"
+    [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" #dt
     [immutable]=false>
     <p-header class="table-head" [ngClass]="{'mobile-t-head': view.isMobile}">
         <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
@@ -8,7 +8,7 @@
         </app-button-group>
 
         <div class="button-wrap">
-            <input class="s-serche" #gb type="text" placeholder="Пошук">
+            <input class="s-serche" type="text" placeholder="Пошук" (input)="dt.filterGlobal($event.target.value, 'contains')">
         </div>
     </p-header>
     <p-column field="category" header="Користувач" [sortable]="true"></p-column>
@@ -35,5 +35,5 @@
         </p-row>
     </p-footerColumnGroup>
 
-</p-dataTable>
+</p-table>
 <app-spinner *ngIf="showSpinner"></app-spinner>

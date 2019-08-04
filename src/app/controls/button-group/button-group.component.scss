@@ -48,6 +48,6 @@
     flex-wrap: wrap;
     align-content: space-between;
 }
-:host /deep/ .show-content >* {
+:host ::ng-deep .show-content >* {
     margin-bottom: 4px;
 }

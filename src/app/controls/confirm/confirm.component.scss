@@ -16,7 +16,7 @@
     align-items: center;
     height: calc(100% - 40px); 
 }
-:host /deep/ .confirm-title {
+:host ::ng-deep .confirm-title {
     display: block;
     text-align: center;
     color: black;

@@ -21,6 +21,7 @@ using Storage.Code.Services;
 using BusinessLogic.Repository.Reports;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Logging;
+using Storage.Code.Hubs;
 
 namespace Storage
 {
@@ -123,10 +124,10 @@ namespace Storage
       app.UseAuthentication();
       app.UseStaticFiles();
       app.UseSpaStaticFiles();
-    
+
 
       app.UseCors(builder => builder.WithOrigins("http://localhost:1609", "http://localhost:3000", "http://localhost", "http://localhost:4200",
-        "http://btv.cloudapp.net:4201", "http://btv.cloudapp.net").AllowAnyHeader().AllowCredentials().AllowAnyMethod().AllowAnyOrigin());
+        "localhost:4200").AllowAnyHeader().AllowCredentials().AllowAnyMethod());
 
       //app.UseSignalR(routes =>
       //{

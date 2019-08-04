@@ -1,8 +1,8 @@
 <div class="page-wrap">
 
-    <p-dataTable class="prime-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem" [loading]="showSpinner"
+    <p-table class="prime-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem" [loading]="showSpinner"
         [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4" [rows]="100" [responsive]="true" (onRowClick)="onRowClick($event)"
-        scrollable="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" [globalFilter]="gb" [immutable]=false>
+        scrollable="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" [immutable]=false #dt>
         <p-header class="table-head" [ngClass]="{'mobile-t-head': view.isMobile}">
             <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
                 <app-i-button icon="add-user-icon" title="Додати користувача" (iClick)="addNewUser()"></app-i-button>
@@ -12,7 +12,7 @@
             </app-button-group>
 
             <div class="button-wrap">
-                <input class="s-serche" #gb type="text" placeholder="Пошук">
+                <input class="s-serche" type="text" placeholder="Пошук" (input)="dt.filterGlobal($event.target.value, 'contains')">
             </div>
         </p-header>
         <p-column field="login" header="Логін" [sortable]="true"></p-column>
@@ -26,7 +26,7 @@
             </ng-template>
         </p-column>
         <p-column field="notes" header="Нотатки"></p-column>
-    </p-dataTable>
+    </p-table>
 </div>
 <app-user [userList]="filteredData" *ngIf="displayDialog" (onCloseDialog)="closeDialog($event)" (saveUser)="save($event)"></app-user>
 <app-user-editor *ngIf="displayEditDialog" [user]="selectedItem" (onCloseDialog)="closeDialog($event)" (saveChange)="saveChange($event)"></app-user-editor>

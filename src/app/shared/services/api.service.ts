@@ -1,24 +1,22 @@
 import { IApiSalePerUser, IApiWarehouseAction, IApiSale, IApiOrdersOverview } from './../../models/api/reports/sales';
-import { IForgotPassword } from './../../models/api/api/api';
-import { IChangePassword } from './../../models/manage/user';
 import { UserService } from './user.service';
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { ApiBase } from '../api/base';
-import { ApiResponse, IApiResponseBase } from './../../models/api';
-import { IUser, ISUser, IUserToEdit } from '../../models/manage/user';
+import { ApiResponse } from './../../models/api';
+import { IUser, ISUser, IUserToEdit, IChangePassword } from '../../models/manage/user';
 import { IProduct } from './../../models/storage/products';
 import { IWarehouse } from '../../models/storage/werehouse';
 import { ICategory } from './../../models/storage/categories';
 import { IOrder, ISaleOrder } from './../../models/storage/order';
 import { ICancelOrder } from '../../models/storage/index';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 
 export class ApiService extends ApiBase {
-    constructor(http: Http, userService: UserService) {
+    constructor(http: HttpClient, userService: UserService) {
         super(http, userService);
     }
 
@@ -62,7 +60,7 @@ export class ApiService extends ApiBase {
         return this.doDelete('product', id);
     }
 
-    addProduct(data) {
+    addProduct(data): Observable<ApiResponse<number>> {
         return this.doPut('product', data);
     }
 
@@ -70,21 +68,21 @@ export class ApiService extends ApiBase {
         return this.doGet('warehouse');
     }
 
-    //transfer method
+    // transfer method
     doTransfer(id: number, data) {
         return this.doPost('product/' + id + '/transfer/', data);
     }
-    //addition method
+    // addition method
     addProductsToWarehouse(id: number, data) {
         return this.doPost('product/' + id + '/add/', data);
     }
 
-    //removeProducts method
+    // removeProducts method
     removeProductsFromWarehouse(id: number, data) {
         return this.doPost('product/' + id + '/remove/', data);
     }
 
-    //sale method
+    // sale method
     sale(data: ISaleOrder) {
         return this.doPost('product/sell/', data);
     }
