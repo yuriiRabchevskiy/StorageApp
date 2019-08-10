@@ -1,6 +1,6 @@
 <div class="page-wrap">
     <div class="page-head">
-        <mat-tab-group class="storage-tab" (selectChange)="selectTab($event)">
+        <mat-tab-group class="storage-tab" (selectedIndexChange)="selectTab($event)">
             <mat-tab class="tab" *ngFor="let tab of tabs" [label]="tab.name">
             </mat-tab>
         </mat-tab-group>
@@ -10,7 +10,8 @@
         <p-table class="prime-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem"
             [loading]="showSpinner" [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [rows]="100" [pageLinks]="4"
             [responsive]="true" (onRowClick)="onRowClick($event)" scrollable="true" scrollWidth="100%"
-            scrollHeight="100%" #dt dataKey="id">
+            scrollHeight="100%" #dt dataKey="id"
+            [globalFilterFields]="['productType', 'model', 'size', 'color', 'freeNote']">
 
             <ng-template pTemplate="caption">
                 <div class="flex-row flex-wrap">
@@ -37,8 +38,9 @@
                     <div class="button-wrap">
                         <app-i-button *ngIf="sellList.length > 0" icon="i-basket" title="Оформити замовлення"
                             (iClick)="showBasketDialog()"></app-i-button>
-                        <input class="s-serche" type="text" placeholder="Пошук"
-                            (input)="dt.filterGlobal($event.target.value, 'contains')">
+                        <input class="s-serche" type="text" pInputText size="50" placeholder="Пошук"
+                        (input)="dt.filterGlobal($event.target.value, 'contains')"
+                        >
                     </div>
                 </div>
             </ng-template>
@@ -96,34 +98,29 @@
                         <p-sortIcon [field]="'wh_'+col.id"></p-sortIcon>
                     </th>
                 </tr>
-                <!-- <tr>
+                <tr>
                     <th>
-                        <input pInputText type="text"
-                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'productType')">
                     </th>
                     <th>
-                        <input pInputText type="text"
-                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'producer')">
                     </th>
                     <th>
-                        <input pInputText type="text"
-                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                        <input pInputText type="text" [style.width]="'100%'" (input)="dt.filter($event.target.value, 'model')">
                     </th>
                     <th>
-                        <input pInputText type="text"
-                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'size')">
                     </th>
                     <th>
-                        <input pInputText type="text"
-                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'color')">
                     </th>
                     <th>
-                        <input pInputText type="text"
-                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'freeNote')">
                     </th>
                     <th *ngIf="canView"></th>
                     <th></th>
-                </tr> -->
+                    <th *ngFor="let col of wereHouses"></th>
+                </tr>
             </ng-template>
 
             <ng-template pTemplate="body" let-rowData>

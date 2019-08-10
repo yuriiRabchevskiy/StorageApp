@@ -71,8 +71,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
     this.loadWereHouse();
   }
 
-  selectTab(event) {
-    this.selectedTab = this.tabs[event.index];
+  selectTab(index: number) {
+    this.selectedTab = this.tabs[index];
   }
 
   showDialogToAdd(isMore: boolean = false, isCopy: boolean = false) {
@@ -256,7 +256,6 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
   }
 
   onRowClick(event) {
-    debugger
     this.findTotalBalance(event);
     if (this.selectedItem !== event.data) return;
     if (!this.isBalance || !this.selectedItem.id) return;
