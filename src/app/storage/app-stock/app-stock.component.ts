@@ -256,6 +256,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
   }
 
   onRowClick(event) {
+    debugger
     this.findTotalBalance(event);
     if (this.selectedItem !== event.data) return;
     if (!this.isBalance || !this.selectedItem.id) return;

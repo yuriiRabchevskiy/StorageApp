@@ -128,7 +128,6 @@ export abstract class ListComponent<TCol> extends SecuredComponent {
     }
 
     select(item: TCol | TCol[], silent: boolean = false) {
-
         if (!item) { // deselect
             this.selectedItem = undefined;
             this.selectedItems = []
