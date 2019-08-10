@@ -33,9 +33,10 @@ namespace Storage.Controllers
 
     // GET api/values
     [HttpGet]
-    public ApiResponse<ApiProduct> Get()
+    public async Task<ApiResponse<ApiProduct>> GetAsync()
     {
-      return new ApiResponse<ApiProduct>(_repo.Get());
+      var data = await _repo.GetAsync().ConfigureAwait(false);
+      return new ApiResponse<ApiProduct>(data);
     }
 
 
@@ -92,7 +93,7 @@ namespace Storage.Controllers
       if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
 
       var user = await GetCurrentUserAsync();
-      _houseRepo.SellOrder(user?.Id, model);
+      await _houseRepo.SellOrderAsync(user?.Id, model).ConfigureAwait(false);
       return new ApiResponseBase();
     }
 
