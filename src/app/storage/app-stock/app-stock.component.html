@@ -43,18 +43,57 @@
                 </div>
             </ng-template>
 
+            <ng-template pTemplate="colgroup">
+                <colgroup>
+                    <col>
+                    <col>
+                    <col width="80px">
+                    <col>
+                    <col>
+                    <col width="300">
+                    <col width="110px">
+                    <col width="110px">
+                    <col width="80px">
+                </colgroup>
+            </ng-template>
+
             <ng-template pTemplate="header">
                 <tr>
-                    <th>Ім'я</th>
-                    <th>Виробник</th>
-                    <th>Модель</th>
-                    <th>Розмір</th>
-                    <th>Колір</th>
-                    <th>Нотатки</th>
-                    <th *ngIf="canView">Ціна покупки</th>
-                    <th>Ціна продажу</th>
-                    <th *ngFor="let col of wereHouses" [style]="{'width': '110px'}">
+                    <th pSortableColumn="productType">
+                        Ім'я
+                        <p-sortIcon field="productType"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="producer">
+                        Виробник
+                        <p-sortIcon field="producer"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="model">
+                        Модель
+                        <p-sortIcon field="model"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="size">
+                        Розмір
+                        <p-sortIcon field="size"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="color">
+                        Колір
+                        <p-sortIcon field="color"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="freeNote">
+                        Нотатки
+                        <p-sortIcon field="freeNote"></p-sortIcon>
+                    </th>
+                    <th *ngIf="canView" pSortableColumn="recommendedBuyPrice">
+                        Ціна покупки
+                        <p-sortIcon field="recommendedBuyPrice"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="recommendedSalePrice">
+                        Ціна продажу
+                        <p-sortIcon field="recommendedSalePrice"></p-sortIcon>
+                    </th>
+                    <th *ngFor="let col of wereHouses" [pSortableColumn]="'wh_'+col.id">
                         {{col.name}}
+                        <p-sortIcon [field]="'wh_'+col.id"></p-sortIcon>
                     </th>
                 </tr>
                 <!-- <tr>
@@ -89,34 +128,15 @@
 
             <ng-template pTemplate="body" let-rowData>
                 <tr [pSelectableRow]="rowData">
-                    <td >
-                        {{rowData.productType}}
-                    </td>
-                    <td >
-                        {{rowData.producer}}
-                    </td>
-                    <td  [style]="{'width':'80px'}">
-                        {{rowData.model}}
-                    </td>
-                    <td >
-                        {{rowData.size}}
-                    </td>
-                    <td >
-                        {{rowData.color}}
-                    </td>
-                    <td [style]="{'width':'300px'}">
-                        {{rowData.freeNote}}
-                    </td>
-                    <td *ngIf="canView" [style]="{'width': '110px'}">
-                        {{rowData.recommendedBuyPrice}}
-                    </td>
-                    <td [style]="{'width': '110px'}">
-                        {{rowData.recommendedSalePrice}}
-                    </td>
-                    <td *ngFor="let col of wereHouses" 
-                        [style]="{'width': '110px'}">
-                        {{rowData['wh_'+col.id]}}
-                    </td>
+                    <td>{{rowData.productType}}</td>
+                    <td>{{rowData.producer}}</td>
+                    <td>{{rowData.model}}</td>
+                    <td>{{rowData.size}}</td>
+                    <td>{{rowData.color}}</td>
+                    <td>{{rowData.freeNote}}</td>
+                    <td *ngIf="canView">{{rowData.recommendedBuyPrice}}</td>
+                    <td>{{rowData.recommendedSalePrice}}</td>
+                    <td *ngFor="let col of wereHouses">{{rowData['wh_'+col.id]}}</td>
                 </tr>
             </ng-template>
         </p-table>
