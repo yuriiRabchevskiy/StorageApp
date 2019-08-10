@@ -14,7 +14,7 @@ export class ApiEndpointsConfig {
     public static getAppEndpoint() {
         if (ApiEndpointsConfig.isDebug()) {
             return 'http://localhost:4577/';
-            // return 'http://btv.cloudapp.net:7700/';
+            // return 'https://sweetkeys.azurewebsites.net/';
         }
 
         const path = location.pathname;
