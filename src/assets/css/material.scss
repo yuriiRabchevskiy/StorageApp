@@ -34,8 +34,8 @@
     }
 }
 
-.s-input-wrapper.mat-input-container,
-.s-area-wrapper.mat-input-container {
+.s-input-wrapper.mat-form-field,
+.s-area-wrapper.mat-form-field {
     display: block;
     @include wH(calc(50% - 40px), 60px);
     min-width: 260px;
@@ -117,7 +117,7 @@
 .s-input-wrapper.mat-input-with-error {
     margin-bottom: 18px;
 }
-.s-area-wrapper.mat-input-container {
+.s-area-wrapper.mat-form-field {
     @include wH(calc(100% - 40px), auto);
     max-width: 800px;
     min-height: 100%;

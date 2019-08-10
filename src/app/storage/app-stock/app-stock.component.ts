@@ -49,6 +49,19 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
     this.filter();
   }
 
+  cols = [
+    { field: 'productType', header: 'Ім\'я' },
+    { field: 'producer', header: 'Виробник' },
+    { field: 'model', header: 'Модель' },
+    { field: 'size', header: 'Розмір' },
+    { field: 'color', header: 'Колір' },
+    { field: 'freeNote', header: 'Нотатки' },
+    { field: 'recommendedBuyPrice', header: 'Нотатки' },
+    { field: 'recommendedSalePrice', header: 'Ціна покупки' },
+    { field: 'recommendedSalePrice', header: 'Ціна продажу' },
+  ];
+
+
   constructor(private apiService: ApiService, public router: Router, notifi: MessageService) {
     super(notifi);
     this.selectedTab = this.tabs[0];
