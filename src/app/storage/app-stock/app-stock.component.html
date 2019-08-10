@@ -7,10 +7,10 @@
     </div>
     <div class="page-body">
         <!--todo - fix it [rowStyleClass]="disabledRow" -->
-        <p-table class="prime-table" [columns]="cols" [value]="filteredData" selectionMode="single"
-            [(selection)]="selectedItem" [loading]="showSpinner" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
-            [rows]="100" [pageLinks]="4" [responsive]="true" (onRowClick)="onRowClick($event)" scrollable="true"
-            scrollWidth="100%" scrollHeight="100%" #dt>
+        <p-table class="prime-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem"
+            [loading]="showSpinner" [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [rows]="100" [pageLinks]="4"
+            [responsive]="true" (onRowClick)="onRowClick($event)" scrollable="true" scrollWidth="100%"
+            scrollHeight="100%" #dt dataKey="id">
 
             <ng-template pTemplate="caption">
                 <div class="flex-row flex-wrap">
@@ -43,34 +43,82 @@
                 </div>
             </ng-template>
 
-            <ng-template pTemplate="header" let-columns>
+            <ng-template pTemplate="header">
                 <tr>
-                    <th *ngFor="let col of columns">
-                        {{col.header}}
+                    <th>Ім'я</th>
+                    <th>Виробник</th>
+                    <th>Модель</th>
+                    <th>Розмір</th>
+                    <th>Колір</th>
+                    <th>Нотатки</th>
+                    <th *ngIf="canView">Ціна покупки</th>
+                    <th>Ціна продажу</th>
+                    <th *ngFor="let col of wereHouses" [style]="{'width': '110px'}">
+                        {{col.name}}
                     </th>
                 </tr>
+                <!-- <tr>
+                    <th>
+                        <input pInputText type="text"
+                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                    </th>
+                    <th>
+                        <input pInputText type="text"
+                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                    </th>
+                    <th>
+                        <input pInputText type="text"
+                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                    </th>
+                    <th>
+                        <input pInputText type="text"
+                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                    </th>
+                    <th>
+                        <input pInputText type="text"
+                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                    </th>
+                    <th>
+                        <input pInputText type="text"
+                            (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+                    </th>
+                    <th *ngIf="canView"></th>
+                    <th></th>
+                </tr> -->
             </ng-template>
 
-            <ng-template pTemplate="body" let-rowData let-columns="columns">
-                <tr>
-                    <td *ngFor="let col of columns">
-                        {{rowData[col.field]}}
+            <ng-template pTemplate="body" let-rowData>
+                <tr [pSelectableRow]="rowData">
+                    <td >
+                        {{rowData.productType}}
+                    </td>
+                    <td >
+                        {{rowData.producer}}
+                    </td>
+                    <td  [style]="{'width':'80px'}">
+                        {{rowData.model}}
+                    </td>
+                    <td >
+                        {{rowData.size}}
+                    </td>
+                    <td >
+                        {{rowData.color}}
+                    </td>
+                    <td [style]="{'width':'300px'}">
+                        {{rowData.freeNote}}
+                    </td>
+                    <td *ngIf="canView" [style]="{'width': '110px'}">
+                        {{rowData.recommendedBuyPrice}}
+                    </td>
+                    <td [style]="{'width': '110px'}">
+                        {{rowData.recommendedSalePrice}}
+                    </td>
+                    <td *ngFor="let col of wereHouses" 
+                        [style]="{'width': '110px'}">
+                        {{rowData['wh_'+col.id]}}
                     </td>
                 </tr>
             </ng-template>
-            <!-- <p-column field="productType" header="Ім'я" [sortable]="true" [filter]="true"></p-column>
-            <p-column field="producer" header="Виробник" [sortable]="true" [filter]="true"></p-column>
-            <p-column field="model" header="Модель" [sortable]="true" [style]="{'width':'80px'}" [filter]="true"></p-column>
-            <p-column field="size" header="Розмір" [sortable]="true" [filter]="true"></p-column>
-            <p-column field="color" header="Колір" [sortable]="true" [filter]="true"></p-column>
-            <p-column field="freeNote" header="Нотатки" [sortable]="true" [style]="{'width':'300px'}" [filter]="true"></p-column>
-            <p-column *ngIf="canView" field="recommendedBuyPrice" header="Ціна покупки" [sortable]="true" [style]="{'width': '110px'}">
-            </p-column>
-            <p-column field="recommendedSalePrice" header="Ціна продажу" [sortable]="true" [style]="{'width': '110px'}">
-            </p-column> -->
-
-
-            <!-- <p-column *ngFor="let col of wereHouses" [field]="'wh_'+col.id" [header]="col.name" [style]="{'width': '80px'}"></p-column> -->
         </p-table>
     </div>
 </div>
