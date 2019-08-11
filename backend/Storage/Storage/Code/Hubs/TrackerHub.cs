@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace Storage.Code.Hubs
 {
   [Authorize(AuthenticationSchemes = "Bearer")]
-  public class TrackerHub : Hub, IStateInformer
+  public class TrackerHub : Hub<IStateInformer>, IStateInformer
   {
     private readonly IHubContext<TrackerHub> _context;
 

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Storage.Code.Helpers;
+using Storage.Code.Hubs;
 
 namespace Storage.Controllers
 {
@@ -33,7 +34,7 @@ namespace Storage.Controllers
 
     // GET api/values
     [HttpGet]
-    public async Task<ApiResponse<ApiProduct>> GetAsync()
+    public async Task<ApiResponse<ApiProduct>> GetAsync([FromServices]  TrackerHub hub)
     {
       var data = await _repo.GetAsync().ConfigureAwait(false);
       return new ApiResponse<ApiProduct>(data);
@@ -88,7 +89,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("sell")]
-    public async Task<ApiResponseBase> Sell([FromBody] ApiSellOrder model)
+    public async Task<ApiResponseBase> Sell([FromBody] ApiSellOrder model, [FromServices]  TrackerHub hub)
     {
       if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
 

@@ -130,6 +130,7 @@ namespace Storage
 
       services.AddTransient<IEmailSender, EmailSender>();
       services.AddTransient<IStateInformer, TrackerHub>();
+      services.AddTransient<TrackerHub, TrackerHub>();
 
     }
 

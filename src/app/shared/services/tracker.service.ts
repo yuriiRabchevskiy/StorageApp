@@ -1,22 +1,56 @@
 import { Injectable } from '@angular/core';
-import * as signalR from '@aspnet/signalr';
+import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
+import { MessageService } from 'primeng/components/common/messageservice';
 import { ApiEndpointsConfig } from '../../api.config';
+import { UserService } from './user.service';
+import { ApiProdCountChanges } from '../../models/api/state/state';
+import { LiteEvent } from '../helpers/lite-event';
 
 @Injectable()
 export class TrackerService {
 
-    public constructor() {
+    public productsCountChanged: LiteEvent<ApiProdCountChanges> = new LiteEvent<ApiProdCountChanges>();
 
+    private _userToken: string;
+    private _connection: HubConnection;
+
+    public constructor(private notify: MessageService, private userService: UserService) {
+        this.connectUser();
+    }
+
+    public connectUser() {
+        const user = this.userService.getLocal();
+        if (!user) return;
+        this._userToken = user.token;
+        if (this._connection) this._connection.stop();
         const apiUrl = ApiEndpointsConfig.getAppEndpoint();
-        // const connection = new signalR.HubConnection(apiUrl + 'tracker');
-        // console.log('started');
+        const hubUrl = `${apiUrl}tracker`;
+        const builder = new HubConnectionBuilder();
+        const connection = builder
+            .withUrl(hubUrl, {
+                accessTokenFactory: () => this._userToken
+            })
+            .build();
 
-        // connection.on('send', data => {
-        //     console.log(data);
+        this._connection = connection;
+
+        connection.on('productsCountChanged', (data: ApiProdCountChanges) => {
+            this.productsCountChanged.trigger(data);
+        });
+
+        // connection.on('setupChange', (data: IClientSetupMessage) => {
+        //     this.clientSetupChanged.trigger(data);
         // });
 
-        // connection.start()
-        //     .then(() => connection.invoke('send', 'Hello'));
+        // connection.onclose((err) => {
+        //     console.error('signal R connection is closed:', err);
+        // });
+
+        connection.start().catch(err => {
+            return console.error(err.toString());
+        });
+        console.log(`signal R Hub started for user ${user.userName}`);
+
     }
 
 }
