@@ -1,3 +1,4 @@
+import { TrackerService } from './../shared/services/tracker.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Message } from 'primeng/components/common/api';
@@ -30,7 +31,7 @@ export class MainComponent extends SecuredComponent implements OnInit {
     return this.work.showSpinner;
   }
 
-  constructor(private router: Router, private apiService: ApiService) {
+  constructor(private router: Router, private apiService: ApiService, private trackerService: TrackerService) {
     super();
     const user = this.userService.getLocal();
     if (!user) return;
@@ -44,6 +45,8 @@ export class MainComponent extends SecuredComponent implements OnInit {
     ];
     this.getCurrentUrl(this.router.url);
     this.work = new WorkProgress(() => this.apiService.logout(), (res) => this.onLogoutConfirmed(res), undefined);
+
+    trackerService.connectUser();
   }
 
   ngOnInit() {

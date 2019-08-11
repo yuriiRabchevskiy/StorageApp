@@ -5,6 +5,8 @@ using SharedDataContracts.Api.Response;
 using BusinessLogic.Models.Api;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
+using BusinessLogic.Abstractions;
+using BusinessLogic.Models.Api.State;
 using BusinessLogic.Models.User;
 using BusinessLogic.Repository;
 using DataAccess.Models;
