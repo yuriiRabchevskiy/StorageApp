@@ -49,19 +49,6 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
     this.filter();
   }
 
-  cols = [
-    { field: 'productType', header: 'Ім\'я' },
-    { field: 'producer', header: 'Виробник' },
-    { field: 'model', header: 'Модель' },
-    { field: 'size', header: 'Розмір' },
-    { field: 'color', header: 'Колір' },
-    { field: 'freeNote', header: 'Нотатки' },
-    { field: 'recommendedBuyPrice', header: 'Нотатки' },
-    { field: 'recommendedSalePrice', header: 'Ціна покупки' },
-    { field: 'recommendedSalePrice', header: 'Ціна продажу' },
-  ];
-
-
   constructor(private apiService: ApiService, public router: Router, notifi: MessageService) {
     super(notifi);
     this.selectedTab = this.tabs[0];
@@ -255,25 +242,30 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
     this.updateBalanceFields(this.selectedItem, balance);
   }
 
-  onRowClick(event) {
-    this.findTotalBalance(event);
-    if (this.selectedItem !== event.data) return;
+  onRowClick(product: IProduct) {
+    this.findTotalBalance(product);
+    if (this.selectedItem.id !== product.id) {
+      this.selectedItem = product;
+      return;
+    }
     if (!this.isBalance || !this.selectedItem.id) return;
     this.showSellDialog();
   }
+  // onRowClick(user: ISUser) {
+  //   if (this.selectedItem.id !== user.id) {
+  //     this.selectedItem = user;
+  //     return;
+  //   }
+  //   this.displayEditDialog = true;
+  // }
 
-  findTotalBalance(val) {
-    let data;
-    if (!val.data) {
-      data = val.balance;
-    } else {
-      data = val.data.balance;
-    }
-    let counts = [];
+  findTotalBalance(item) {
+    const data = item.balance;
+    const counts = [];
     for (let key in data) {
       counts.push(data[key]);
     }
-    let count = counts.reduce((a, b) => {
+    const count = counts.reduce((a, b) => {
       return a + b;
     }, 0);
     if (count > 0) {
