@@ -1,3 +1,5 @@
+import { Order } from '../../storage';
+
 export class ApiProdCountChanges {
     changes: ApiProdCountChange[];
 }
@@ -7,4 +9,15 @@ export class ApiProdCountChange {
     warehouseId: number;
     newCount: number;
     oldCount: number;
+}
+
+export class ApiOrderDetailsChanges {
+    changes: ApiOrderDetailsChange[];
+}
+
+export class ApiOrderDetailsChange {
+
+  orderId: number;
+  changeTime: number;
+  order: Order;
 }

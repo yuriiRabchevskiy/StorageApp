@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BusinessLogic.Models.Api.State;
 
@@ -5,6 +6,8 @@ namespace BusinessLogic.Abstractions
 {
   public interface IStateInformer
   {
-    Task ProductsCountChangedAsync(ApiProdCountChanges changes);
+    Task ProductsCountChangedAsync(IEnumerable<ApiProdCountChange> changes);
+
+    Task OrderChangedAsync(IEnumerable<ApiOrderDetailsChange> changes);
   }
 }

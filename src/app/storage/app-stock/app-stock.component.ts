@@ -379,7 +379,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     info.changes.forEach(change => {
       const product = this.data.find(it => it.id === change.productId);
       const current = product.balance[change.warehouseId];
-      if (current !== change.oldCount) {
+      if (current !== change.oldCount && current !== change.newCount) {
         this.notifi.add({
           severity: 'error',
           summary: 'Виникла розсинхронізація клієнта та сервера. Кількість товарів може не збігатися. Оновіть дані.',

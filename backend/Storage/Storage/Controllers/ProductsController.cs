@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using SharedDataContracts.Api.Response;
 using BusinessLogic.Models.Api;
 using BusinessLogic.Repository;
-using System;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using DataAccess.Models;
@@ -23,9 +22,7 @@ namespace Storage.Controllers
     Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
 
-    public ProductController(IProductsRepository repo, IWarehouseRepository houseRepo,
-                        IOrdersRepository ordersRepo,
-                        UserManager<ApplicationUser> userManager)
+    public ProductController(IProductsRepository repo, IWarehouseRepository houseRepo, UserManager<ApplicationUser> userManager)
     {
       _repo = repo;
       _houseRepo = houseRepo;
@@ -34,7 +31,7 @@ namespace Storage.Controllers
 
     // GET api/values
     [HttpGet]
-    public async Task<ApiResponse<ApiProduct>> GetAsync([FromServices]  TrackerHub hub)
+    public async Task<ApiResponse<ApiProduct>> GetAsync()
     {
       var data = await _repo.GetAsync().ConfigureAwait(false);
       return new ApiResponse<ApiProduct>(data);
