@@ -7,14 +7,16 @@
     </div>
     <div class="page-body">
         <!--todo - fix it [rowStyleClass]="disabledRow" -->
-        <p-table class="prime-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem"
-            [loading]="showSpinner" [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [rows]="100" [pageLinks]="4"
-            [responsive]="true" (onRowClick)="onRowClick($event)" scrollable="true" scrollWidth="100%"
+        <p-table class="prime-table" [value]="filteredData"
+            [loading]="showSpinner" [paginator]="true"
+            [rowsPerPageOptions]="[100,50,30]" [rows]="100" [pageLinks]="4"
+            [responsive]="true"
+            scrollable="true" scrollWidth="100%"
             scrollHeight="100%" #dt dataKey="id"
             [globalFilterFields]="['productType', 'model', 'size', 'color', 'freeNote']">
 
             <ng-template pTemplate="caption">
-                <div class="flex-row flex-wrap">
+                <div class="flex-row flex-wrap table-header">
                     <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile && canView">
                         <app-i-button *ngIf="canView" icon="add-icon" title="Додати Продукт"
                             (iClick)="showDialogToAdd()"></app-i-button>
@@ -55,7 +57,7 @@
                     <col width="300">
                     <col width="110px">
                     <col width="110px">
-                    <col width="80px">
+                    <col *ngFor="let col of wereHouses" width="80px">
                 </colgroup>
             </ng-template>
 
@@ -124,7 +126,7 @@
             </ng-template>
 
             <ng-template pTemplate="body" let-rowData>
-                <tr [pSelectableRow]="rowData">
+                <tr (click)="onRowClick(rowData)" [ngClass]="{'s-selected-row': rowData.id === selectedItem.id}">
                     <td>{{rowData.productType}}</td>
                     <td>{{rowData.producer}}</td>
                     <td>{{rowData.model}}</td>
