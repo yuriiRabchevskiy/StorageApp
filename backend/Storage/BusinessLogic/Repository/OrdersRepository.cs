@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using DataAccess.Models;
 using BusinessLogic.Models.Api;
 using AutoMapper;
+using BusinessLogic.Abstractions;
 using BusinessLogic.Helpers;
+using BusinessLogic.Models.Api.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,7 +24,8 @@ namespace DataAccess.Repository
   public class OrdersRepository : IOrdersRepository
   {
 
-    private IServiceProvider _di;
+    private readonly IServiceProvider _di;
+    IStateInformer Informer => _di.GetService<IStateInformer>();
     private ClientTimeZone ClientTime { get; set; }
 
     public OrdersRepository(IServiceProvider serviceProvider, IConfiguration configuration)
@@ -85,6 +88,12 @@ namespace DataAccess.Repository
           order.OrderEditions = new List<OrderAction>(new[] {
             new OrderAction { Date = ClientTime.Now, OrderId = order.Id, UserId = userId, Note = note }
             });
+          await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
+          {
+            OrderId = order.Id,
+            Order = it,
+            ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+          } }).ConfigureAwait(false);
         }
         await context.SaveChangesAsync().ConfigureAwait(false);
       }

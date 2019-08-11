@@ -37,6 +37,8 @@ namespace BusinessLogic.Repository
     private ClientTimeZone ClientTime { get; set; }
     static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
+    IStateInformer Informer => _di.GetService<IStateInformer>();
+
     public WarehousesRepository(IServiceProvider serviceProvider, IConfiguration configuration)
     {
       _di = serviceProvider;
@@ -171,14 +173,13 @@ namespace BusinessLogic.Repository
             {
               var from = getStockAndVerify(productOrder.IdProduct, productOrder, context);
 
-              var change = new ApiProdCountChange
+              changesNotes.Add(new ApiProdCountChange
               {
                 ProductId = productOrder.IdProduct,
                 WarehouseId = productOrder.FromId,
                 NewCount = from.Quantity,
                 OldCount = from.Quantity + productOrder.Quantity
-              };
-              changesNotes.Add(change);
+              });
 
               var prodOrder = new ProductAction
               {
@@ -202,9 +203,7 @@ namespace BusinessLogic.Repository
           }
         }
 
-        var informer = this._di.GetService<IStateInformer>();
-        var changes = new ApiProdCountChanges { Changes = changesNotes };
-        await informer.ProductsCountChangedAsync(changes).ConfigureAwait(false);
+        await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
       }
       finally
       {
@@ -214,6 +213,8 @@ namespace BusinessLogic.Repository
 
     public async Task<bool> CancelOrderAsync(string userId, int id, string reason)
     {
+      var changesNotes = new List<ApiProdCountChange>();
+
       using (var context = _di.GetService<ApplicationDbContext>())
       {
         using (var transaction = context.Database.BeginTransaction())
@@ -222,24 +223,29 @@ namespace BusinessLogic.Repository
             .FirstOrDefaultAsync(it => it.Id == id).ConfigureAwait(false);
 
           if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Поточне замовлення уже скасовано");
+          order.Status = OrderStatus.Canceled;
+          order.CloseDate = DateTime.Now;
+          order.CanceledByUserId = userId;
+          order.CancelReason = reason;
+
 
           var warehouses = context.WarehouseProducts.Include(it => it.Product);
-
-          if (order != null)
-          {
-            order.Status = OrderStatus.Canceled;
-            order.CloseDate = DateTime.Now;
-            order.CanceledByUserId = userId;
-            order.CancelReason = reason;
-          }
-
           var revertActions = new List<ProductAction>();
 
           var date = ClientTime.Now;
           foreach (var action in order.Transactions)
           {
             var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
+            var oldCount = from.Quantity;
             from.Quantity += action.Quantity * -1; // quantity is negative in sale action
+
+            changesNotes.Add(new ApiProdCountChange
+            {
+              ProductId = action.ProductId,
+              WarehouseId = from.WarehouseId,
+              NewCount = from.Quantity,
+              OldCount = oldCount
+            });
 
             var restoreAction = new ProductAction
             {
@@ -261,9 +267,9 @@ namespace BusinessLogic.Repository
           context.SaveChanges();
           transaction.Commit();
         }
-
-
       }
+
+      await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
 
       return true;
     }

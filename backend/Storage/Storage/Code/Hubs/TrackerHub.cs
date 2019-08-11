@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BusinessLogic.Abstractions;
 using BusinessLogic.Models.Api.State;
@@ -17,10 +18,14 @@ namespace Storage.Code.Hubs
       _context = context;
     }
 
-    public Task ProductsCountChangedAsync(ApiProdCountChanges changes)
+    public Task ProductsCountChangedAsync(IEnumerable<ApiProdCountChange> changes)
     {
-      var connectionId = Context?.ConnectionId;
-      return _context.Clients.AllExcept(connectionId).SendAsync("productsCountChanged", changes);
+      return _context.Clients.All.SendAsync("productsCountChanged", new ApiProdCountChanges { Changes = changes });
+    }
+
+    public Task OrderChangedAsync(IEnumerable<ApiOrderDetailsChange> changes)
+    {
+      return _context.Clients.All.SendAsync("orderChanged", new ApiOrderDetailsChanges { Changes = changes });
     }
   }
 

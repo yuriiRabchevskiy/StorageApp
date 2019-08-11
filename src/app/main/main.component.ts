@@ -1,5 +1,5 @@
 import { TrackerService } from './../shared/services/tracker.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
 import { Message } from 'primeng/components/common/api';
 import { SecuredComponent } from '../models/component/base-api.component';
@@ -12,6 +12,7 @@ import { ApiService } from '../shared/services/api.service';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent extends SecuredComponent implements OnInit {
+
   pages = [];
   page: string = '';
   userLogin: string = 'admin';
@@ -31,7 +32,7 @@ export class MainComponent extends SecuredComponent implements OnInit {
     return this.work.showSpinner;
   }
 
-  constructor(private router: Router, private apiService: ApiService, private trackerService: TrackerService) {
+  constructor(private router: Router, private apiService: ApiService, trackerService: TrackerService) {
     super();
     const user = this.userService.getLocal();
     if (!user) return;
