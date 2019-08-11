@@ -1,35 +1,86 @@
 <div class="page-wrap">
+    <p-table class="prime-table" [value]="filteredData"
+        [loading]="showSpinner" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
+        [pageLinks]="4" [rows]="100"
+        [responsive]="true" scrollable="true" scrollWidth="100%"
+        scrollHeight="calc(100% - 54px)" #dt dataKey="id"
+        [globalFilterFields]="['login', 'email', 'name', 'surname', 'phone', 'isAdmin']">
+        <ng-template pTemplate="caption">
+            <div class="flex-row flex-wrap table-header">
+                <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
+                    <app-i-button icon="add-user-icon" title="Додати користувача" (iClick)="addNewUser()">
+                    </app-i-button>
+                    <app-i-button icon="del-icon" title="Видалити користувача" (iClick)="confirmation()"></app-i-button>
+                    <app-i-button icon="edit-icon" title="Редагувати користувача" (iClick)="showToEdit()">
+                    </app-i-button>
+                    <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
+                </app-button-group>
 
-    <p-table class="prime-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem" [loading]="showSpinner"
-        [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4" [rows]="100" [responsive]="true" (onRowClick)="onRowClick($event)"
-        scrollable="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" #dt>
-        <p-header class="table-head" [ngClass]="{'mobile-t-head': view.isMobile}">
-            <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
-                <app-i-button icon="add-user-icon" title="Додати користувача" (iClick)="addNewUser()"></app-i-button>
-                <app-i-button icon="del-icon" title="Видалити користувача" (iClick)="confirmation()"></app-i-button>
-                <app-i-button icon="edit-icon" title="Редагувати користувача" (iClick)="showToEdit()"></app-i-button>
-                <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
-            </app-button-group>
-
-            <div class="button-wrap">
-                <input class="s-serche" type="text" placeholder="Пошук" (input)="dt.filterGlobal($event.target.value, 'contains')">
+                <div class="button-wrap">
+                    <input class="s-serche" type="text" placeholder="Пошук"
+                        (input)="dt.filterGlobal($event.target.value, 'contains')">
+                </div>
             </div>
-        </p-header>
-        <p-column field="login" header="Логін" [sortable]="true"></p-column>
-        <p-column field="email" header="Емейл" [sortable]="true"></p-column>
-        <p-column field="name" header="Ім'я" [sortable]="true"></p-column>
-        <p-column field="surname" header="Фамілія" [sortable]="true"></p-column>
-        <p-column field="phone" header="Телефон" [sortable]="true"></p-column>
-        <p-column field="isAdmin" header="Роль" [sortable]="true" [style]="{'width':'120px'}">
-            <ng-template let-col let-role="rowData" pTemplate="body">
-                <span>{{role[col.field] === true ? 'Адміністратор' : 'Продавець'}}</span>
+        </ng-template>
+        <ng-template pTemplate="colgroup">
+                <colgroup>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col width="120px">
+                    <col>
+                </colgroup>
             </ng-template>
-        </p-column>
-        <p-column field="notes" header="Нотатки"></p-column>
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="login">
+                    Логін
+                    <p-sortIcon field="login"></p-sortIcon>
+                </th>
+                <th pSortableColumn="email">
+                    Емейл
+                    <p-sortIcon field="email"></p-sortIcon>
+                </th>
+                <th pSortableColumn="name">
+                    Ім'я
+                    <p-sortIcon field="name"></p-sortIcon>
+                </th>
+                <th pSortableColumn="surname">
+                    Фамілія
+                    <p-sortIcon field="surname"></p-sortIcon>
+                </th>
+                <th pSortableColumn="phone">
+                    Телефон
+                    <p-sortIcon field="phone"></p-sortIcon>
+                </th>
+                <th pSortableColumn="isAdmin">
+                    Роль
+                    <p-sortIcon field="isAdmin"></p-sortIcon>
+                </th>
+                <th>Нотатки</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData>
+            <tr (click)="onRowClick(rowData)" [ngClass]="{'s-selected-row': rowData.id === selectedItem.id}">
+                <td>{{rowData.login}}</td>
+                <td>{{rowData.email}}</td>
+                <td>{{rowData.name}}</td>
+                <td>{{rowData.surname}}</td>
+                <td>{{rowData.phone}}</td>
+
+                <td>{{rowData.isAdmin ? 'Адміністратор' : 'Продавець'}}</td>
+
+                <td>{{rowData.notes}}</td>
+            </tr>
+        </ng-template>
     </p-table>
 </div>
-<app-user [userList]="filteredData" *ngIf="displayDialog" (onCloseDialog)="closeDialog($event)" (saveUser)="save($event)"></app-user>
-<app-user-editor *ngIf="displayEditDialog" [user]="selectedItem" (onCloseDialog)="closeDialog($event)" (saveChange)="saveChange($event)"></app-user-editor>
+<app-user [userList]="filteredData" *ngIf="displayDialog" (onCloseDialog)="closeDialog($event)"
+    (saveUser)="save($event)"></app-user>
+<app-user-editor *ngIf="displayEditDialog" [user]="selectedItem" (onCloseDialog)="closeDialog($event)"
+    (saveChange)="saveChange($event)"></app-user-editor>
 <app-confirm (confirm)="confirmDelete($event)" *ngIf="showConfirm">
     <span header class="confirm-title">Ви впевнені, що бажаєте видалити користувача:
         <b>{{selectedItem.name}}</b>

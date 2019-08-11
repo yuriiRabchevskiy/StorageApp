@@ -22,8 +22,11 @@ export class UsersComponent extends ApiListComponent<ISUser> {
     super(notifi);
   }
 
-  onRowClick(val) {
-    if (this.selectedItem !== val.data) return;
+  onRowClick(user: ISUser) {
+    if (this.selectedItem.id !== user.id) {
+      this.selectedItem = user;
+      return;
+    }
     this.displayEditDialog = true;
   }
 
@@ -146,7 +149,6 @@ export class UsersComponent extends ApiListComponent<ISUser> {
 
   onDataReceived(res: ApiResponse<ISUser>) {
     super.onDataReceived(res);
-    console.log(res);
   }
 
   showToEdit() {
