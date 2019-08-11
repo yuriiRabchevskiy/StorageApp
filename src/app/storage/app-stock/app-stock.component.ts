@@ -53,19 +53,6 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.filter();
   }
 
-  cols = [
-    { field: 'productType', header: 'Ім\'я' },
-    { field: 'producer', header: 'Виробник' },
-    { field: 'model', header: 'Модель' },
-    { field: 'size', header: 'Розмір' },
-    { field: 'color', header: 'Колір' },
-    { field: 'freeNote', header: 'Нотатки' },
-    { field: 'recommendedBuyPrice', header: 'Нотатки' },
-    { field: 'recommendedSalePrice', header: 'Ціна покупки' },
-    { field: 'recommendedSalePrice', header: 'Ціна продажу' },
-  ];
-
-
   constructor(private apiService: ApiService, public router: Router, notifi: MessageService,
     private tracker: TrackerService) {
     super(notifi);
@@ -78,8 +65,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.loadWereHouse();
   }
 
-  selectTab(event) {
-    this.selectedTab = this.tabs[event.index];
+  selectTab(index: number) {
+    this.selectedTab = this.tabs[index];
   }
 
   showDialogToAdd(isMore: boolean = false, isCopy: boolean = false) {
@@ -262,26 +249,23 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.updateBalanceFields(this.selectedItem, balance);
   }
 
-  onRowClick(event) {
-    debugger
-    this.findTotalBalance(event);
-    if (this.selectedItem !== event.data) return;
+  onRowClick(product: IProduct) {
+    this.findTotalBalance(product);
+    if (this.selectedItem.id !== product.id) {
+      this.selectedItem = product;
+      return;
+    }
     if (!this.isBalance || !this.selectedItem.id) return;
     this.showSellDialog();
   }
 
-  findTotalBalance(val) {
-    let data;
-    if (!val.data) {
-      data = val.balance;
-    } else {
-      data = val.data.balance;
-    }
-    let counts = [];
+  findTotalBalance(item) {
+    const data = item.balance;
+    const counts = [];
     for (let key in data) {
       counts.push(data[key]);
     }
-    let count = counts.reduce((a, b) => {
+    const count = counts.reduce((a, b) => {
       return a + b;
     }, 0);
     if (count > 0) {
