@@ -1,4 +1,5 @@
 export interface IApiSale {
+    id?: string;
     category: number;
     quantity: number;
     sales: number;
