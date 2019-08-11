@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DataAccess.Models;
 using BusinessLogic.Models.Api;
 using AutoMapper;
+using BusinessLogic.Abstractions;
+using BusinessLogic.Models.Api.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +14,7 @@ namespace DataAccess.Repository
 {
   public interface IProductsRepository
   {
-    List<ApiProduct> Get();
+    Task<List<ApiProduct>> GetAsync();
     int Add(ApiProduct product);
     void Update(ApiProduct product);
     void Delete(int productId);
@@ -27,16 +30,18 @@ namespace DataAccess.Repository
       _di = serviceProvider;
     }
 
-    public List<ApiProduct> Get()
+    public async Task<List<ApiProduct>> GetAsync()
     {
       using (var context = _di.GetService<ApplicationDbContext>())
       {
-        return context.Products.Where(it => it.IsActive).Include(it => it.State).ToList().Select(it =>
+        var products = await context.Products.Where(it => it.IsActive).Include(it => it.State).ToListAsync();
+        var data = products.Select(it =>
         {
           var prod = Mapper.Map<ApiProduct>(it);
           prod.Balance = it.State.ToDictionary(key => key.WarehouseId, val => val.Quantity);
           return prod;
-        }).OrderByDescending(it=> it.Balance.Values.Sum() > 0 ).ToList();
+        }).OrderByDescending(it => it.Balance.Values.Sum() > 0).ToList();
+        return data;
       }
     }
 

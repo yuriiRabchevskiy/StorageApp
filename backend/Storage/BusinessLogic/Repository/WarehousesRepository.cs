@@ -6,8 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using BusinessLogic.Abstractions;
 using BusinessLogic.Helpers;
+using BusinessLogic.Models.Api.State;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,21 +26,21 @@ namespace BusinessLogic.Repository
     void TransferProduct(string userId, int prouductId, ApiProdTransfer info);
     void RemoveProduct(string userId, int productId, ApiProdAction info);
     void AddProduct(string userId, int productId, ApiProdAction info);
-    void SellOrder(string userId, ApiSellOrder info);
+    Task SellOrderAsync(string userId, ApiSellOrder info);
     Task<bool> CancelOrderAsync(string userId, int id, string reason);
   }
 
   public class WarehousesRepository : IWarehouseRepository
   {
 
-    private IServiceProvider _di;
-    private ClientTimeZone ClientTyme { get; set; }
-    private static object _lockObj = new object();
+    private readonly IServiceProvider _di;
+    private ClientTimeZone ClientTime { get; set; }
+    static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
     public WarehousesRepository(IServiceProvider serviceProvider, IConfiguration configuration)
     {
       _di = serviceProvider;
-      ClientTyme = new ClientTimeZone(configuration["ShiftTimeZone"]);
+      ClientTime = new ClientTimeZone(configuration["ShiftTimeZone"]);
     }
 
     public List<ApiWarehouse> Get()
@@ -106,7 +109,7 @@ namespace BusinessLogic.Repository
             to.Quantity += info.Quantity;
             context.SaveChanges();
 
-            var date = ClientTyme.Now;
+            var date = ClientTime.Now;
             context.ProductsTrqansactions.Add(new ProductAction
             {
               ProductId = productId,
@@ -146,16 +149,18 @@ namespace BusinessLogic.Repository
       }
     }
 
-    public void SellOrder(string userId, ApiSellOrder info)
+    public async Task SellOrderAsync(string userId, ApiSellOrder info)
     {
       var oi = info;
-      lock (_lockObj)
+      var changesNotes = new List<ApiProdCountChange>();
+      await _semaphoreSlim.WaitAsync();
+      try
       {
         using (var context = _di.GetService<ApplicationDbContext>())
         {
           using (var transaction = context.Database.BeginTransaction(IsolationLevel.ReadCommitted))
           {
-            var date = ClientTyme.Now;
+            var date = ClientTime.Now;
             var order = Mapper.Map<Order>(oi);
             order.OpenDate = date;
             order.Status = OrderStatus.Open;
@@ -165,6 +170,16 @@ namespace BusinessLogic.Repository
             foreach (var productOrder in info.ProductOrders)
             {
               var from = getStockAndVerify(productOrder.IdProduct, productOrder, context);
+
+              var change = new ApiProdCountChange
+              {
+                ProductId = productOrder.IdProduct,
+                WarehouseId = productOrder.FromId,
+                NewCount = from.Quantity,
+                OldCount = from.Quantity + productOrder.Quantity
+              };
+              changesNotes.Add(change);
+
               var prodOrder = new ProductAction
               {
                 Date = date,
@@ -181,11 +196,19 @@ namespace BusinessLogic.Repository
             }
 
             context.Orders.Add(order);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             transaction.Commit();
           }
         }
+
+        var informer = this._di.GetService<IStateInformer>();
+        var changes = new ApiProdCountChanges { Changes = changesNotes };
+        await informer.ProductsCountChangedAsync(changes).ConfigureAwait(false);
+      }
+      finally
+      {
+        _semaphoreSlim.Release();
       }
     }
 
@@ -212,7 +235,7 @@ namespace BusinessLogic.Repository
 
           var revertActions = new List<ProductAction>();
 
-          var date = ClientTyme.Now;
+          var date = ClientTime.Now;
           foreach (var action in order.Transactions)
           {
             var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
@@ -256,7 +279,7 @@ namespace BusinessLogic.Repository
           try
           {
 
-            var date = ClientTyme.Now;
+            var date = ClientTime.Now;
             var action = new ProductAction()
             {
               ProductId = productId,
@@ -302,7 +325,7 @@ namespace BusinessLogic.Repository
           {
             context.SaveChanges();
 
-            var date = ClientTyme.Now;
+            var date = ClientTime.Now;
             context.ProductsTrqansactions.Add(new ProductAction()
             {
               ProductId = productId,
