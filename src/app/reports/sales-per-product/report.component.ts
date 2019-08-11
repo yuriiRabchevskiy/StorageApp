@@ -39,6 +39,9 @@ export class SalesPerProductComponent extends ApiListComponent<IApiSale> {
   }
 
   onDataReceived(res: ApiResponse<IApiSale>) {
+    if (res && res.items.length) {
+      res.items.map((it, index) => it.id = `${index}-${it.buyPrice}-${it.sales}-${it.profit}`);
+    }
     super.onDataReceived(res);
   }
 
