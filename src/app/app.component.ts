@@ -7,5 +7,7 @@ import { TrackerService } from './shared/services/tracker.service';
   template: `<router-outlet></router-outlet>`
 })
 export class AppComponent {
-  constructor(public trackerService: TrackerService) {  }
+  constructor(public trackerService: TrackerService) {
+
+  }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { ApiResponse } from '../../models/api';
@@ -6,17 +6,21 @@ import { ApiListComponent } from '../../models/component/list-api.component';
 import { IProduct, ISell, ITransfer, Product, Sell } from '../../models/storage';
 import { ICategory } from '../../models/storage/categories';
 import { ApiService } from '../../shared/services/api.service';
+import { ApiProdCountChanges } from './../../models/api/state/state';
 import { NumberFilter } from './../../models/filtering/filters';
 import { IWarehouse } from './../../models/storage/werehouse';
+import { TrackerService } from './../../shared/services/tracker.service';
 import { ISaveAddition } from './addition/addition.component';
 import { ISaveResult } from './product/product.component';
+import { INDictionary } from '../../models';
 
 @Component({
   selector: 'app-all-stock',
   templateUrl: './app-stock.component.html',
   styleUrls: ['./app-stock.component.scss']
 })
-export class AppStockComponent extends ApiListComponent<IProduct> {
+export class AppStockComponent extends ApiListComponent<IProduct> implements OnDestroy {
+
   selectedItem: IProduct;
   oldItem: IProduct;
   sell: ISell;
@@ -62,8 +66,11 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
   ];
 
 
-  constructor(private apiService: ApiService, public router: Router, notifi: MessageService) {
+  constructor(private apiService: ApiService, public router: Router, notifi: MessageService,
+    private tracker: TrackerService) {
     super(notifi);
+
+    this.tracker.productsCountChanged.on(this.onProductsCountChnaged);
     this.selectedTab = this.tabs[0];
     this.typeFilter.getNumber = (it) => it.categoryId;
     this.filters.push(this.typeFilter);
@@ -284,7 +291,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
     }
   }
 
-  updateBalanceFields(product: IProduct, balance) {
+  updateBalanceFields(product: IProduct, balance: INDictionary<number>) {
     Object.keys(balance).map(key => product['wh_' + key] = balance[key]);
   }
 
@@ -333,7 +340,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
 
   showSellDialog() {
     this.sellDialog = true;
-    let newSell = new Sell(this.selectedItem.recommendedSalePrice);
+    const newSell = new Sell(this.selectedItem.recommendedSalePrice);
     newSell.idProduct = this.selectedItem.id;
     this.sell = newSell;
   }
@@ -383,6 +390,29 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
     return !sum ? 'disabled-row' : '';
   }
 
+  private onProductsCountChnaged = (info: ApiProdCountChanges) => {
+    console.log('products coutn chaneged', info);
+    info.changes.forEach(change => {
+      const product = this.data.find(it => it.id === change.productId);
+      const current = product.balance[change.warehouseId];
+      if (current !== change.oldCount) {
+        this.notifi.add({
+          severity: 'error',
+          summary: 'Виникла розсинхронізація клієнта та сервера. Кількість товарів може не збігатися. Оновіть дані.',
+          detail: `Продукт id: ${product.id}: ${product.productType} ${product.producer} - очікувалось ${change.oldCount}, а є ${current}`
+        });
+      }
+
+      product.balance[change.warehouseId] = change.newCount;
+      this.updateBalanceFields(product, product.balance);
+
+    }
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.tracker.productsCountChanged.off(this.onProductsCountChnaged);
+  }
 
 
 }
