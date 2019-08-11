@@ -251,13 +251,6 @@ export class AppStockComponent extends ApiListComponent<IProduct> {
     if (!this.isBalance || !this.selectedItem.id) return;
     this.showSellDialog();
   }
-  // onRowClick(user: ISUser) {
-  //   if (this.selectedItem.id !== user.id) {
-  //     this.selectedItem = user;
-  //     return;
-  //   }
-  //   this.displayEditDialog = true;
-  // }
 
   findTotalBalance(item) {
     const data = item.balance;
