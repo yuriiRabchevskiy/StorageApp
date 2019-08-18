@@ -58,7 +58,4 @@ export class SalesPerProductComponent extends ApiListComponent<IApiSale> {
     }, newTotals);
     this.totals = newTotals;
   }
-
-
-
 }

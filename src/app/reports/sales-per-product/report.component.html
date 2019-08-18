@@ -49,7 +49,8 @@
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-rowData>
-        <tr [pSelectableRow]="rowData" [ngClass]="{'s-selected-row': rowData.id === selectedItem?.id}">
+        <tr (click)="onRowClick(rowData)"
+            [pSelectableRow]="rowData" [ngClass]="{'s-selected-row': rowData.id === selectedItem?.id}">
             <td>{{rowData.category}}</td>
             <td>{{rowData.quantity}}</td>
             <td>{{rowData.sales}}</td>
@@ -58,24 +59,15 @@
         </tr>
     </ng-template>
 
-    <!-- <ng-template pTemplate="footer" let-rowData>
+    <ng-template pTemplate="footer" let-rowData>
         <tr>
-            <td>{{rowData.category}}</td>
-            <td>{{rowData.quantity}}</td>
-            <td>{{rowData.sales}}</td>
-            <td>{{rowData.buyPrice}}</td>
-            <td>{{rowData.profit}}</td>
+            <td># {{filteredData?.length}}</td>
+            <td>{{totals?.quantity}}</td>
+            <td>{{totals?.sales}}</td>
+            <td>{{totals?.buyPrice}}</td>
+            <td>{{totals?.profit}}</td>
         </tr>
     </ng-template>
-    <p-footerColumnGroup>
-        <p-row>
-            <p-column footer="# {{filteredData?.length}}"></p-column>
-            <p-column footer="{{totals?.quantity}}"></p-column>
-            <p-column footer="{{totals?.sales}}"></p-column>
-            <p-column footer="{{totals?.buyPrice}}"></p-column>
-            <p-column footer="{{totals?.profit}}"></p-column>
-        </p-row>
-    </p-footerColumnGroup> -->
 
 </p-table>
 <app-spinner *ngIf="showSpinner"></app-spinner>
