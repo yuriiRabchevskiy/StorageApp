@@ -88,6 +88,8 @@ namespace DataAccess.Repository
           order.OrderEditions = new List<OrderAction>(new[] {
             new OrderAction { Date = ClientTime.Now, OrderId = order.Id, UserId = userId, Note = note }
             });
+
+          it.Products = null; // we do not want to sent this back to the client.
           await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
           {
             OrderId = order.Id,

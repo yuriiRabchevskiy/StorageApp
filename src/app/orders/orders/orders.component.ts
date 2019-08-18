@@ -1,14 +1,16 @@
-import { Dictionary } from './../../models/dictionary';
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import * as moment from 'moment-mini';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { Table } from 'primeng/table';
 import { ApiResponse } from '../../models/api';
+import { ApiOrdersChanges } from '../../models/api/state/state';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { NumberFilter, StringFilter } from '../../models/filtering/filters';
-import { IOrder, OrderStatus } from '../../models/storage';
+import { IOrder, ITransaction, OrderStatus } from '../../models/storage';
 import { ApiService } from '../../shared/services/api.service';
+import { TrackerService } from '../../shared/services/tracker.service';
+import { Dictionary } from './../../models/dictionary';
 
 interface ITab {
     label: string;
@@ -26,7 +28,7 @@ interface IExportData {
     templateUrl: './orders.component.html',
     styleUrls: ['./orders.component.scss']
 })
-export class OrdersComponent extends ApiListComponent<IOrder> {
+export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestroy {
     @ViewChild('dt', { static: true }) dataTable: Table;
     selectedItem: IOrder;
     orderDialog: boolean = false;
@@ -80,9 +82,11 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
 
     itemsFormatted = [];
 
-    constructor(private apiService: ApiService, public router: Router, notifi: MessageService) {
+    constructor(private apiService: ApiService, public router: Router, notifi: MessageService,
+        private tracker: TrackerService) {
         super(notifi);
 
+        this.tracker.orderChanged.on(this.onOrdersChnaged);
         const isAdmin = this.userService.getLocal().isAdmin;
         if (isAdmin) this.tabs.push({ label: 'Скасовані', value: OrderStatus.Canceled });
         this.selectedTab = this.tabs[0];
@@ -119,27 +123,17 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
 
     onDataReceived(res: ApiResponse<IOrder>) {
         if (res.success) {
-            res.items.map(it =>
-                Object.keys(it).map(date => it['date'] = moment(new Date(it.openDate)).format('DD/MM/YYYY')));
-            res.items.map(it =>
-                Object.keys(it).map(itemsName => it['itemsName'] = this.getItemsName(it.products)));
+            res.items.map(it => {
+                it.date = moment(new Date(it.openDate)).format('DD/MM/YYYY');
+                it.itemsName = this.getItemsName(it.products);
+            });
             res.items.sort(this.orderByDate);
         }
         super.onDataReceived(res);
     }
 
-    getItemsName(val) {
-        const items = [];
-        let name = '';
-        for (let i = 0; i < val.length; i++) {
-            if (i === 0) {
-                name = val[i].product.productType;
-            } else {
-                name = '\n' + val[i].product.productType;
-            }
-            items.push(name);
-        }
-        return items;
+    getItemsName(val: ITransaction[]) {
+        return val.map(it => it.product.productType).join('\n');
     }
 
     orderByDate(a, b) {
@@ -264,7 +258,6 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     }
 
     saveToExcel(data) {
-        debugger
         this.createFileName();
         this.formated(data);
         this.exportCSVFile(this.headers, this.itemsFormatted, this.csvFileName);
@@ -284,7 +277,6 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
         return str;
     }
     formated(val) {
-        debugger
         this.itemsFormatted = [];
         val.forEach((item) => {
             const productList = this.generateProductList(item);
@@ -346,5 +338,17 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
                 document.body.removeChild(link);
             }
         }
+    }
+
+    private onOrdersChnaged = (info: ApiOrdersChanges) => {
+        console.log('products coutn chaneged', info);
+        info.changes.forEach(orderChange => {
+            const current = this.data.find(it => it.id === orderChange.orderId);
+            Object.assign(current, orderChange.order);
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.tracker.orderChanged.off(this.onOrdersChnaged);
     }
 }

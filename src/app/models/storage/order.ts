@@ -18,6 +18,11 @@ export interface IOrder {
     closeDate?: Date;
     seller?: string;
     products?: ITransaction[]; // to display for user
+
+    // client properties
+    date?: string;
+    itemsName?: string;
+
 }
 
 export interface ISaleOrder extends IOrder {
