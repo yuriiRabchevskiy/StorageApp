@@ -1,6 +1,6 @@
 <div class="page-wrap">
     <p-table class="prime-table" [value]="filteredData"
-        [loading]="showSpinner" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
+        [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
         [pageLinks]="4" [rows]="100"
         [responsive]="true" scrollable="true" scrollWidth="100%"
         scrollHeight="calc(100% - 54px)" #dt dataKey="id"
@@ -77,6 +77,7 @@
         </ng-template>
     </p-table>
 </div>
+<app-spinner *ngIf="showSpinner"></app-spinner>
 <app-user [userList]="filteredData" *ngIf="displayDialog" (onCloseDialog)="closeDialog($event)"
     (saveUser)="save($event)"></app-user>
 <app-user-editor *ngIf="displayEditDialog" [user]="selectedItem" (onCloseDialog)="closeDialog($event)"
