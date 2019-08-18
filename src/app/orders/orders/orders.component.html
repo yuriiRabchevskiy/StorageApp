@@ -1,163 +1,230 @@
 <div class="page-wrap">
-    <div class="page-head">
-        <mat-tab-group class="storage-tab" (selectChange)="selectTab($event)">
-            <mat-tab class="tab" *ngFor="let tab of tabs" [label]="tab.label">
-            </mat-tab>
-        </mat-tab-group>
-    </div>
-    <div class="page-body">
-        <p-table class="prime-table" [value]="viewData" selectionMode="multiple" [(selection)]="selectedItems"
-            dataKey="id" [loading]="showSpinner" [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4"
-            [rows]="100" [responsive]="true" (onRowClick)="onRowClick($event)" scrollable="true" scrollWidth="100%"
-            scrollHeight="100%" sortField="openDate" sortOrder="1" rowGroupMode="subheader"
-            groupField="date" expandableRows="true" exportFilename="Продажі" #dt>
-            <p-header class="table-head" [ngClass]="{'mobile-t-head': view.isMobile}">
-                <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
-                    <app-i-button *ngIf="selectedTab.value !== 1 && !isCancelTab"
-                        [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="edit-icon"
-                        title="Редагувати продажу" (iClick)="showToEdit()"></app-i-button>
-                    <app-i-button *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
-                        [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="i-closeOrder"
-                        title="Закрити продажу" (iClick)="confirmation()"></app-i-button>
-                    <app-i-button *ngIf="canView && !isCancelTab" icon="i-returnOrder" title="Повернути замовлення"
-                        (iClick)="confCancel()" [disabled]="viewData.length < 1 || selectedItems.length > 1">
-                    </app-i-button>
-                    <app-i-button *ngIf="canView" icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
-                        [disabled]="viewData.length < 1 || selectedItems.length > 1"></app-i-button>
-                    <app-i-button *ngIf="canView" icon="i-collapse" title="Згорнути усі продажі"
-                        (iClick)="collapseOrders()" [disabled]="viewData.length < 1 || selectedItems.length > 1">
-                    </app-i-button>
-                    <app-i-button *ngIf="canView" icon="i-export-one" title="Зберегти вибрані"
-                        (iClick)="saveToExcel(selectedItems)"
-                        [disabled]="viewData.length < 1 || selectedItems.length < 1"></app-i-button>
-                    <app-i-button *ngIf="canView" icon="i-export-all" title="Зберегти всі дані"
-                        (iClick)="saveToExcel(viewData)" [disabled]="viewData.length < 1"></app-i-button>
-                    <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
-                </app-button-group>
+  <div class="page-head">
+    <mat-tab-group class="storage-tab" (selectedIndexChange)="selectTab($event)">
+      <mat-tab class="tab" *ngFor="let tab of tabs" [label]="tab.label">
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <div class="page-body">
+    <p-table class="prime-table" [value]="viewData"
+      [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4" [rows]="100"
+      [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="100%"
+      sortField="openDate" sortOrder="1"
+      rowGroupMode="subheader" groupField="date" exportFilename="Продажі"
+      #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
+        'clientPhone', 'clientName', 'clientAddress', 'payment', 'seller', 'canceledBy',
+        'itemsName', 'other', 'totalPrice']">
+      <ng-template pTemplate="caption">
+        <div class="flex-row flex-wrap table-header">
+          <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
+            <app-i-button *ngIf="selectedTab.value !== 1 && !isCancelTab"
+              [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="edit-icon" title="Редагувати продажу"
+              (iClick)="showToEdit()"></app-i-button>
+            <app-i-button *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
+              [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="i-closeOrder" title="Закрити продажу"
+              (iClick)="confirmation()"></app-i-button>
+            <app-i-button *ngIf="canView && !isCancelTab" icon="i-returnOrder" title="Повернути замовлення"
+              (iClick)="confCancel()" [disabled]="viewData.length < 1 || selectedItems.length > 1">
+            </app-i-button>
+            <app-i-button *ngIf="canView" icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
+              [disabled]="viewData.length < 1 || selectedItems.length > 1"></app-i-button>
+            <app-i-button *ngIf="canView" icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
+              [disabled]="viewData.length < 1 || selectedItems.length > 1">
+            </app-i-button>
+            <app-i-button *ngIf="canView" icon="i-export-one" title="Зберегти вибрані"
+              (iClick)="saveToExcel(selectedItems)" [disabled]="viewData.length < 1 || selectedItems.length < 1">
+            </app-i-button>
+            <app-i-button *ngIf="canView" icon="i-export-all" title="Зберегти всі дані" (iClick)="saveToExcel(viewData)"
+              [disabled]="viewData.length < 1"></app-i-button>
+            <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
+          </app-button-group>
 
-                <div class="button-wrap">
-                    <input class="s-serche" type="text" placeholder="Пошук" (input)="dt.filterGlobal($event.target.value, 'contains')">
-                </div>
-            </p-header>
-            <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['date']}}</ng-template>
-            <p-column expander="true" styleClass="col-icon" [style]="{'width':'20px'}"></p-column>
-            <p-column field="id" header="№" [style]="{'width':'50px'}"></p-column>
-            <p-column field="openDate" header="Дата продажу" [sortable]="true" [style]="{'width':'120px'}">
-                <ng-template let-col let-oDate="rowData" pTemplate="body">
-                    <span>{{oDate[col.field] | date: 'dd/MM/yy HH:mm'}}</span>
-                </ng-template>
-            </p-column>
-            <p-column *ngIf="selectedTab.value === 1" field="closeDate" header="Дата закриття" [sortable]="true"
-                [style]="{'width':'130px'}">
-                <ng-template let-col let-cDate="rowData" pTemplate="body">
-                    <span>{{cDate[col.field] | date: 'dd/MM/yy HH:mm'}}</span>
-                </ng-template>
-            </p-column>
-            <p-column *ngIf="selectedTab.value === 3" field="cancelDate" header="Дата відміни" [sortable]="true"
-                [style]="{'width':'130px'}">
-                <ng-template let-col let-cDate="rowData" pTemplate="body">
-                    <span>{{cDate[col.field] | date: 'dd/MM/yy HH:mm'}}</span>
-                </ng-template>
-            </p-column>
+          <div class="button-wrap">
+            <input class="s-serche" type="text" placeholder="Пошук"
+              (input)="dt.filterGlobal($event.target.value, 'contains')">
+          </div>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="colgroup">
+        <colgroup>
+          <col width="20">
+          <col width="50">
+          <col width="120">
+          <col width="130" *ngIf="selectedTab.value === 1">
+          <col width="130" *ngIf="selectedTab.value === 3">
+          <col width="120">
+          <col width="120">
+          <col>
+          <col>
+          <col width="100">
+          <col>
+          <col *ngIf="isCancelTab">
+          <col width="180">
+          <col>
+          <col width="100" *ngIf="!isCancelTab">
+        </colgroup>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th></th>
+          <th>#</th>
+          <th pSortableColumn="openDate">
+            Дата продажу
+            <p-sortIcon field="openDate"></p-sortIcon>
+          </th>
+          <th pSortableColumn="closeDate" *ngIf="selectedTab.value === 1">
+            Дата закриття
+            <p-sortIcon field="closeDate"></p-sortIcon>
+          </th>
+          <th pSortableColumn="cancelDate" *ngIf="selectedTab.value === 3">
+            Дата відміни
+            <p-sortIcon field="cancelDate"></p-sortIcon>
+          </th>
+          <th pSortableColumn="orderNumber">
+            Накладна
+            <p-sortIcon field="orderNumber"></p-sortIcon>
+          </th>
+          <th pSortableColumn="clientPhone">
+            Телефон
+            <p-sortIcon field="clientPhone"></p-sortIcon>
+          </th>
+          <th pSortableColumn="clientName">
+            Одержувач
+            <p-sortIcon field="clientName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="clientAddress">
+            Адреса
+            <p-sortIcon field="clientAddress"></p-sortIcon>
+          </th>
+          <th pSortableColumn="payment">
+            Тип Оплати
+            <p-sortIcon field="payment"></p-sortIcon>
+          </th>
+          <th pSortableColumn="seller">
+            Продавець
+            <p-sortIcon field="seller"></p-sortIcon>
+          </th>
+          <th pSortableColumn="canceledBy" *ngIf="isCancelTab">
+            Скасував
+            <p-sortIcon field="canceledBy"></p-sortIcon>
+          </th>
+          <th pSortableColumn="itemsName">
+            Товари
+            <p-sortIcon field="itemsName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="other">
+            Нотатки
+            <p-sortIcon field="other"></p-sortIcon>
+          </th>
+          <th pSortableColumn="totalPrice" *ngIf="!isCancelTab">
+            Сума
+            <p-sortIcon field="totalPrice"></p-sortIcon>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-expanded="expanded" let-rowData>
+        <tr (click)="onRowClick(rowData)" [pSelectableRow]="rowData"
+          [ngClass]="{'s-selected-row': rowData.id === selectedItem?.id}">
+          <td>
+            <a href="#" [pRowToggler]="rowData">
+              <i [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+            </a>
+          </td>
+          <td>{{rowData.id}}</td>
+          <td>{{rowData.openDate | date: 'dd/MM/yy HH:mm'}}</td>
+          <td *ngIf="selectedTab.value === 1">{{rowData.closeDate | date: 'dd/MM/yy HH:mm'}}</td>
+          <td *ngIf="selectedTab.value === 3">{{rowData.cancelDate | date: 'dd/MM/yy HH:mm'}}</td>
+          <td>
+            <a href="https://novaposhta.ua/tracking/?cargo_number={{rowData.orderNumber}}" target="_blank">
+              <span>{{rowData.orderNumber}}</span>
+            </a>
+          </td>
 
-            <p-column field="orderNumber" header="Накладна" [style]="{'width':'120px'}">
-                <ng-template let-col let-paym="rowData" pTemplate="body" >
-                    <a href="https://novaposhta.ua/tracking/?cargo_number={{paym[col.field]}}" target="_blank">
-                        <span>{{paym[col.field]}}</span>
-                    </a>
-                </ng-template>
-            </p-column>
-            <p-column field="clientPhone" header="Телефон" [style]="{'width':'120px'}"></p-column>
-            <p-column field="clientName" header="Одержувач"></p-column>
-            <p-column field="clientAddress" header="Адреса"></p-column>
-            <p-column field="payment" header="Тип Оплати" [style]="{'width':'100px'}">
-                <ng-template let-col let-paym="rowData" pTemplate="body">
-                    <span>{{paym[col.field] === 0 ? 'Оплачено' : 'Наложний'}}</span>
-                </ng-template>
-            </p-column>
-            <p-column field="seller" header="Продавець" [sortable]="true"></p-column>
-            <p-column field="canceledBy" header="Скасував" [sortable]="true" *ngIf="isCancelTab"></p-column>
-            <p-column field="itemsName" header="Товари" [style]="{'width':'180px'}">
-                <ng-template let-col let-iName="rowData" pTemplate="body">
-                    <span class="order-items-name">{{iName[col.field]}}</span>
-                </ng-template>
-            </p-column>
-            <p-column field="other" header="Нотатки"></p-column>
-            <p-column *ngIf="!isCancelTab" field="totalPrice" header="Сума" [style]="{'width':'100px'}">
-                <ng-template let-col let-total="rowData" pTemplate="body">
-                    <span class="total-order-cell">{{total[col.field]}}</span>
-                </ng-template>
-            </p-column>
+          <td>{{rowData.clientPhone}}</td>
+          <td>{{rowData.clientName}}</td>
+          <td>{{rowData.clientAddress}}</td>
+          <td>{{rowData.payment === 0 ? 'Оплачено' : 'Наложний'}}</td>
+          <td>{{rowData.seller}}</td>
+          <td *ngIf="isCancelTab">{{rowData.canceledBy}}</td>
+          <td><span class="order-items-name">{{rowData.itemsName}}</span></td>
+          <td>{{rowData.other}}</td>
+          <td *ngIf="!isCancelTab"><span class="total-order-cell">{{rowData.totalPrice}}</span></td>
+        </tr>
+      </ng-template>
 
-            <ng-template let-item pTemplate="rowexpansion">
-                <div class="cancel-reason" *ngIf="isCancelTab">
-                    Причина відміни:
-                    <b> {{ item.cancelReason }} </b>
-                </div>
-                <div class="products-list flex-col">
-                    <table class="check-order">
-                        <colgroup>
-                            <col width="100px">
-                            <col>
-                            <col width="110px">
-                            <col width="110px">
-                            <col width="100px">
-                            <col width="100px">
-                        </colgroup>
-                        <thead class="check-head">
-                            <tr class="check-tr">
-                                <th class="check-cell">Кількість</th>
-                                <th class="check-cell">Назва</th>
-                                <th class="check-cell" *ngIf="canView">Ціна покупки</th>
-                                <th class="check-cell">Ціна продажу</th>
-                                <th class="check-cell" *ngIf="canView">Різниця</th>
-                                <th class="check-cell">Сума</th>
-                            </tr>
-                        </thead>
-
-                        <tbody class="check-body">
-                            <tr class="check-tr" *ngFor="let prod of item.products">
-                                <td class="check-td">{{prod.quantity}} *</td>
-                                <td class="check-td check-item-name-td">
-                                    {{prod.product.size}} {{prod.product.color}} {{prod.product.productType}} -
-                                    {{prod.product.model}}
-                                    {{prod.product.producer}}
-
-                                    <br *ngIf="prod.product.freeNote" />
-                                    <span class="prod-notes">{{prod.product.freeNote}}</span>
-                                </td>
-                                <td class="check-td" *ngIf="canView">{{prod.product.recommendedBuyPrice}} </td>
-                                <td class="check-td">{{prod.price}}</td>
-                                <td class="check-td" *ngIf="canView">{{getDifference(prod)}}</td>
-                                <td class="check-td">{{prod.totalPrice}}</td>
-                            </tr>
-                        </tbody>
+      <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['date']}}</ng-template>
 
 
-                        <tfoot class="check-foot">
-                            <tr class="check-tr">
-                                <td class="check-cell"></td>
-                                <td class="check-cell"></td>
-                                <td class="check-cell total-cell" *ngIf="canView">Прибуток:</td>
-                                <td class="check-cell total-cell" *ngIf="canView">{{getProfit(item)}}</td>
-                                <td class="check-cell total-cell">До оплати:</td>
-                                <td class="check-cell total-cell">{{item.totalPrice}}</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </ng-template>
-        </p-table>
-    </div>
+      <ng-template let-item pTemplate="rowexpansion">
+        <div class="cancel-reason" *ngIf="isCancelTab">
+          Причина відміни:
+          <b> {{ item.cancelReason }} </b>
+        </div>
+        <div class="products-list flex-col">
+          <table class="check-order">
+            <colgroup>
+              <col width="100px">
+              <col>
+              <col width="110px">
+              <col width="110px">
+              <col width="100px">
+              <col width="100px">
+            </colgroup>
+            <thead class="check-head">
+              <tr class="check-tr">
+                <th class="check-cell">Кількість</th>
+                <th class="check-cell">Назва</th>
+                <th class="check-cell" *ngIf="canView">Ціна покупки</th>
+                <th class="check-cell">Ціна продажу</th>
+                <th class="check-cell" *ngIf="canView">Різниця</th>
+                <th class="check-cell">Сума</th>
+              </tr>
+            </thead>
+
+            <tbody class="check-body">
+              <tr class="check-tr" *ngFor="let prod of item.products">
+                <td class="check-td">{{prod.quantity}} *</td>
+                <td class="check-td check-item-name-td">
+                  {{prod.product.size}} {{prod.product.color}} {{prod.product.productType}} -
+                  {{prod.product.model}}
+                  {{prod.product.producer}}
+
+                  <br *ngIf="prod.product.freeNote" />
+                  <span class="prod-notes">{{prod.product.freeNote}}</span>
+                </td>
+                <td class="check-td" *ngIf="canView">{{prod.product.recommendedBuyPrice}} </td>
+                <td class="check-td">{{prod.price}}</td>
+                <td class="check-td" *ngIf="canView">{{getDifference(prod)}}</td>
+                <td class="check-td">{{prod.totalPrice}}</td>
+              </tr>
+            </tbody>
+
+
+            <tfoot class="check-foot">
+              <tr class="check-tr">
+                <td class="check-cell"></td>
+                <td class="check-cell"></td>
+                <td class="check-cell total-cell" *ngIf="canView">Прибуток:</td>
+                <td class="check-cell total-cell" *ngIf="canView">{{getProfit(item)}}</td>
+                <td class="check-cell total-cell">До оплати:</td>
+                <td class="check-cell total-cell">{{item.totalPrice}}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </ng-template>
+    </p-table>
+  </div>
 
 
 </div>
+<app-spinner *ngIf="showSpinner"></app-spinner>
 <app-order *ngIf="orderDialog" [order]="selectedItem" (iSave)="save($event)" (onCloseDialog)="closeEditDialog($event)"
-    [canEdit]="canEdit"></app-order>
+  [canEdit]="canEdit"></app-order>
 
 <app-confirm (confirm)="confirmCloseOrder($event)" *ngIf="showConfirm">
-    <span header class="confirm-title">Ви впевнені, що бажаєте закрити продажу №:
-        <b>{{selectedItem.orderNumber}}</b>
-    </span>
+  <span header class="confirm-title">Ви впевнені, що бажаєте закрити продажу №:
+    <b>{{selectedItem.orderNumber}}</b>
+  </span>
 </app-confirm>
 <app-return (confirm)="closeCancelOrder($event)" [order]="selectedItem" *ngIf="showConfirmCancel"></app-return>

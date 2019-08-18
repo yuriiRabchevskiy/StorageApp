@@ -90,19 +90,20 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
         this.filters.push(this.typeFilter);
     }
 
-    onRowClick(val) {
-        if (this.selectedItem !== val.data) {
-            this.selectedItem = val.data;
-        } else {
-            this.showToEdit();
-        }
-    }
+    // onRowClick(val) {
+    //     if (this.selectedItem !== val.data) {
+    //         this.selectedItem = val.data;
+    //     } else {
+    //         this.showToEdit();
+    //     }
+    // }
 
-    selectTab(event) {
-        this.selectedTab = this.tabs[event.index];
+    selectTab(index: number) {
+        this.selectedTab = this.tabs[index];
         if (this.filteredData.length < -1) return;
         this.selectedItem = this.filteredData[0];
     }
+
 
     refresh() {
         if (this.isCancelTab) {
@@ -263,6 +264,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
     }
 
     saveToExcel(data) {
+        debugger
         this.createFileName();
         this.formated(data);
         this.exportCSVFile(this.headers, this.itemsFormatted, this.csvFileName);
@@ -282,6 +284,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> {
         return str;
     }
     formated(val) {
+        debugger
         this.itemsFormatted = [];
         val.forEach((item) => {
             const productList = this.generateProductList(item);
