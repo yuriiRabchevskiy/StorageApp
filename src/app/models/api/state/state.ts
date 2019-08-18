@@ -11,11 +11,11 @@ export class ApiProdCountChange {
     oldCount: number;
 }
 
-export class ApiOrderDetailsChanges {
-    changes: ApiOrderDetailsChange[];
+export class ApiOrdersChanges {
+    changes: ApiOrderChanges[];
 }
 
-export class ApiOrderDetailsChange {
+export class ApiOrderChanges {
 
   orderId: number;
   changeTime: number;

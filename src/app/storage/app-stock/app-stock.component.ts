@@ -93,7 +93,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   delete(val: IProduct) {
-    let deleteProd = val;
+    const deleteProd = val;
     this.work.showSpinner = true;
     this.apiService.deleteProduct(deleteProd.id).subscribe(
       res => {
@@ -166,8 +166,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   doTransfer(val: ITransfer) {
-    let item = val;
-    let balance = this.selectedItem.balance;
+    const item = val;
+    const balance = this.selectedItem.balance;
     balance[item.fromId] = balance[item.fromId] - item.quantity;
     balance[item.toId] = (balance[item.toId] || 0) + item.quantity;
     this.updateBalanceFields(this.selectedItem, balance);
@@ -187,8 +187,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   removeProducts(val: ISaveAddition) {
-    let item = val.item;
-    let balance = this.selectedItem.balance;
+    const item = val.item;
+    const balance = this.selectedItem.balance;
     balance[item.fromId] = (balance[item.fromId] || 0) - item.quantity;
     this.updateBalanceFields(this.selectedItem, balance);
     this.apiService.removeProductsFromWarehouse(this.selectedItem.id, item).subscribe(
@@ -206,8 +206,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   saveAddition(val: ISaveAddition) {
-    let item = val.item;
-    let balance = this.selectedItem.balance;
+    const item = val.item;
+    const balance = this.selectedItem.balance;
     balance[item.fromId] = (balance[item.fromId] || 0) + item.quantity;
     this.updateBalanceFields(this.selectedItem, balance);
     this.apiService.addProductsToWarehouse(this.selectedItem.id, item).subscribe(
@@ -226,11 +226,11 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   sale(val: ISell) {
-    let item = val;
-    let balance = this.selectedItem.balance;
+    const item = val;
+    const balance = this.selectedItem.balance;
     balance[val.fromId] = balance[val.fromId] - item.quantity;
     this.updateBalanceFields(this.selectedItem, balance);
-    let sellItem = {
+    const sellItem = {
       product: this.selectedItem,
       prodOrder: item
     };
@@ -242,9 +242,9 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
 
 
   turnFromBasket(event) {
-    let item = event;
+    const item = event;
     this.selectedItem = this.data.find(it => it.id === event.product.id);
-    let balance = this.selectedItem.balance;
+    const balance = this.selectedItem.balance;
     balance[event.prodOrder.fromId] = balance[event.prodOrder.fromId] + item.prodOrder.quantity;
     this.updateBalanceFields(this.selectedItem, balance);
   }
@@ -261,10 +261,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
 
   findTotalBalance(item) {
     const data = item.balance;
-    const counts = [];
-    for (let key in data) {
-      counts.push(data[key]);
-    }
+    const keys = Object.keys(data);
+    const counts = keys.map(key => data[key]);
     const count = counts.reduce((a, b) => {
       return a + b;
     }, 0);
