@@ -33,4 +33,5 @@ export interface IApiWarehouseAction {
     Warehouse: string;
     User: string;
     ProductString: string;
+    id?: string;
 }

@@ -20,7 +20,7 @@ export abstract class ListComponent<TCol> extends SecuredComponent {
 
     public filters: Filter<TCol>[] = [this.strFilter]; // filters which can reduce amount of shown items;
 
-    constructor( notifi: MessageService) {
+    constructor(notifi: MessageService) {
         super(notifi);
     }
 
@@ -143,6 +143,10 @@ export abstract class ListComponent<TCol> extends SecuredComponent {
 
         if (!silent)
             this.onSelect(item);
+    }
+
+    onRowClick(item) {
+        this.select(item);
     }
 
     onSelect(item: TCol | TCol[]) {

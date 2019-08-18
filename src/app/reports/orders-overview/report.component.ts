@@ -39,6 +39,9 @@ export class OrdersOverviewComponent extends ApiListComponent<IApiOrdersOverview
   }
 
   onDataReceived(res: ApiResponse<IApiOrdersOverview>) {
+    if (res && res.items.length) {
+      res.items.map((it, index) => it.id = `${it.category}-${index}`);
+    }
     super.onDataReceived(res);
   }
 
@@ -65,7 +68,4 @@ export class OrdersOverviewComponent extends ApiListComponent<IApiOrdersOverview
     }, newTotals);
     this.totals = newTotals;
   }
-
-
-
 }

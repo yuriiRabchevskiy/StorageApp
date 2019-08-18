@@ -40,24 +40,13 @@ export class WarehouseActionsComponent extends ApiListComponent<IApiWarehouseAct
   }
 
   onDataReceived(res: ApiResponse<IApiWarehouseAction>) {
+    if (res && res.items.length) {
+      res.items.map((it, index) => it.id = `${it.User}-${index}`);
+    }
     super.onDataReceived(res);
   }
 
   onFiltered() {
     super.onFiltered();
-    const filtered = this.filteredData;
-    // const newTotals: IApiSalePerUser = <any>{ sales: 0, quantity: 0, ordersCount: 0, buyPrice: 0, profit: 0 };
-    // filtered.reduce((sum, it) => {
-    //   newTotals.sales += it.sales;
-    //   newTotals.quantity += it.quantity;
-    //   newTotals.profit += it.profit;
-    //   newTotals.buyPrice += it.buyPrice;
-    //   newTotals.ordersCount += it.ordersCount;
-    //   return newTotals;
-    // }, newTotals);
-    // this.totals = newTotals;
   }
-
-
-
 }

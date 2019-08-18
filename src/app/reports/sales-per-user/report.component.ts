@@ -41,6 +41,9 @@ export class SalesPerUsersComponent extends ApiListComponent<IApiSalePerUser> {
   }
 
   onDataReceived(res: ApiResponse<IApiSalePerUser>) {
+    if (res && res.items.length) {
+      res.items.map((it, index) => it.id = `${it.category}-${index}`);
+    }
     super.onDataReceived(res);
   }
 
@@ -58,7 +61,4 @@ export class SalesPerUsersComponent extends ApiListComponent<IApiSalePerUser> {
     }, newTotals);
     this.totals = newTotals;
   }
-
-
-
 }
