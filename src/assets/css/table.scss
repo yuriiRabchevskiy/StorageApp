@@ -1,377 +1,177 @@
 @import 'globals';
 
 .t-i-button-group {
-    position: absolute;
-    left: 4px;
+  position: absolute;
+  left: 4px;
 }
 
 .prime-table {
-    display: block;
-    @include wH(100%, 100%);
+  display: block;
+  @include wH(100%, 100%);
+  * {
+      outline: 0;
+  }
+  .ui-table-caption {
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 8px;
+  }
+  .ui-sortable-column.ui-state-highlight {
+    background-color: transparent !important;
+    color: #333 !important;
+    .ui-sortable-column-icon {
+        color: #848484 !important;
+    }
+  }
+  td {
+      border-color: $defBtn !important;
+      word-break: break-all;
+      padding: 12px 4px !important;
+      vertical-align: top !important;
+  }
+  .expanded-cell {
+      padding: 12px 0px !important;
+      vertical-align: top !important;
+  }
+  .ui-table-tbody tr.s-selected-row {
+    color: $WhiteColor;
+    background-color: $defBtn !important;
+    cursor: default;
+    a {
+      color: $WhiteColor;
+    }
+  }
 
-    .ui-table-tbody tr:hover,
-    .ui-table-tbody tr.s-selected-row {
-        color: #FFFFFF;
-        background-color: black !important;
-        a {
-            color: white;
-        }
+  .ui-table-tbody tr:hover:not(.expanded-row) {
+      color: $hoverColor !important;
+      background-color: $disabledText !important;
+  }
+
+  th {
+    padding: 8px 12px !important;
+    position: relative;
+    word-break: break-all;
+    overflow: hidden;
+  }
+
+  p-sorticon {
+    position: absolute;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    margin-top: 4px;
+  }
+  .ui-sortable-column-icon {
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+    vertical-align: top;
+  }
+
+  .table-header {
+      justify-content: space-between;
+  }
+
+  .ui-inputtext:not(.s-serche) {
+      width: 100%;
+  }
+
+
+
+  .ui-paginator-bottom {
+    flex-shrink: 0;
+    border: none;
+    background: $defBtn;
+    height: 32px;
+    line-height: 16px;
+    padding: 3px 0px;
+    font-size: 14px;
+
+    & * {
+      font-size: inherit;
     }
 
+    .ui-paginator-element {
+      line-height: 28px;
+      border-radius: 0px;
+      @include wH(24px, 24px);
+      padding: 0;
+      vertical-align: top;
 
+      .fa {
+        @include wH(100%, 100%);
+        line-height: 26px;
+      }
+    }
 
+    .ui-paginator-pages {
+      padding: 0;
+      height: 24px;
+      vertical-align: top;
 
-
-
-    .ui-datatable {
+      .ui-paginator-page {
+        line-height: 24px;
         height: 100%;
-        font-family: Verdana, Geneva, Tahoma, sans-serif;
-        display: flex;
-        flex-direction: column;
-        font-size: 12px;
-        background-color: #e0e0e0;
+      }
 
-        & * {
-            font-size: inherit;
-        }
+      .ui-paginator-page.ui-state-active {
+        border-color: $appRedColor;
+        background: $appRedColor;
+      }
     }
 
-    .ui-datatable-header {
-        padding: 2px 4px;
-        min-height: 48px;
-        text-align: left;
-        background: black;
-        flex-shrink: 0;
-        border: none;
+    .ui-dropdown {
+      border-radius: 0px;
+      color: $WhiteColor !important;
+      background: $appRedColor !important;
+      box-shadow: none;
+      border: none;
+      height: 100%;
+      width: 60px;
     }
 
-    .table-head {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
+    .ui-dropdown-label {
+      border-radius: 0px;
+      color: $WhiteColor !important;
+      background: $appRedColor !important;
+      height: 100%;
     }
 
-    .mobile-t-head {
-        justify-content: flex-end;
-        box-sizing: border-box;
-        padding-left: 44px;
+    .ui-dropdown-trigger {
+      border: none;
+      color: $WhiteColor !important;
+      background: $appRedColor !important;
+
+      span.fa {
+        margin-top: calc(50% - 1px);
+      }
     }
 
-    .ui-datatable-scrollable-header {
-        background: transparent;
+    .ui-dropdown-panel {
+      border-radius: 0px;
+      box-shadow: none;
     }
 
-    .ui-datatable-scrollable-header-box {
-        border-bottom: 1px solid black;
+    .ui-dropdown-items {
+      padding: 0px 4px;
+      border-radius: 0px;
+      color: $WhiteColor !important;
+      background: $appRedColor !important;
     }
 
-    .ui-datatable-thead {
-        tr {
-            th {
-                font-size: inherit;
-                height: 40px;
-                text-align: left;
-                position: relative;
-                border: none;
-                padding-left: 4px;
-                padding-right: 4px;
-            }
-
-            th.ui-state-active {
-                background-color: $appRedHoverColor;
-            }
-
-            .ui-column-title {
-                width: calc(100% - 16px);
-                display: inline-block;
-                height: 18px;
-                line-height: 12px;
-                white-space: nowrap;
-                overflow: hidden;
-                line-height: 18px;
-                text-overflow: ellipsis;
-            }
-
-            .ui-sortable-column-icon {
-                position: absolute;
-                top: 12px;
-                width: 16px;
-            }
-        }
+    .ui-dropdown-item {
+      border-radius: 0px;
     }
 
-    .ui-datatable-scrollable-wrapper {
-        flex-grow: 1;
-        overflow: hidden;
-        max-height: calc(100% - 80px);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        overflow-x: auto;
+    .ui-dropdown-item.ui-state-highlight {
+      border-radius: 0px;
+      color: $WhiteColor !important;
+      background: $appRedColor !important;
     }
-
-    .ui-datatable-scrollable-table-wrapper {
-        width: 100%;
-
-        table {
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-    }
-
-    .ui-datatable-scrollable-view {
-        overflow: hidden;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        min-width: 1240px;
-
-        @include customMaxWidth(35em) {
-            min-width: calc(100vw - 24px);
-        }
-
-        .ui-datatable-scrollable-header {
-            flex-shrink: 0;
-        }
-
-        .ui-datatable-scrollable-body {
-            height: 100% !important;
-            min-height: 300px;
-            max-height: none !important;
-        }
-
-        tr.ui-widget-content.ui-datatable-even,
-        tr.ui-widget-content.ui-datatable-odd {
-            height: auto;
-            border-color: transparent;
-            background-color: transparent;
-
-            td {
-                font-size: inherit;
-                height: auto;
-                vertical-align: top;
-                border: none;
-                border-top: 1px solid;
-                border-bottom: 1px solid;
-                border-top-color: grey;
-                border-bottom-color: grey;
-                padding-left: 4px;
-                padding-right: 4px;
-
-                @include customMaxWidth(35em) {
-                    display: flex;
-                    font-size: 10px;
-                    border: none;
-                }
-
-                .ui-column-title {
-                    @include customMaxWidth(35em) {
-                        width: calc(30% - 4px);
-                        margin: 0;
-                        margin-right: 4px;
-                    }
-                }
-
-                .ui-cell-data {
-                    height: auto;
-                    white-space: normal;
-                    word-break: break-word;
-
-                    @include customMaxWidth(35em) {
-                        width: 70%;
-                        padding: 0.4em 0px;
-                    }
-                }
-
-                .total-order-cell {
-                    display: block;
-                    text-align: right;
-                }
-            }
-
-            .order-items-name {
-                white-space: pre-line;
-            }
-        }
-
-        tr.ui-widget-content.disabled-row {
-            color: black;
-            background: #ccc2a7;
-        }
-
-        tr.ui-widget-content.ui-state-highlight,
-        tbody.ui-datatable-hoverable-rows tr.ui-widget-content:hover {
-            color: #FFFFFF;
-            background-color: black;
-
-            td {
-                border-top-color: grey;
-                border-bottom-color: grey;
-            }
-
-            a {
-                color: white;
-            }
-        }
-
-        tr.ui-rowgroup-header {
-            background: #a09292;
-            border-color: #a09292;
-            border-top-color: grey;
-            border-bottom-color: grey;
-            cursor: default !important;
-
-            td {
-                padding-left: 22px;
-            }
-        }
-
-        .ui-expanded-row-content {
-            background: #e0e0e0;
-
-            td {
-                overflow: hidden;
-                padding: 0px 0px 0px 24px;
-                border: none;
-
-                @include customMaxWidth(35em) {
-                    padding: 0px;
-                }
-            }
-        }
-
-        tr.ui-widget-content td.col-icon {
-            @include customMaxWidth(35em) {
-                font-size: 18px;
-            }
-
-            .ui-column-title {
-                @include customMaxWidth(35em) {
-                    width: 0px;
-                    min-width: auto;
-                    padding: 0px;
-                    margin: 0px;
-                }
-            }
-        }
-
-        tr.ui-widget-content:hover:not(.disabled-row),
-        tr.ui-state-highlight:not(.disabled-row) {
-            .ui-row-toggler {
-                color: #fff;
-            }
-        }
-    }
-
-    .ui-datatable-scrollable-footer {
-        min-height: 20px;
-
-        tr {
-            border: none;
-            border-top: 1px solid grey;
-            border-bottom: 2px solid grey;
-            cursor: default;
-
-            td {
-                color: black;
-                font-weight: 900;
-                text-align: left;
-                padding-left: 4px;
-                padding-right: 4px;
-                border: none;
-            }
-        }
-    }
-
-    .ui-paginator-bottom {
-        flex-shrink: 0;
-        border: none;
-        border-top: 1px solid silver;
-        background: black;
-        height: 32px;
-        line-height: 16px;
-        padding: 3px 0px;
-        font-size: 14px;
-
-        & * {
-            font-size: inherit;
-        }
-
-        .ui-paginator-element {
-            line-height: 28px;
-            border-radius: 0px;
-            @include wH(24px, 24px);
-            padding: 0;
-            vertical-align: top;
-
-            .fa {
-                @include wH(100%, 100%);
-                line-height: 26px;
-            }
-        }
-
-        .ui-paginator-pages {
-            padding: 0;
-            height: 24px;
-            vertical-align: top;
-
-            .ui-paginator-page {
-                line-height: 24px;
-            }
-
-            .ui-paginator-page.ui-state-active {
-                border-color: $appRedColor;
-                background: $appRedColor;
-            }
-        }
-
-        .ui-dropdown {
-            border-radius: 0px;
-            color: black;
-            box-shadow: none;
-            border: none;
-            height: 100%;
-        }
-
-        .ui-dropdown-label {
-            border-radius: 0px;
-            color: black;
-            height: 100%;
-            line-height: 20px;
-        }
-
-        .ui-dropdown-trigger {
-            border: none;
-            color: black;
-
-            span.fa {
-                margin-top: calc(50% - 1px);
-            }
-        }
-
-        .ui-dropdown-panel {
-            border-radius: 0px;
-            box-shadow: none;
-        }
-
-        .ui-dropdown-items {
-            padding: 0px 4px;
-            border-radius: 0px;
-            color: black;
-        }
-
-        .ui-dropdown-item {
-            border-radius: 0px;
-        }
-
-        .ui-dropdown-item.ui-state-highlight {
-            border-radius: 0px;
-            background: $appRedHoverColor;
-        }
-    }
+  }
 }
 
 .prime-table.report-table .ui-datatable-scrollable-body {
-    min-height: auto;
-    height: auto !important;
+  min-height: auto;
+  height: auto !important;
 }

@@ -94,13 +94,13 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this.filters.push(this.typeFilter);
     }
 
-    // onRowClick(val) {
-    //     if (this.selectedItem !== val.data) {
-    //         this.selectedItem = val.data;
-    //     } else {
-    //         this.showToEdit();
-    //     }
-    // }
+    onItemClick(event) {
+        if (this.selectedItem !== event) {
+            this.onRowClick(event);
+        } else {
+            this.showToEdit();
+        }
+    }
 
     selectTab(index: number) {
         this.selectedTab = this.tabs[index];
@@ -252,17 +252,6 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this.dataTable.expandedRowKeys = {};
     }
 
-    createFileName() {
-        const date = moment(new Date()).format('DD.MM.YYYY HH:mm');
-        this.csvFileName = this.selectedTab.label + ' продажі - ' + date;
-    }
-
-    saveToExcel(data) {
-        this.createFileName();
-        this.formated(data);
-        this.exportCSVFile(this.headers, this.itemsFormatted, this.csvFileName);
-    }
-
     generateProductList(val) {
         let str = '';
         for (let i = 0; i < val.products.length; i++) {
@@ -276,69 +265,80 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         }
         return str;
     }
-    formated(val) {
-        this.itemsFormatted = [];
-        val.forEach((item) => {
-            const productList = this.generateProductList(item);
-            this.itemsFormatted.push({
-                id: item.id,
-                orderNumber: item.orderNumber,
-                date: item.date,
-                seller: item.seller,
-                products: productList
-            });
-        });
-    }
 
-    convertToCSV(objArray) {
-        const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
-        let str = '';
+    // createFileName() {
+    //     const date = moment(new Date()).format('DD.MM.YYYY HH:mm');
+    //     this.csvFileName = this.selectedTab.label + ' продажі - ' + date;
+    // }
 
-        for (let i = 0; i < array.length; i++) {
-            let line = '';
-            for (const index in array[i]) {
-                if (i === 0) {
-                    if (line !== '') {
-                        line += ',';
-                    }
-                    line += array[i][index];
-                } else {
-                    if (line !== '') {
-                        line += ',';
-                    }
-                    line = line + array[i][index];
-                }
-            }
-            str += line + '\r\n';
-        }
-        return str;
-    }
+    // saveToExcel(data) {
+    //     this.createFileName();
+    //     this.formated(data);
+    //     this.exportCSVFile(this.headers, this.itemsFormatted, this.csvFileName);
+    // }
+    // formated(val) {
+    //     this.itemsFormatted = [];
+    //     val.forEach((item) => {
+    //         const productList = this.generateProductList(item);
+    //         this.itemsFormatted.push({
+    //             id: item.id,
+    //             orderNumber: item.orderNumber,
+    //             date: item.date,
+    //             seller: item.seller,
+    //             products: productList
+    //         });
+    //     });
+    // }
 
-    exportCSVFile(headers, items, fileTitle) {
-        if (headers) {
-            items.unshift(headers);
-        }
+    // convertToCSV(objArray) {
+    //     const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
+    //     let str = '';
 
-        // Convert Object to JSON
-        const jsonObject = JSON.stringify(items);
-        const csv = this.convertToCSV(jsonObject);
-        const fileName = fileTitle + '.csv' || 'export.csv';
-        const blob = new Blob([csv], { type: 'text/csv; charset=utf-8' });
-        if (navigator.msSaveBlob) {
-            navigator.msSaveBlob(blob, fileName);
-        } else {
-            const link = document.createElement('a');
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', fileName);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
-    }
+    //     for (let i = 0; i < array.length; i++) {
+    //         let line = '';
+    //         for (const index in array[i]) {
+    //             if (i === 0) {
+    //                 if (line !== '') {
+    //                     line += ',';
+    //                 }
+    //                 line += array[i][index];
+    //             } else {
+    //                 if (line !== '') {
+    //                     line += ',';
+    //                 }
+    //                 line = line + array[i][index];
+    //             }
+    //         }
+    //         str += line + '\r\n';
+    //     }
+    //     return str;
+    // }
+
+    // exportCSVFile(headers, items, fileTitle) {
+    //     if (headers) {
+    //         items.unshift(headers);
+    //     }
+
+    //     // Convert Object to JSON
+    //     const jsonObject = JSON.stringify(items);
+    //     const csv = this.convertToCSV(jsonObject);
+    //     const fileName = fileTitle + '.csv' || 'export.csv';
+    //     const blob = new Blob([csv], { type: 'text/csv; charset=utf-8' });
+    //     if (navigator.msSaveBlob) {
+    //         navigator.msSaveBlob(blob, fileName);
+    //     } else {
+    //         const link = document.createElement('a');
+    //         if (link.download !== undefined) {
+    //             const url = URL.createObjectURL(blob);
+    //             link.setAttribute('href', url);
+    //             link.setAttribute('download', fileName);
+    //             link.style.visibility = 'hidden';
+    //             document.body.appendChild(link);
+    //             link.click();
+    //             document.body.removeChild(link);
+    //         }
+    //     }
+    // }
 
     private onOrdersChnaged = (info: ApiOrdersChanges) => {
         console.log('products coutn chaneged', info);
