@@ -1,3 +1,4 @@
+import { ApiOrdersChanges } from './../../models/api/state/state';
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
 import { MessageService } from 'primeng/components/common/messageservice';
@@ -10,6 +11,7 @@ import { LiteEvent } from '../helpers/lite-event';
 export class TrackerService {
 
     public productsCountChanged: LiteEvent<ApiProdCountChanges> = new LiteEvent<ApiProdCountChanges>();
+    public orderChanged: LiteEvent<ApiOrdersChanges> = new LiteEvent<ApiOrdersChanges>();
 
     private _userToken: string;
     private _connection: HubConnection;
@@ -38,13 +40,11 @@ export class TrackerService {
             this.productsCountChanged.trigger(data);
         });
 
-        // connection.on('setupChange', (data: IClientSetupMessage) => {
-        //     this.clientSetupChanged.trigger(data);
-        // });
+        connection.on('orderChanged', (data: ApiOrdersChanges) => {
+            this.orderChanged.trigger(data);
+        });
 
-        // connection.onclose((err) => {
-        //     console.error('signal R connection is closed:', err);
-        // });
+
 
         connection.start().catch(err => {
             return console.error(err.toString());
