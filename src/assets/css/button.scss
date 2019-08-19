@@ -53,10 +53,10 @@ app-i-button {
     border: 1px solid;
     border-color: $appRedColor;
     background: $appRedColor;
-    box-shadow: -3px 3px 12px -2px black;
+    box-shadow: -3px 3px 12px -2px black !important;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     opacity: 0.9;
-    outline: 0;
+    outline: 0 !important;
     cursor: pointer;
     &:hover,
     &:enabled:hover {

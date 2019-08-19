@@ -82,7 +82,7 @@
     }
     .mat-form-field-subscript-wrapper {
         height: 18px;
-        margin-top: 2px;
+        margin-top: 0px;
     }
     .mat-select,
     .mat-select-trigger {
@@ -121,7 +121,7 @@
     @include wH(calc(100% - 40px), auto);
     max-width: 800px;
     min-height: 100%;
-    margin-bottom: 6px;
+    margin-bottom: 0px;
     @include customMaxWidth(800px) {
         max-width: 400px;
         margin: 0px auto;
@@ -138,6 +138,10 @@
         font-family: Verdana, Geneva, Tahoma, sans-serif;
         background-color: #D7DFDC;
     }
+}
+
+.s-area-wrapper.mat-form-field .mat-form-field-wrapper {
+    height: 100%;
 }
 
 .mat-form-field-underline {
