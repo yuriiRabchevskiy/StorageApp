@@ -142,6 +142,8 @@ namespace Storage
         app.UseDeveloperExceptionPage();
       }
 
+      app.UseDeveloperExceptionPage();
+
       app.UseAuthentication();
       app.UseStaticFiles();
       app.UseSpaStaticFiles();

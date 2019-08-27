@@ -1,3 +1,4 @@
+import { element } from 'protractor';
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import * as moment from 'moment-mini';
@@ -23,6 +24,12 @@ interface IExportData {
     orderNumber: number;
     seller: string;
 }
+
+interface IDoubleClick {
+    date?: number;
+    element?: IOrder;
+}
+
 @Component({
     selector: 'app-orders',
     templateUrl: './orders.component.html',
@@ -41,6 +48,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     canceledOrders: IOrder[] = [];
     canceledOrdersIsLoading: boolean = false;
     private _canceledLoadTimeMs: number = undefined;
+    clickInfo: IDoubleClick = {};
 
     get viewData() {
         return this.isCancelTab ? this.canceledOrders : this.filteredData;
@@ -94,12 +102,27 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this.filters.push(this.typeFilter);
     }
 
-    onItemClick(event) {
-        if (this.selectedItem !== event) {
-            this.onRowClick(event);
-        } else {
-            this.showToEdit();
+    onItemClick(event: IOrder) {
+        this.onRowClick(event);
+
+        const now = Date.now();
+
+        if (this.clickInfo.element === event) { // same item
+            const diff = now - (this.clickInfo.date || 0);
+            console.log(diff);
+
+            if (diff < 250) {
+                this.showToEdit();
+            }
         }
+
+        this.clickInfo = {
+            date: now,
+            element: event
+        };
+
+
+
     }
 
     selectTab(index: number) {
