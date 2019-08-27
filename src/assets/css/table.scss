@@ -24,13 +24,12 @@
     }
   }
   td {
-      border-color: $defBtn !important;
       word-break: break-all;
-      padding: 12px 4px !important;
+      padding: 6px 2px !important;
       vertical-align: top !important;
   }
   .expanded-cell {
-      padding: 12px 0px !important;
+      padding: 6px 0px !important;
       vertical-align: top !important;
   }
   .ui-table-tbody tr.s-selected-row {
@@ -48,7 +47,7 @@
   }
 
   th {
-    padding: 8px 12px !important;
+    padding: 6px 12px 6px 4px !important;
     position: relative;
     word-break: break-all;
     overflow: hidden;
