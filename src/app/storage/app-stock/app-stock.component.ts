@@ -1,6 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/components/common/messageservice';
+import { INDictionary } from '../../models';
 import { ApiResponse } from '../../models/api';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { IProduct, ISell, ITransfer, Product, Sell } from '../../models/storage';
@@ -12,7 +13,6 @@ import { IWarehouse } from './../../models/storage/werehouse';
 import { TrackerService } from './../../shared/services/tracker.service';
 import { ISaveAddition } from './addition/addition.component';
 import { ISaveResult } from './product/product.component';
-import { INDictionary } from '../../models';
 
 @Component({
   selector: 'app-all-stock',
@@ -39,6 +39,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   isBalance: boolean = false;
 
   typeFilter: NumberFilter<IProduct> = new NumberFilter<IProduct>();
+
+  globalSearchFields = ['productType', 'producer', 'model', 'size', 'color', 'freeNote', 'recommendedBuyPrice', 'recommendedSalePrice'];
 
   tabs: ICategory[] = [];
   _selectedTab: ICategory;

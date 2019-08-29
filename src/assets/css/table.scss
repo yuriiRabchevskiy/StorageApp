@@ -9,19 +9,24 @@
     display: block;
     @include wH(100%, 100%);
 
+    .ui-table-tbody tr.disabled-row {
+        color: black;
+        background-color: gray !important;
+
+        a {
+            color: black;
+        }
+    }
+
     .ui-table-tbody tr:hover,
     .ui-table-tbody tr.s-selected-row {
         color: #FFFFFF;
         background-color: black !important;
+
         a {
             color: white;
         }
     }
-
-
-
-
-
 
     .ui-datatable {
         height: 100%;

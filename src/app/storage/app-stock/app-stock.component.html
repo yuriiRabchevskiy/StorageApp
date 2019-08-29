@@ -7,11 +7,9 @@
     </div>
     <div class="page-body">
         <!--todo - fix it [rowStyleClass]="disabledRow" -->
-        <p-table class="prime-table" [value]="filteredData" [paginator]="true"
-            [rowsPerPageOptions]="[100,50,30]" [rows]="100" [pageLinks]="4"
-            [responsive]="true" scrollable="true" scrollWidth="100%"
-            scrollHeight="100%" #dt dataKey="id"
-            [globalFilterFields]="['productType', 'model', 'size', 'color', 'freeNote']">
+        <p-table class="prime-table" [value]="filteredData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
+            [rows]="100" [pageLinks]="4" [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="100%"
+            #dt dataKey="id" [globalFilterFields]="globalSearchFields">
 
             <ng-template pTemplate="caption">
                 <div class="flex-row flex-wrap table-header">
@@ -39,8 +37,7 @@
                         <app-i-button *ngIf="sellList.length > 0" icon="i-basket" title="Оформити замовлення"
                             (iClick)="showBasketDialog()"></app-i-button>
                         <input class="s-serche" type="text" pInputText size="50" placeholder="Пошук"
-                        (input)="dt.filterGlobal($event.target.value, 'contains')"
-                        >
+                            (input)="dt.filterGlobal($event.target.value, 'contains')">
                     </div>
                 </div>
             </ng-template>
@@ -106,7 +103,8 @@
                         <input pInputText type="text" (input)="dt.filter($event.target.value, 'producer')">
                     </th>
                     <th>
-                        <input pInputText type="text" [style.width]="'100%'" (input)="dt.filter($event.target.value, 'model')">
+                        <input pInputText type="text" [style.width]="'100%'"
+                            (input)="dt.filter($event.target.value, 'model')">
                     </th>
                     <th>
                         <input pInputText type="text" (input)="dt.filter($event.target.value, 'size')">
@@ -124,7 +122,8 @@
             </ng-template>
 
             <ng-template pTemplate="body" let-rowData>
-                <tr (click)="onRowClick(rowData)" [ngClass]="{'s-selected-row': rowData.id === selectedItem.id}">
+                <tr (click)="onRowClick(rowData)" [class]="disabledRow()"
+                    [ngClass]="{'s-selected-row': rowData.id === selectedItem.id}">
                     <td>{{rowData.productType}}</td>
                     <td>{{rowData.producer}}</td>
                     <td>{{rowData.model}}</td>
