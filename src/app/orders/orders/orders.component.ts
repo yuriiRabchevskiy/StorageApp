@@ -23,6 +23,12 @@ interface IExportData {
     orderNumber: number;
     seller: string;
 }
+
+interface IDoubleClick {
+    date?: number;
+    element?: IOrder;
+}
+
 @Component({
     selector: 'app-orders',
     templateUrl: './orders.component.html',
@@ -36,11 +42,13 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     showConfirmCancel: boolean = false;
     typeFilter: NumberFilter<IOrder> = new NumberFilter<IOrder>();
     stringFilters: StringFilter<IOrder> = new StringFilter<IOrder>();
+    rowGroupMetadata: any;
 
     isCancelTab: boolean = false;
     canceledOrders: IOrder[] = [];
     canceledOrdersIsLoading: boolean = false;
     private _canceledLoadTimeMs: number = undefined;
+    clickInfo: IDoubleClick = {};
 
     get viewData() {
         return this.isCancelTab ? this.canceledOrders : this.filteredData;
@@ -86,7 +94,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         private tracker: TrackerService) {
         super(notifi);
 
-        this.tracker.orderChanged.on(this.onOrdersChnaged);
+        this.tracker.orderChanged.on(this.onOrdersChanged);
         const isAdmin = this.userService.getLocal().isAdmin;
         if (isAdmin) this.tabs.push({ label: 'Скасовані', value: OrderStatus.Canceled });
         this.selectedTab = this.tabs[0];
@@ -94,13 +102,33 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this.filters.push(this.typeFilter);
     }
 
-    // onRowClick(val) {
-    //     if (this.selectedItem !== val.data) {
-    //         this.selectedItem = val.data;
-    //     } else {
-    //         this.showToEdit();
-    //     }
-    // }
+    onFiltered() {
+        super.onFiltered();
+        this.updateRowGroupMetaData();
+    }
+
+    onItemClick(event: IOrder) {
+        this.onRowClick(event);
+
+        const now = Date.now();
+
+        if (this.clickInfo.element === event) { // same item
+            const diff = now - (this.clickInfo.date || 0);
+            console.log(diff);
+
+            if (diff < 250) {
+                this.showToEdit();
+            }
+        }
+
+        this.clickInfo = {
+            date: now,
+            element: event
+        };
+
+
+
+    }
 
     selectTab(index: number) {
         this.selectedTab = this.tabs[index];
@@ -124,12 +152,14 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     onDataReceived(res: ApiResponse<IOrder>) {
         if (res.success) {
             res.items.map(it => {
-                it.date = moment(new Date(it.openDate)).format('DD/MM/YYYY');
+                it.openDate = new Date(it.openDate);
+                it.date = moment(it.openDate).format('DD/MM/YYYY');
                 it.itemsName = this.getItemsName(it.products);
             });
             res.items.sort(this.orderByDate);
         }
         super.onDataReceived(res);
+        this.updateRowGroupMetaData();
     }
 
     getItemsName(val: ITransaction[]) {
@@ -252,17 +282,6 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this.dataTable.expandedRowKeys = {};
     }
 
-    createFileName() {
-        const date = moment(new Date()).format('DD.MM.YYYY HH:mm');
-        this.csvFileName = this.selectedTab.label + ' продажі - ' + date;
-    }
-
-    saveToExcel(data) {
-        this.createFileName();
-        this.formated(data);
-        this.exportCSVFile(this.headers, this.itemsFormatted, this.csvFileName);
-    }
-
     generateProductList(val) {
         let str = '';
         for (let i = 0; i < val.products.length; i++) {
@@ -276,79 +295,47 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         }
         return str;
     }
-    formated(val) {
-        this.itemsFormatted = [];
-        val.forEach((item) => {
-            const productList = this.generateProductList(item);
-            this.itemsFormatted.push({
-                id: item.id,
-                orderNumber: item.orderNumber,
-                date: item.date,
-                seller: item.seller,
-                products: productList
-            });
-        });
+
+    onSort() {
+        this.updateRowGroupMetaData();
     }
 
-    convertToCSV(objArray) {
-        const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
-        let str = '';
-
-        for (let i = 0; i < array.length; i++) {
-            let line = '';
-            for (const index in array[i]) {
-                if (i === 0) {
-                    if (line !== '') {
-                        line += ',';
-                    }
-                    line += array[i][index];
-                } else {
-                    if (line !== '') {
-                        line += ',';
-                    }
-                    line = line + array[i][index];
-                }
-            }
-            str += line + '\r\n';
-        }
-        return str;
+    getDateKey(d: Date) {
+        return `${d.getDate()}`;
     }
 
-    exportCSVFile(headers, items, fileTitle) {
-        if (headers) {
-            items.unshift(headers);
-        }
+    updateRowGroupMetaData() {
+        this.rowGroupMetadata = {};
+        if (!this.viewData) return;
 
-        // Convert Object to JSON
-        const jsonObject = JSON.stringify(items);
-        const csv = this.convertToCSV(jsonObject);
-        const fileName = fileTitle + '.csv' || 'export.csv';
-        const blob = new Blob([csv], { type: 'text/csv; charset=utf-8' });
-        if (navigator.msSaveBlob) {
-            navigator.msSaveBlob(blob, fileName);
-        } else {
-            const link = document.createElement('a');
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', fileName);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+        for (let i = 0; i < this.viewData.length; i++) {
+            const rowData = this.viewData[i];
+            const date = this.getDateKey(rowData.openDate);
+            if (i === 0) {
+                this.rowGroupMetadata[date] = { index: 0, size: 1 };
+            } else {
+                const previousRowData = this.viewData[i - 1];
+                const previousRowGroup = this.getDateKey(previousRowData.openDate);
+                if (date === previousRowGroup)
+                    this.rowGroupMetadata[date].size++;
+                else
+                    this.rowGroupMetadata[date] = { index: i, size: 1 };
             }
         }
+
     }
 
-    private onOrdersChnaged = (info: ApiOrdersChanges) => {
+    private onOrdersChanged = (info: ApiOrdersChanges) => {
         console.log('products coutn chaneged', info);
         info.changes.forEach(orderChange => {
             const current = this.data.find(it => it.id === orderChange.orderId);
+            const originalProducts = current.products;
             Object.assign(current, orderChange.order);
+            current.products = originalProducts; // restore as unmodifiable
         });
     }
 
     ngOnDestroy(): void {
-        this.tracker.orderChanged.off(this.onOrdersChnaged);
+        this.tracker.orderChanged.off(this.onOrdersChanged);
     }
 }
