@@ -59,7 +59,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     private tracker: TrackerService) {
     super(notifi);
 
-    this.tracker.productsCountChanged.on(this.onProductsCountChnaged);
+    this.tracker.productsCountChanged.on(this.onProductsCountChanged);
     this.selectedTab = this.tabs[0];
     this.typeFilter.getNumber = (it) => it.categoryId;
     this.filters.push(this.typeFilter);
@@ -374,7 +374,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     return !sum ? 'disabled-row' : '';
   }
 
-  private onProductsCountChnaged = (info: ApiProdCountChanges) => {
+  private onProductsCountChanged = (info: ApiProdCountChanges) => {
     console.log('products coutn chaneged', info);
     info.changes.forEach(change => {
       const product = this.data.find(it => it.id === change.productId);
@@ -395,7 +395,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   ngOnDestroy(): void {
-    this.tracker.productsCountChanged.off(this.onProductsCountChnaged);
+    this.tracker.productsCountChanged.off(this.onProductsCountChanged);
   }
 
 

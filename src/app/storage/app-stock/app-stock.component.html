@@ -122,7 +122,7 @@
             </ng-template>
 
             <ng-template pTemplate="body" let-rowData>
-                <tr (click)="onRowClick(rowData)" [class]="disabledRow()"
+                <tr (click)="onRowClick(rowData)" [class]="disabledRow(rowData)"
                     [ngClass]="{'s-selected-row': rowData.id === selectedItem.id}">
                     <td>{{rowData.productType}}</td>
                     <td>{{rowData.producer}}</td>

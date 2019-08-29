@@ -61,7 +61,7 @@
         <div class="foot-group">
             <button class="d-s-button" type="button" pButton icon="pi pi-check" (click)="save()" label="Зберегти"
                 [disabled]="(items.length <= 0) || orderEditor.invalid || isSaving"></button>
-            <button class="d-s-button-cancel" type="button" pButton icon="pi-times" label="Закрити"
+            <button class="d-s-button-cancel" type="button" pButton icon="pi pi-times" label="Закрити"
                 (click)="closeDialog()" [disabled]="isSaving"></button>
         </div>
     </p-footer>
