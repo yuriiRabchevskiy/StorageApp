@@ -10,7 +10,7 @@
       [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="100%"
       dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
         'clientPhone', 'clientName', 'clientAddress', 'payment', 'seller', 'canceledBy',
-        'itemsName', 'other', 'totalPrice']">
+        'itemsName', 'other', 'totalPrice']" (onSort)="onSort()">
       <ng-template pTemplate="caption">
         <div class="flex-row flex-wrap table-header">
           <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
@@ -44,21 +44,30 @@
       </ng-template>
       <ng-template pTemplate="colgroup">
         <colgroup>
+          <!--Expanded-->
           <col width="20">
+          <!--Id-->
           <col width="50">
-          <col width="120">
-          <col width="130" *ngIf="selectedTab.value === 1">
-          <col width="130" *ngIf="selectedTab.value === 3">
-          <col width="120">
-          <col width="120">
+          <!--Date-->
+          <col width="126">
+          <!--Close Date-->
+          <col width="126" *ngIf="selectedTab.value === 1">
+          <!--Cancel Date-->
+          <col width="126" *ngIf="selectedTab.value === 3">
+          <!--Order No-->
+          <col width="126">
+          <!--Phone No-->
+          <col width="95">
           <col>
           <col>
-          <col width="100">
-          <col>
+          <!--Kind-->
+          <col width="108">
+          <!--Seller-->
+          <col width="140px">
           <col *ngIf="isCancelTab">
           <col width="180">
           <col>
-          <col width="100" *ngIf="!isCancelTab">
+          <col width="80" *ngIf="!isCancelTab">
         </colgroup>
       </ng-template>
       <ng-template pTemplate="header">
@@ -119,7 +128,14 @@
           </th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-expanded="expanded" let-rowData>
+      <ng-template pTemplate="body" let-expanded="expanded" let-rowData let-rowIndex="rowIndex">
+
+        <tr class="ui-widget-header" *ngIf="rowGroupMetadata[getDateKey(rowData.openDate)].index === rowIndex">
+          <td colspan="3">
+            <span style="font-weight:bold">{{rowData.openDate | date: 'dd/MM/yy'}}</span>
+          </td>
+        </tr>
+
         <tr (click)="onItemClick(rowData)" [pSelectableRow]="rowData"
           [ngClass]="{'s-selected-row': rowData.id === selectedItem?.id}">
           <td class="expanded-cell">
@@ -152,7 +168,7 @@
 
       <ng-template let-item pTemplate="rowexpansion">
         <tr class="expanded-row">
-          <td [attr.colspan]="selectedTab.value > 1 ? 13 : 12">
+          <td [attr.colspan]="12">
             <div class="cancel-reason" *ngIf="isCancelTab">
               Причина відміни:
               <b> {{ item.cancelReason }} </b>
