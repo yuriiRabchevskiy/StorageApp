@@ -1,174 +1,199 @@
 @import 'globals';
 
 .t-i-button-group {
-  position: absolute;
-  left: 4px;
+    position: absolute;
+    left: 4px;
 }
 
 .prime-table {
-  display: block;
-  @include wH(100%, 100%);
-  * {
-      outline: 0;
-  }
-  .ui-table-caption {
-    border: none !important;
-    padding: 0 !important;
-    margin-bottom: 8px;
-  }
-  .ui-sortable-column.ui-state-highlight {
-    background-color: transparent !important;
-    color: #333 !important;
+    display: block;
+    @include wH(100%, 100%);
+
+    * {
+        outline: 0;
+    }
+
+    .ui-table-caption {
+        border: none !important;
+        padding: 0 !important;
+        margin-bottom: 8px;
+    }
+
+    .ui-sortable-column.ui-state-highlight {
+        background-color: transparent !important;
+        color: #333 !important;
+
+        .ui-sortable-column-icon {
+            color: #848484 !important;
+        }
+    }
+
+    .ui-widget-header {
+        background: #E0E0E0;
+    }
+
+
+
+    td {
+        word-break: break-word;
+        padding: 4px 2px !important;
+        vertical-align: top !important;
+    }
+
+    .expanded-cell {
+        padding: 4px 0px !important;
+        vertical-align: top !important;
+    }
+
+    .ui-table-tbody tr.disabled-row {
+        color: $WhiteColor;
+        background-color: #848484 !important;
+        cursor: default;
+
+        a {
+            color: $WhiteColor;
+        }
+    }
+
+    .ui-table-tbody tr.s-selected-row {
+        color: $WhiteColor;
+        background-color: $defBtn !important;
+        cursor: default;
+
+        a {
+            color: $WhiteColor;
+        }
+    }
+
+    .ui-table-tbody tr:hover:not(.expanded-row) {
+        color: $hoverColor !important;
+        background-color: $disabledText !important;
+    }
+
+    th {
+        padding: 6px 12px 6px 2px !important;
+        position: relative;
+        word-break: break-word;
+        overflow: hidden;
+    }
+
+    p-sorticon {
+        position: absolute;
+        right: 2px;
+        width: 12px;
+        height: 12px;
+        margin-top: 4px;
+    }
+
     .ui-sortable-column-icon {
-        color: #848484 !important;
-    }
-  }
-  td {
-      word-break: break-all;
-      padding: 4px 2px !important;
-      vertical-align: top !important;
-  }
-  .expanded-cell {
-      padding: 4px 0px !important;
-      vertical-align: top !important;
-  }
-  .ui-table-tbody tr.s-selected-row {
-    color: $WhiteColor;
-    background-color: $defBtn !important;
-    cursor: default;
-    a {
-      color: $WhiteColor;
-    }
-  }
-
-  .ui-table-tbody tr:hover:not(.expanded-row) {
-      color: $hoverColor !important;
-      background-color: $disabledText !important;
-  }
-
-  th {
-    padding: 6px 12px 6px 4px !important;
-    position: relative;
-    word-break: break-all;
-    overflow: hidden;
-  }
-
-  p-sorticon {
-    position: absolute;
-    right: 2px;
-    width: 12px;
-    height: 12px;
-    margin-top: 4px;
-  }
-  .ui-sortable-column-icon {
-    width: 100%;
-    height: 100%;
-    font-size: 12px;
-    vertical-align: top;
-  }
-
-  .table-header {
-      justify-content: space-between;
-  }
-
-  .ui-inputtext:not(.s-serche) {
-      width: 100%;
-  }
-
-  .ui-paginator-bottom {
-    flex-shrink: 0;
-    border: none;
-    background: $defBtn;
-    height: 32px;
-    line-height: 16px;
-    padding: 3px 0px;
-    font-size: 14px;
-
-    & * {
-      font-size: inherit;
-    }
-
-    .ui-paginator-element {
-      line-height: 28px;
-      border-radius: 0px;
-      @include wH(24px, 24px);
-      padding: 0;
-      vertical-align: top;
-
-      .fa {
-        @include wH(100%, 100%);
-        line-height: 26px;
-      }
-    }
-
-    .ui-paginator-pages {
-      padding: 0;
-      height: 24px;
-      vertical-align: top;
-
-      .ui-paginator-page {
-        line-height: 24px;
+        width: 100%;
         height: 100%;
-      }
-
-      .ui-paginator-page.ui-state-active {
-        border-color: $appRedColor;
-        background: $appRedColor;
-      }
+        font-size: 12px;
+        vertical-align: top;
     }
 
-    .ui-dropdown {
-      border-radius: 0px;
-      color: $WhiteColor !important;
-      background: $appRedColor !important;
-      box-shadow: none;
-      border: none;
-      height: 100%;
-      width: 60px;
+    .table-header {
+        justify-content: space-between;
     }
 
-    .ui-dropdown-label {
-      border-radius: 0px;
-      color: $WhiteColor !important;
-      background: $appRedColor !important;
-      height: 100%;
+    .ui-inputtext:not(.s-serche) {
+        width: 100%;
     }
 
-    .ui-dropdown-trigger {
-      border: none;
-      color: $WhiteColor !important;
-      background: $appRedColor !important;
+    .ui-paginator-bottom {
+        flex-shrink: 0;
+        border: none;
+        background: $defBtn;
+        height: 32px;
+        line-height: 16px;
+        padding: 3px 0px;
+        font-size: 14px;
 
-      span.fa {
-        margin-top: calc(50% - 1px);
-      }
-    }
+        & * {
+            font-size: inherit;
+        }
 
-    .ui-dropdown-panel {
-      border-radius: 0px;
-      box-shadow: none;
-    }
+        .ui-paginator-element {
+            line-height: 28px;
+            border-radius: 0px;
+            @include wH(24px, 24px);
+            padding: 0;
+            vertical-align: top;
 
-    .ui-dropdown-items {
-      padding: 0px 4px;
-      border-radius: 0px;
-      color: $WhiteColor !important;
-      background: $appRedColor !important;
-    }
+            .fa {
+                @include wH(100%, 100%);
+                line-height: 26px;
+            }
+        }
 
-    .ui-dropdown-item {
-      border-radius: 0px;
-    }
+        .ui-paginator-pages {
+            padding: 0;
+            height: 24px;
+            vertical-align: top;
 
-    .ui-dropdown-item.ui-state-highlight {
-      border-radius: 0px;
-      color: $WhiteColor !important;
-      background: $appRedColor !important;
+            .ui-paginator-page {
+                line-height: 24px;
+                height: 100%;
+            }
+
+            .ui-paginator-page.ui-state-active {
+                border-color: $appRedColor;
+                background: $appRedColor;
+            }
+        }
+
+        .ui-dropdown {
+            border-radius: 0px;
+            color: $WhiteColor !important;
+            background: $appRedColor !important;
+            box-shadow: none;
+            border: none;
+            height: 100%;
+            width: 60px;
+        }
+
+        .ui-dropdown-label {
+            border-radius: 0px;
+            color: $WhiteColor !important;
+            background: $appRedColor !important;
+            height: 100%;
+        }
+
+        .ui-dropdown-trigger {
+            border: none;
+            color: $WhiteColor !important;
+            background: $appRedColor !important;
+
+            span.fa {
+                margin-top: calc(50% - 1px);
+            }
+        }
+
+        .ui-dropdown-panel {
+            border-radius: 0px;
+            box-shadow: none;
+        }
+
+        .ui-dropdown-items {
+            padding: 0px 4px;
+            border-radius: 0px;
+            color: $WhiteColor !important;
+            background: $appRedColor !important;
+        }
+
+        .ui-dropdown-item {
+            border-radius: 0px;
+        }
+
+        .ui-dropdown-item.ui-state-highlight {
+            border-radius: 0px;
+            color: $WhiteColor !important;
+            background: $appRedColor !important;
+        }
     }
-  }
 }
 
 .prime-table.report-table .ui-datatable-scrollable-body {
-  min-height: auto;
-  height: auto !important;
+    min-height: auto;
+    height: auto !important;
 }

@@ -1,6 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/components/common/messageservice';
+import { INDictionary } from '../../models';
 import { ApiResponse } from '../../models/api';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { IProduct, ISell, ITransfer, Product, Sell } from '../../models/storage';
@@ -12,7 +13,6 @@ import { IWarehouse } from './../../models/storage/werehouse';
 import { TrackerService } from './../../shared/services/tracker.service';
 import { ISaveAddition } from './addition/addition.component';
 import { ISaveResult } from './product/product.component';
-import { INDictionary } from '../../models';
 
 @Component({
   selector: 'app-all-stock',
@@ -40,6 +40,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
 
   typeFilter: NumberFilter<IProduct> = new NumberFilter<IProduct>();
 
+  globalSearchFields = ['productType', 'producer', 'model', 'size', 'color', 'freeNote', 'recommendedBuyPrice', 'recommendedSalePrice'];
+
   tabs: ICategory[] = [];
   _selectedTab: ICategory;
 
@@ -57,7 +59,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     private tracker: TrackerService) {
     super(notifi);
 
-    this.tracker.productsCountChanged.on(this.onProductsCountChnaged);
+    this.tracker.productsCountChanged.on(this.onProductsCountChanged);
     this.selectedTab = this.tabs[0];
     this.typeFilter.getNumber = (it) => it.categoryId;
     this.filters.push(this.typeFilter);
@@ -372,7 +374,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     return !sum ? 'disabled-row' : '';
   }
 
-  private onProductsCountChnaged = (info: ApiProdCountChanges) => {
+  private onProductsCountChanged = (info: ApiProdCountChanges) => {
     console.log('products coutn chaneged', info);
     info.changes.forEach(change => {
       const product = this.data.find(it => it.id === change.productId);
@@ -393,7 +395,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   ngOnDestroy(): void {
-    this.tracker.productsCountChanged.off(this.onProductsCountChnaged);
+    this.tracker.productsCountChanged.off(this.onProductsCountChanged);
   }
 
 
