@@ -10,7 +10,7 @@ import { NumberFilter, StringFilter } from '../../models/filtering/filters';
 import { IOrder, ITransaction, OrderStatus } from '../../models/storage';
 import { ApiService } from '../../shared/services/api.service';
 import { TrackerService } from '../../shared/services/tracker.service';
-import { Dictionary } from './../../models/dictionary';
+import { Dictionary, IDictionary } from './../../models/dictionary';
 
 interface ITab {
     label: string;
@@ -42,13 +42,20 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     showConfirmCancel: boolean = false;
     typeFilter: NumberFilter<IOrder> = new NumberFilter<IOrder>();
     stringFilters: StringFilter<IOrder> = new StringFilter<IOrder>();
-    rowGroupMetadata: any;
+    rowGroupMetadata: IDictionary<any>;
+    canceledRowGroupMetadata: IDictionary<any>;
+
+
 
     isCancelTab: boolean = false;
     canceledOrders: IOrder[] = [];
     canceledOrdersIsLoading: boolean = false;
     private _canceledLoadTimeMs: number = undefined;
     clickInfo: IDoubleClick = {};
+
+    get rowMetadata() {
+        return this.isCancelTab ? this.canceledRowGroupMetadata : this.rowGroupMetadata;
+    }
 
     get viewData() {
         return this.isCancelTab ? this.canceledOrders : this.filteredData;
@@ -104,7 +111,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
     onFiltered() {
         super.onFiltered();
-        this.updateRowGroupMetaData();
+        this.updateMetadata();
     }
 
     onItemClick(event: IOrder) {
@@ -159,7 +166,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             res.items.sort(this.orderByDate);
         }
         super.onDataReceived(res);
-        this.updateRowGroupMetaData();
+        this.updateMetadata();
     }
 
     getItemsName(val: ITransaction[]) {
@@ -246,7 +253,9 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             res => {
                 this._canceledLoadTimeMs = new Date().getTime();
                 this.canceledOrdersIsLoading = false;
+                res.items.forEach(it => it.openDate = new Date(it.openDate));
                 this.canceledOrders = res.items;
+                this.canceledRowGroupMetadata = this.updateRowGroupMetaData(this.canceledOrders);
             },
             err => this.canceledOrdersIsLoading = false
         );
@@ -297,31 +306,37 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     }
 
     onSort() {
-        this.updateRowGroupMetaData();
+        this.updateMetadata();
     }
 
     getDateKey(d: Date) {
         return `${d.getDate()}`;
     }
 
-    updateRowGroupMetaData() {
-        this.rowGroupMetadata = {};
-        if (!this.viewData) return;
+    private updateMetadata() {
+        this.rowGroupMetadata = this.updateRowGroupMetaData(this.viewData);
+        this.canceledRowGroupMetadata = this.updateRowGroupMetaData(this.canceledOrders);
+    }
 
-        for (let i = 0; i < this.viewData.length; i++) {
-            const rowData = this.viewData[i];
+    updateRowGroupMetaData(orders: IOrder[]) {
+        const metadata = {};
+        if (!orders) return;
+
+        for (let i = 0; i < orders.length; i++) {
+            const rowData = orders[i];
             const date = this.getDateKey(rowData.openDate);
             if (i === 0) {
-                this.rowGroupMetadata[date] = { index: 0, size: 1 };
+                metadata[date] = { index: 0, size: 1 };
             } else {
-                const previousRowData = this.viewData[i - 1];
+                const previousRowData = orders[i - 1];
                 const previousRowGroup = this.getDateKey(previousRowData.openDate);
                 if (date === previousRowGroup)
-                    this.rowGroupMetadata[date].size++;
+                    metadata[date].size++;
                 else
-                    this.rowGroupMetadata[date] = { index: i, size: 1 };
+                    metadata[date] = { index: i, size: 1 };
             }
         }
+        return metadata;
 
     }
 
@@ -332,6 +347,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             const originalProducts = current.products;
             Object.assign(current, orderChange.order);
             current.products = originalProducts; // restore as unmodifiable
+            current.openDate = new Date(current.openDate); // open date
         });
     }
 
