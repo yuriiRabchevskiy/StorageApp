@@ -58,7 +58,9 @@
           <col width="126">
           <!--Phone No-->
           <col width="95">
-          <col>
+          <!--Reciver-->
+          <col >
+          <!--Address-->
           <col>
           <!--Kind-->
           <col width="108">
@@ -66,6 +68,7 @@
           <col width="140px">
           <col *ngIf="isCancelTab">
           <col width="180">
+          <!--Notes-->
           <col>
           <col width="80" *ngIf="!isCancelTab">
         </colgroup>
@@ -94,7 +97,7 @@
             Телефон
             <p-sortIcon field="clientPhone"></p-sortIcon>
           </th>
-          <th pSortableColumn="clientName">
+          <th pSortableColumn="clientName" max-width="140px">
             Одержувач
             <p-sortIcon field="clientName"></p-sortIcon>
           </th>
@@ -130,7 +133,7 @@
       </ng-template>
       <ng-template pTemplate="body" let-expanded="expanded" let-rowData let-rowIndex="rowIndex">
 
-        <tr class="ui-widget-header" *ngIf="rowGroupMetadata[getDateKey(rowData.openDate)].index === rowIndex">
+        <tr class="ui-widget-header" *ngIf="rowMetadata[getDateKey(rowData.openDate)].index === rowIndex">
           <td colspan="3">
             <span style="font-weight:bold">{{rowData.openDate | date: 'dd/MM/yy'}}</span>
           </td>
