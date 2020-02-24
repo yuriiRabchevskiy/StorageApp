@@ -59,7 +59,7 @@
           <!--Phone No-->
           <col width="95">
           <!--Reciver-->
-          <col >
+          <col>
           <!--Address-->
           <col>
           <!--Kind-->
@@ -237,8 +237,10 @@
 
 </div>
 <app-spinner *ngIf="showSpinner"></app-spinner>
+
 <app-order *ngIf="orderDialog" [order]="selectedItem" (iSave)="save($event)" (onCloseDialog)="closeEditDialog($event)"
-  [canEdit]="canEdit"></app-order>
+  [canEdit]="canEdit">
+</app-order>
 
 <app-confirm (confirm)="confirmCloseOrder($event)" *ngIf="showConfirm">
   <span header class="confirm-title">Ви впевнені, що бажаєте закрити продажу №:
