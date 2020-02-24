@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/components/common/messageservice';
+import {MessageService} from 'primeng/api';
 import { INDictionary } from '../../models';
 import { ApiResponse } from '../../models/api';
 import { ApiListComponent } from '../../models/component/list-api.component';

@@ -5,7 +5,7 @@ import { ISUser, User, IUserToEdit } from './../../models/manage';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { ApiResponse } from '../../models/api';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/components/common/messageservice';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-sales-per-user',

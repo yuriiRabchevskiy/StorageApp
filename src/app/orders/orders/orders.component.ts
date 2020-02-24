@@ -1,7 +1,7 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import * as moment from 'moment-mini';
-import { MessageService } from 'primeng/components/common/messageservice';
+import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ApiResponse } from '../../models/api';
 import { ApiOrdersChanges } from '../../models/api/state/state';
@@ -66,11 +66,9 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     { label: 'Отримані', value: OrderStatus.Closed }
     ];
 
-    _selectedTab: ITab;
-    get selectedTab() {
-        return this._selectedTab;
-    }
-    set selectedTab(value: ITab) {
+    private _selectedTab: ITab;
+    public get selectedTab() { return this._selectedTab; }
+    public set selectedTab(value: ITab) {
         if (this._selectedTab === value) return;
         this._selectedTab = value;
         this.typeFilter.number = value.value;
@@ -140,7 +138,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     selectTab(index: number) {
         this.selectedTab = this.tabs[index];
         if (this.filteredData.length < -1) return;
-        this.selectedItem = this.filteredData[0];
+        this.select(this.filteredData[0]);
     }
 
 
@@ -230,13 +228,17 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             this.showConfirmCancel = val.conf;
             return;
         }
-        this.apiService.сancelOrder(this.selectedItem.id, val.item).subscribe(
+
+        const order = this.selectedItem;
+        this.apiService.сancelOrder(order.id, val.item).subscribe(
             res => {
                 if (res.success) {
                     this.showSuccessMessage('Продажу повернено');
                     if (this.filteredData.length < 1) return;
-                    this.remove(this.selectedItem);
-                    this.selectedItem = this.filteredData[0];
+                    if (this.selectedItem.id === order.id) {
+                        this.remove(order);
+                    }
+                    this.select(this.filteredData[0]);
                     return;
                 }
                 this.showApiErrorMessage('Продажу не повернено', res.errors);
@@ -341,7 +343,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     }
 
     private onOrdersChanged = (info: ApiOrdersChanges) => {
-        console.log('products coutn chaneged', info);
+        console.log('products count changed', info);
         info.changes.forEach(orderChange => {
             const current = this.data.find(it => it.id === orderChange.orderId);
             const originalProducts = current.products;
@@ -349,6 +351,10 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             current.products = originalProducts; // restore as unmodifiable
             current.openDate = new Date(current.openDate); // open date
         });
+    }
+
+    private showHistory() {
+
     }
 
     ngOnDestroy(): void {

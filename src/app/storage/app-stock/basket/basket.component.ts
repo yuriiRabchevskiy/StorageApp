@@ -3,7 +3,7 @@ import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core
 import { ApiService } from '../../../shared/services/api.service';
 import { ISaleOrder, IProdOrder, IWarehouse } from '../../../models/storage';
 import { ViewState } from '../../../shared/helpers/index';
-import { MessageService } from 'primeng/components/common/messageservice';
+import {MessageService} from 'primeng/api';
 import { OrderEditorComponent } from '../../../controls/index';
 import { SecuredComponent } from '../../../models/component';
 

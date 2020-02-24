@@ -1,14 +1,14 @@
-import { IChangePassword, ChangePassword } from './../../models/manage/user';
-import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
-import { IUser } from '../../models/manage/user';
-import { Router } from '@angular/router';
-import { ApiService } from '../../shared/services/api.service';
-import { SecuredComponent } from '../../models/component/base-api.component';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { matchOtherValidator } from '../../shared/directive/math-validator';
-import { MessageService } from 'primeng/components/common/messageservice';
-import { MatIconRegistry } from '@angular/material';
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import {MessageService} from 'primeng/api';
+import { SecuredComponent } from '../../models/component/base-api.component';
+import { IUser } from '../../models/manage/user';
+import { matchOtherValidator } from '../../shared/directive/math-validator';
+import { ApiService } from '../../shared/services/api.service';
+import { ChangePassword, IChangePassword } from './../../models/manage/user';
 
 @Component({
   selector: 'app-settings',

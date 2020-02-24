@@ -1,10 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { ApiService } from '../../shared/services/api.service';
-import { ISUser, User, IUserToEdit } from './../../models/manage';
-import { ApiListComponent } from '../../models/component/list-api.component';
-import { ApiResponse } from '../../models/api';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/components/common/messageservice';
+import { MessageService } from 'primeng/api';
+import { ApiResponse } from '../../models/api';
+import { ApiListComponent } from '../../models/component/list-api.component';
+import { ApiService } from '../../shared/services/api.service';
+import { ISUser, IUserToEdit } from './../../models/manage';
 
 @Component({
   selector: 'app-users',
