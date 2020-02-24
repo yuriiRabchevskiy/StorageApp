@@ -13,11 +13,12 @@ namespace Storage.Code
       Mapper.Initialize(cfg =>
       {
         cfg.CreateMap<ApiProdAction, ApiProdSell>();
-        cfg.CreateMap<Order, ApiOrder>();        
+        cfg.CreateMap<Order, ApiOrder>();
         cfg.CreateMap<ApiSellOrder, Order>();
         cfg.CreateMap<ApiOrder, Order>();
+        cfg.CreateMap<OrderAction, ApiOrderAction>().ReverseMap();
         cfg.CreateMap<ApplicationUser, ApiUser>().ForMember(it => it.Login, opt => opt.MapFrom(src => src.UserName));
-        cfg.CreateMap<ApiUser, ApplicationUser>().ForMember(it=> it.UserName, opt => opt.MapFrom(src => src.Login));
+        cfg.CreateMap<ApiUser, ApplicationUser>().ForMember(it => it.UserName, opt => opt.MapFrom(src => src.Login));
         cfg.CreateMap<Category, ApiCategory>();
         cfg.CreateMap<ApiCategory, Category>();
         cfg.CreateMap<Product, ApiProduct>();
@@ -26,7 +27,7 @@ namespace Storage.Code
         cfg.CreateMap<ApiWarehouse, Warehouse>();
         cfg.CreateMap<ApiWarehouseAction, ProductAction>();
         cfg.CreateMap<ProductAction, ApiWarehouseAction>();
-        
+
       });
     }
   }
