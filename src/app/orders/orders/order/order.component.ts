@@ -22,7 +22,6 @@ export class OrderComponent {
     }
 
     createOrder() {
-        debugger
         this.order.orderNumber = this.orderEditor.orderEditForm.value.orderNumber;
         this.order.clientName = this.orderEditor.orderEditForm.value.clientName;
         this.order.clientAddress = this.orderEditor.orderEditForm.value.clientAddress;
