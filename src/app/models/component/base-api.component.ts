@@ -1,4 +1,4 @@
-import { MessageService } from 'primeng/components/common/messageservice';
+import {MessageService} from 'primeng/api';
 import { Observable } from 'rxjs/Observable';
 import { ReflectiveInjector } from '@angular/core';
 

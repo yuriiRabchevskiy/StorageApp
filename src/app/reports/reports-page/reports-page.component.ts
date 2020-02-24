@@ -2,7 +2,7 @@ import { UserService } from './../../shared/services/user.service';
 import { ViewState } from './../../shared/helpers/view';
 import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MessageService } from 'primeng/components/common/messageservice';
+import {MessageService} from 'primeng/api';
 import { Location } from '@angular/common';
 import { RouteStateComponent } from '../../models/component/state.component';
 

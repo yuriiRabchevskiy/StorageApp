@@ -49,3 +49,5 @@ Thumbs.db
 /backend/Storage/DataAccess/obj
 /backend/Storage/DataAccess/bin/Debug/netcoreapp2.0
 /backend/Storage/.vs/Storage/v15
+/backend/Storage/_ReSharper.Caches
+/package-lock.json

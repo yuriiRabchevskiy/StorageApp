@@ -2,10 +2,10 @@ import { FormControl, Validators } from '@angular/forms';
 import { IWarehouse } from './../../../models/storage/werehouse';
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
-import { SelectItem } from 'primeng/primeng';
 import { IProduct } from '../../../models/storage';
 import { ITransfer, TransferItem } from '../../../models/storage';
 import * as moment from 'moment-mini';
+import { SelectItem } from 'primeng/api';
 
 @Component({
   selector: 'app-transfer',
@@ -102,7 +102,7 @@ export class TransferComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.trCount =  new FormControl({value: 1, disabled: true},
+    this.trCount = new FormControl({ value: 1, disabled: true },
       [Validators.pattern('^[0-9]+$'), Validators.required]);
   }
 
