@@ -26,6 +26,9 @@ namespace DataAccess
     public DbSet<Warehouse> Warehouses { get; set; }
     public DbSet<WarehouseProducts> WarehouseProducts { get; set; }
     public DbSet<Preference> UserPreferences { get; set; }
+    public DbSet<OrderAction> OrderAction { get; set; }
+
+    
 
   }
 }

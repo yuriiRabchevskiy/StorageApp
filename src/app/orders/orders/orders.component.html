@@ -16,7 +16,11 @@
           <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
             <app-i-button *ngIf="selectedTab.value !== 1 && !isCancelTab"
               [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="edit-icon" title="Редагувати продажу"
-              (iClick)="showToEdit()"></app-i-button>
+              (iClick)="showToEdit()">
+            </app-i-button>
+            <app-i-button *ngIf="canView" icon="i-history" title="Історія замовлення"
+              (iClick)="showHistory()" [disabled]="viewData.length < 1 || selectedItems.length > 1">
+            </app-i-button>
             <app-i-button *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
               [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="i-closeOrder" title="Закрити продажу"
               (iClick)="confirmation()"></app-i-button>

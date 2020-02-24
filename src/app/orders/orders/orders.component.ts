@@ -1,7 +1,7 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import * as moment from 'moment-mini';
-import {MessageService} from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ApiResponse } from '../../models/api';
 import { ApiOrdersChanges } from '../../models/api/state/state';
@@ -351,6 +351,10 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             current.products = originalProducts; // restore as unmodifiable
             current.openDate = new Date(current.openDate); // open date
         });
+    }
+
+    private showHistory() {
+
     }
 
     ngOnDestroy(): void {
