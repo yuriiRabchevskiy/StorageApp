@@ -52,7 +52,7 @@ namespace Storage.Controllers
     }
 
 
-    [HttpGet("history/{id}")]
+    [HttpGet("{id}/history")]
     public async Task<ApiResponse<ApiOrderAction>> GetOrderHistory(int id)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);

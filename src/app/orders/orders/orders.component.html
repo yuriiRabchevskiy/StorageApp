@@ -18,8 +18,8 @@
               [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="edit-icon" title="Редагувати продажу"
               (iClick)="showToEdit()">
             </app-i-button>
-            <app-i-button *ngIf="canView" icon="i-history" title="Історія замовлення"
-              (iClick)="showHistory()" [disabled]="viewData.length < 1 || selectedItems.length > 1">
+            <app-i-button *ngIf="canView" icon="i-history" title="Історія замовлення" (iClick)="showHistory()"
+              [disabled]="viewData.length < 1 || selectedItems.length > 1">
             </app-i-button>
             <app-i-button *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
               [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="i-closeOrder" title="Закрити продажу"
@@ -249,7 +249,13 @@
 
 <app-confirm (confirm)="confirmCloseOrder($event)" *ngIf="showConfirm">
   <span header class="confirm-title">Ви впевнені, що бажаєте закрити продажу №:
-    <b>{{selectedItem.orderNumber}}</b>
+    <b>{{selectedItem.orderNumber}} для {{selectedItem.clientName}}</b> ?
   </span>
 </app-confirm>
-<app-return (confirm)="closeCancelOrder($event)" [order]="selectedItem" *ngIf="showConfirmCancel"></app-return>
+
+<app-return (confirm)="closeCancelOrder($event)" [order]="selectedItem" *ngIf="showConfirmCancel">
+</app-return>
+
+<app-order-history [order]="selectedItem" [orderHistory]="orderHistory" *ngIf="showOrderHistory"
+  (onCloseDialog)="showOrderHistory=$event">
+</app-order-history>

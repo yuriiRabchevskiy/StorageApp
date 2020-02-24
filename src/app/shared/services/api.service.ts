@@ -9,9 +9,10 @@ import { IUser, ISUser, IUserToEdit, IChangePassword } from '../../models/manage
 import { IProduct } from './../../models/storage/products';
 import { IWarehouse } from '../../models/storage/werehouse';
 import { ICategory } from './../../models/storage/categories';
-import { IOrder, ISaleOrder } from './../../models/storage/order';
+import { IOrder, ISaleOrder, IOrderAction, OrderOperation } from './../../models/storage/order';
 import { ICancelOrder } from '../../models/storage/index';
 import { HttpClient } from '@angular/common/http';
+import { tap } from 'rxjs/operators';
 
 @Injectable()
 
@@ -31,6 +32,40 @@ export class ApiService extends ApiBase {
     // orders method
     getOrders(): Observable<ApiResponse<IOrder>> {
         return this.doGet('order');
+    }
+
+    // orders method
+    getOrderHistory(id: number): Observable<ApiResponse<IOrderAction>> {
+        return this.doGet<IOrderAction>(`order/${id}/history`).pipe(
+            tap(res => {
+                res.items.map(it => {
+                    it.date = new Date(it.date);
+                    it.orderJson = JSON.parse(it.orderJson as string);
+                    it.prettyJson = JSON.stringify(it.orderJson, null, 2);
+                    switch (it.operation) {
+                        case OrderOperation.Canceled: {
+                            it.operationName = 'Скасовано';
+                            break;
+                        }
+                        case OrderOperation.Created: {
+                            it.operationName = 'Створено';
+                            break;
+                        }
+                        case OrderOperation.Updated: {
+                            it.operationName = 'Оновлено';
+                            break;
+                        }
+                        case OrderOperation.Closed: {
+                            it.operationName = 'Закрито';
+                            break;
+                        }
+                        default: {
+                            it.operationName = 'Не задано';
+                            break;
+                        }
+                    }
+                });
+            }));
     }
 
     getCanceledOrders(): Observable<ApiResponse<IOrder>> {

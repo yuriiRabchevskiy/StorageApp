@@ -22,7 +22,21 @@ export interface IOrder {
     // client properties
     date?: string;
     itemsName?: string;
+}
 
+export enum OrderOperation { Created, Updated, Closed, Canceled }
+
+export interface IOrderAction {
+    id: number;
+    orderId: number;
+    user: string;
+    date: Date;
+    note: string;
+    orderJson: string | IOrder;
+    operation: OrderOperation;
+
+    operationName?: string;
+    prettyJson: string;
 }
 
 export interface ISaleOrder extends IOrder {
