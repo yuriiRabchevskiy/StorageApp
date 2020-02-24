@@ -1,7 +1,7 @@
 import { ApiOrdersChanges } from './../../models/api/state/state';
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
-import { MessageService } from 'primeng/components/common/messageservice';
+import {MessageService} from 'primeng/api';
 import { ApiEndpointsConfig } from '../../api.config';
 import { UserService } from './user.service';
 import { ApiProdCountChanges } from '../../models/api/state/state';

@@ -1,36 +1,36 @@
+import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import 'rxjs/Rx';
 import 'hammerjs';
-
-import { routing } from './app.routing';
-import { AppComponent } from './app.component';
-
-import {
-  MatTabsModule, MatRadioModule, MatInputModule,
-  MatFormFieldModule, MatIconModule, MatSelectModule, ErrorStateMatcher, ShowOnDirtyErrorStateMatcher
-} from '@angular/material';
-
-import { ApiService } from './shared/services/api.service';
-import { UserService } from './shared/services/user.service';
-import { AuthGuard } from './shared/services/auth-guard';
-
-import { ShareModule } from './shared/share.module';
-import { MessageService } from 'primeng/components/common/messageservice';
+import { MessageService, SharedModule } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { SpinnerModule } from 'primeng/spinner';
 import { TableModule } from 'primeng/table';
-import { HttpClientModule } from '@angular/common/http';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
+import 'rxjs/Rx';
+import { AppComponent } from './app.component';
+import { routing } from './app.routing';
+import { ApiService } from './shared/services/api.service';
+import { AuthGuard } from './shared/services/auth-guard';
 import { TrackerService } from './shared/services/tracker.service';
-import { DialogModule } from 'primeng/components/dialog/dialog';
-import { InputTextModule } from 'primeng/components/inputtext/inputtext';
-import { ButtonModule } from 'primeng/components/button/button';
-import { SpinnerModule } from 'primeng/components/spinner/spinner';
-import { CheckboxModule } from 'primeng/components/checkbox/checkbox';
-import { TooltipModule } from 'primeng/components/tooltip/tooltip';
-import { GrowlModule } from 'primeng/components/growl/growl';
-import { SharedModule } from 'primeng/components/common/shared';
+import { UserService } from './shared/services/user.service';
+import { ShareModule } from './shared/share.module';
+
+
 
 
 
@@ -58,7 +58,7 @@ import { SharedModule } from 'primeng/components/common/shared';
     ButtonModule,
     CheckboxModule,
     TooltipModule,
-    GrowlModule,
+    ToastModule,
     SharedModule,
     ShareModule
   ],

@@ -1,10 +1,9 @@
-import { TrackerService } from './../shared/services/tracker.service';
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Message } from 'primeng/components/common/api';
 import { SecuredComponent } from '../models/component/base-api.component';
 import { WorkProgress } from '../models/component/work-progress';
 import { ApiService } from '../shared/services/api.service';
+import { TrackerService } from './../shared/services/tracker.service';
 
 @Component({
   selector: 'app-main',
@@ -17,7 +16,6 @@ export class MainComponent extends SecuredComponent implements OnInit {
   page: string = '';
   userLogin: string = 'admin';
   open: boolean = false;
-  msgs: Message[] = [];
 
   private _selectedPage: any;
   get selectedPage() {

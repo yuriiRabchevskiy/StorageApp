@@ -1,12 +1,12 @@
-import { User, IUser } from './../../../models/manage/user';
-import { Component, Input, EventEmitter, Output, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { matchOtherValidator } from '../../../shared/directive/math-validator';
 import { ApiService } from '../../../shared/services/api.service';
 import { ISUser } from './../../../models/manage';
-import { FormGroup, FormControl, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
-import { matchOtherValidator } from '../../../shared/directive/math-validator';
-import { MatIconRegistry } from '@angular/material';
-import { DomSanitizer } from '@angular/platform-browser';
+import { User } from './../../../models/manage/user';
 
 export function nameValidator(items: ISUser[]): ValidatorFn {
   return (control: AbstractControl): any => {

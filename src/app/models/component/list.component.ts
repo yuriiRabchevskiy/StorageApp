@@ -1,9 +1,10 @@
-import { MessageService } from 'primeng/components/common/messageservice';
+import {MessageService} from 'primeng/api';
 import { Observable } from 'rxjs/Observable';
 import { SecuredComponent } from './base-api.component';
-import { Input } from '@angular/core';
+import { Input, Directive } from '@angular/core';
 import { StringFilter, Filter } from '../filtering/filters';
 
+@Directive()
 export abstract class ListComponent<TCol> extends SecuredComponent {
 
     public data: TCol[] = []; // initial data provided to this component.

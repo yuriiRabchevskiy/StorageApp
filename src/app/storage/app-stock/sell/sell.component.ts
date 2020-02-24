@@ -1,8 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
-import { IProduct, IOrder, Order, ISell, Sell } from '../../../models/storage';
+import { IProduct, ISell } from '../../../models/storage';
 import { IWarehouse } from './../../../models/storage/werehouse';
-import { ErrorStateMatcher } from '@angular/material';
 import { FormControl, Validators } from '@angular/forms';
 
 @Component({
@@ -95,7 +94,7 @@ export class SellComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.sCount =  new FormControl({value: 1, disabled: true},
+    this.sCount = new FormControl({ value: 1, disabled: true },
       [Validators.pattern('^[0-9]+$'), Validators.required]);
   }
 

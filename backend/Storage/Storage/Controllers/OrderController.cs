@@ -38,7 +38,7 @@ namespace Storage.Controllers
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
-      var data = await _repo.GetAsync(user.Id, isAdmin, DateTime.Now.AddDays(-30), DateTime.Now).ConfigureAwait(false);
+      var data = await _repo.GetAsync(user.Id, isAdmin, DateTime.Now.AddDays(-60), DateTime.Now).ConfigureAwait(false);
       return new ApiResponse<ApiOrder>(data);
     }
 
@@ -49,6 +49,16 @@ namespace Storage.Controllers
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
       var data = await _repo.GetCanceledOrdersAsync(user.Id, isAdmin, DateTime.Now.AddDays(-30), DateTime.Now).ConfigureAwait(false);
       return new ApiResponse<ApiOrder>(data);
+    }
+
+
+    [HttpGet("history/{id}")]
+    public async Task<ApiResponse<ApiOrderAction>> GetOrderHistory(int id)
+    {
+      var user = await GetCurrentUserAsync().ConfigureAwait(false);
+      var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
+      var data = await _repo.GetOrderHistoryAsync(user.Id, isAdmin, id).ConfigureAwait(false);
+      return new ApiResponse<ApiOrderAction>(data);
     }
 
 

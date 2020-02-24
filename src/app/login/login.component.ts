@@ -1,18 +1,15 @@
 import { ForgotPassword } from './../models/api/api/api';
-import { ApiBase } from './../shared/api/base';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 
 import { StringExtensions } from '../shared/helpers/index';
 import { ApiService } from '../shared/services/api.service';
-import { ApiResponse, IForgotPassword } from '../models/api';
+import { IForgotPassword } from '../models/api';
 import { UserService } from '../shared/services/user.service';
 
 import { Dictionary } from './../models/dictionary';
-import { IUser } from './../models/manage/user';
-import { MessageService } from 'primeng/components/common/messageservice';
-import { Message } from 'primeng/components/common/api';
+import {MessageService} from 'primeng/api';
 
 interface IUrlParamsPair {
   url: string;
@@ -38,7 +35,6 @@ export class LoginComponent implements OnInit {
   isLogged: any;
   forgotPass: IForgotPassword;
   showForgotDialog: boolean = false;
-  msgs: Message[] = [];
 
   connectionError: boolean;
   error: boolean;
