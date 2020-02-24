@@ -11,6 +11,7 @@ using BusinessLogic.Models.Api.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace DataAccess.Repository
 {
@@ -84,9 +85,27 @@ namespace DataAccess.Repository
             order.CanceledDate = ClientTime.Now;
             order.CanceledByUserId = userId;
           }
+
           var note = order.ResponsibleUserId != userId ? "Відредаговано іншим продавцем" : null;
+          var operation = OrderOperation.Created;
+          if (order.Id != 0)
+          {
+            switch (order.Status)
+            {
+              case OrderStatus.Canceled: operation = OrderOperation.Canceled; break;
+              case OrderStatus.Closed: operation = OrderOperation.Closed; break;
+              default: operation = OrderOperation.Updated; break;
+            }
+          }
+
           order.OrderEditions = new List<OrderAction>(new[] {
-            new OrderAction { Date = ClientTime.Now, OrderId = order.Id, UserId = userId, Note = note }
+            new OrderAction {
+              Date = ClientTime.Now,
+              OrderId = order.Id,
+              UserId = userId,
+              Note = note,
+              Operation = operation,
+              OrderJson = JsonConvert.SerializeObject(it)}
             });
 
           it.Products = null; // we do not want to sent this back to the client.
