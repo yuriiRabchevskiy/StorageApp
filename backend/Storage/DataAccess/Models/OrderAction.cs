@@ -14,5 +14,7 @@ namespace DataAccess.Models
     public OrderOperation? Operation { get; set; }
     public string OrderJson { get; set; }
 
+    public ApplicationUser User { get; set; }
+
   }
 }

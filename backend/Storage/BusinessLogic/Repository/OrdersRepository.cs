@@ -42,7 +42,7 @@ namespace DataAccess.Repository
       {
         // Where(it => isAdmin || it.ResponsibleUserId == userId)
         var query = context.Orders
-          .Where(it => it.Status != OrderStatus.Canceled && it.OpenDate >= from && it.OpenDate <= till )
+          .Where(it => it.Status != OrderStatus.Canceled && it.OpenDate >= from && it.OpenDate <= till)
           .Include(ord => ord.ResponsibleUser)
           .Include(ord => ord.Transactions)
           .ThenInclude(y => y.Product);
@@ -56,9 +56,14 @@ namespace DataAccess.Repository
       using (var context = _di.GetService<ApplicationDbContext>())
       {
         // Where(it => isAdmin || it.ResponsibleUserId == userId)
-        var data = await context.OrderAction.Where(it => it.OrderId == orderId)
+        var data = await context.OrderAction.Where(it => it.OrderId == orderId).Include(it => it.User)
           .AsNoTracking().ToListAsync().ConfigureAwait(false);
-        return data.Select(Mapper.Map<ApiOrderAction>).ToList();
+        return data.Select(it =>
+        {
+          var mapped = Mapper.Map<ApiOrderAction>(it);
+          mapped.User = it.User.Name;
+          return mapped;
+        }).ToList();
       }
     }
 

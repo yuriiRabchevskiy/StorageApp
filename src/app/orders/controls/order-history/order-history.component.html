@@ -1,8 +1,60 @@
 <p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
     <p-header>
-        Історія замовлення
+        Історія замовлення {{order.orderNumber}} для {{order.clientName}}
     </p-header>
     <div class="dialog-body">
+
+        <div *ngIf="!initialAction">
+            Завантажую історію...
+        </div>
+
+        <p-table class="prime-table" [value]="diffs" [paginator]="true" [rowsPerPageOptions]="[10,5,3]" [pageLinks]="4"
+            [rows]="10" [responsive]="false" scrollable="true" scrollWidth="100%" scrollHeight="100%" dataKey="id" #dt>
+
+            <ng-template pTemplate="colgroup">
+                <colgroup>
+                    <!--operationName-->
+                    <col width="120">
+                    <!--user-->
+                    <col width="120">
+                    <!--date-->
+                    <col width="120">
+                    <!--details-->
+                    <col>
+                </colgroup>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Операція</th>
+                    <th>Користувач</th>
+                    <th>Час операції</th>
+                    <th>Деталі</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-expanded="expanded" let-rowData let-rowIndex="rowIndex">
+                <tr>
+                    <td>{{rowData.operationName}}</td>
+                    <td>{{rowData.user}}</td>
+                    <td>{{rowData.date | date: 'dd/MM/yy HH:mm'}}</td>
+                    <td *ngIf="!rowData.diffs" class="pretty">
+                        {{rowData.prettyJson}}
+                    </td>
+                    <td *ngIf="rowData.diffs">
+                        Змінено
+                        <ul>
+                            <li *ngFor="let diff of rowData.diffs">{{diff.key}}: {{diff.value}}</li>
+                        </ul>
+                    </td>
+                </tr>
+            </ng-template>
+
+        </p-table>
+
+
+        <!-- 
+        {{initialOrder}} -->
 
     </div>
     <p-footer class="s-dialog-foot">

@@ -1,6 +1,5 @@
-using DataAccess.Models;
 using System;
-using System.Collections.Generic;
+using DataAccess.Models;
 
 namespace BusinessLogic.Models.Api
 {
@@ -8,9 +7,11 @@ namespace BusinessLogic.Models.Api
   {
     public int Id { get; set; }
     public int OrderId { get; set; }
-    public string UserId { get; set; }
+    public string User { get; set; }
     public DateTime Date { get; set; }
     public string Note { get; set; }
     public string OrderJson { get; set; }
+
+    public OrderOperation? Operation { get; set; }
   }
 }

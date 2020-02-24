@@ -7,7 +7,7 @@ import { ApiResponse } from '../../models/api';
 import { ApiOrdersChanges } from '../../models/api/state/state';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { NumberFilter, StringFilter } from '../../models/filtering/filters';
-import { IOrder, ITransaction, OrderStatus } from '../../models/storage';
+import { IOrder, ITransaction, OrderStatus, IOrderAction } from '../../models/storage';
 import { ApiService } from '../../shared/services/api.service';
 import { TrackerService } from '../../shared/services/tracker.service';
 import { Dictionary, IDictionary } from './../../models/dictionary';
@@ -35,23 +35,24 @@ interface IDoubleClick {
     styleUrls: ['./orders.component.scss']
 })
 export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestroy {
-    @ViewChild('dt', { static: true }) dataTable: Table;
-    selectedItem: IOrder;
-    orderDialog: boolean = false;
-    showConfirm: boolean = false;
-    showConfirmCancel: boolean = false;
-    typeFilter: NumberFilter<IOrder> = new NumberFilter<IOrder>();
-    stringFilters: StringFilter<IOrder> = new StringFilter<IOrder>();
-    rowGroupMetadata: IDictionary<any>;
-    canceledRowGroupMetadata: IDictionary<any>;
+    @ViewChild('dt', { static: true }) public dataTable: Table;
+    public selectedItem: IOrder;
+    public orderDialog: boolean = false;
+    public showConfirm: boolean = false;
+    public showConfirmCancel: boolean = false;
+    public showOrderHistory: boolean = false;
+    public typeFilter: NumberFilter<IOrder> = new NumberFilter<IOrder>();
+    public stringFilters: StringFilter<IOrder> = new StringFilter<IOrder>();
+    public rowGroupMetadata: IDictionary<any>;
+    public canceledRowGroupMetadata: IDictionary<any>;
 
+    public orderHistory: IOrderAction[] = [];
 
-
-    isCancelTab: boolean = false;
-    canceledOrders: IOrder[] = [];
-    canceledOrdersIsLoading: boolean = false;
+    public isCancelTab: boolean = false;
+    public canceledOrders: IOrder[] = [];
+    public canceledOrdersIsLoading: boolean = false;
     private _canceledLoadTimeMs: number = undefined;
-    clickInfo: IDoubleClick = {};
+    public clickInfo: IDoubleClick = {};
 
     get rowMetadata() {
         return this.isCancelTab ? this.canceledRowGroupMetadata : this.rowGroupMetadata;
@@ -353,8 +354,14 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         });
     }
 
-    private showHistory() {
-
+    public showHistory() {
+        this.showOrderHistory = true;
+        this.orderHistory = undefined;
+        this.apiService.getOrderHistory(this.selectedItem.id).subscribe(
+            res => {
+                this.orderHistory = res.items;
+            }
+        );
     }
 
     ngOnDestroy(): void {
