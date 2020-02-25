@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using BusinessLogic.Models.Api.Reports;
@@ -19,10 +20,12 @@ namespace BusinessLogic.Repository.Reports
   {
 
     private IServiceProvider _di;
+    private readonly IMapper _mapper;
 
-    public WarehouseActionsRepository(IServiceProvider serviceProvider)
+    public WarehouseActionsRepository(IServiceProvider serviceProvider, IMapper mapper)
     {
       _di = serviceProvider;
+      _mapper = mapper;
     }
 
     public async Task<IEnumerable<ApiWarehouseAction>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
@@ -38,7 +41,7 @@ namespace BusinessLogic.Repository.Reports
 
         var result = dbdata.Select(it =>
         {
-          var api = AutoMapper.Mapper.Map<ApiWarehouseAction>(it);
+          var api = _mapper.Map<ApiWarehouseAction>(it);
           api.Operation = it.GetOperationString();
           api.Warehouse = it.Warehouse.Name;
           api.User = it.User.BuildFullName();

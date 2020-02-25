@@ -11,11 +11,11 @@ namespace BusinessLogic.Helpers
 {
   public static class OrderToApiOrderMapper
   {
-    public static List<ApiOrder> ToApi(this List<Order> source)
+    public static List<ApiOrder> ToApi(this List<Order> source, IMapper mapper)
     {
       return source.Select(ord =>
       {
-        var api = Mapper.Map<ApiOrder>(ord);
+        var api = mapper.Map<ApiOrder>(ord);
 
         if (ord.Status == OrderStatus.Canceled && ord.CanceledByUser != null)
         {
@@ -31,7 +31,7 @@ namespace BusinessLogic.Helpers
           Price = it.Price,
           Quantity = -it.Quantity,
           BuyPrice = it.BuyPrice,
-          Product = Mapper.Map<ApiProduct>(it.Product),
+          Product = mapper.Map<ApiProduct>(it.Product),
           TotalPrice = -it.Price * it.Quantity
         });
         return api;

@@ -2,15 +2,16 @@ using AutoMapper;
 using BusinessLogic.Models.Api;
 using BusinessLogic.Models.Api.Reports;
 using DataAccess.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Storage.Code
 {
   public static class StorageConfiguration
   {
-    static public void SetupAutoMapper()
+    static public void SetupAutoMapper(this IServiceCollection services)
     {
-      Mapper.Initialize(cfg =>
+      var config = new MapperConfiguration(cfg =>
       {
         cfg.CreateMap<ApiProdAction, ApiProdSell>();
         cfg.CreateMap<Order, ApiOrder>();
@@ -27,8 +28,9 @@ namespace Storage.Code
         cfg.CreateMap<ApiWarehouse, Warehouse>();
         cfg.CreateMap<ApiWarehouseAction, ProductAction>();
         cfg.CreateMap<ProductAction, ApiWarehouseAction>();
-
       });
+      var mapper = config.CreateMapper();
+      services.AddSingleton(mapper);
     }
   }
 }

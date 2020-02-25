@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using BusinessLogic.Helpers;
@@ -20,10 +21,12 @@ namespace BusinessLogic.Repository.Reports
   {
 
     private IServiceProvider _di;
+    private readonly IMapper _mapper;
 
-    public SalesPerUserRepository(IServiceProvider serviceProvider)
+    public SalesPerUserRepository(IServiceProvider serviceProvider, IMapper mapper)
     {
       _di = serviceProvider;
+      _mapper = mapper;
     }
 
     public async Task<IEnumerable<ApiSalePerUser>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
@@ -37,7 +40,7 @@ namespace BusinessLogic.Repository.Reports
           .Where(it => from <= it.OpenDate && it.OpenDate <= till)
           .Include(ord => ord.ResponsibleUser)
           .Include(ord => ord.Transactions).ThenInclude(y => y.Product).ToListAsync().ConfigureAwait(false);
-        orders = data.ToApi();
+        orders = data.ToApi(_mapper);
       }
 
       var result = orders.GroupBy(it => it.Seller).Select(it =>
