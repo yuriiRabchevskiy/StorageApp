@@ -22,6 +22,7 @@ using BusinessLogic.Models.Api;
 using Storage.Code.Services;
 using BusinessLogic.Repository.Reports;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Storage.Code.Hubs;
 
@@ -137,7 +138,7 @@ namespace Storage
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext dbContext, ILoggerFactory loggerFactory)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext dbContext, ILoggerFactory loggerFactory)
     {
       if (env.IsDevelopment())
       {
