@@ -27,12 +27,15 @@ namespace DataAccess.Repository
   public class OrdersRepository : IOrdersRepository
   {
     private readonly IServiceProvider _di;
+    private readonly IMapper _mapper;
     IStateInformer Informer => _di.GetService<IStateInformer>();
     private ClientTimeZone ClientTime { get; set; }
 
-    public OrdersRepository(IServiceProvider serviceProvider, IConfiguration configuration)
+
+    public OrdersRepository(IServiceProvider serviceProvider, IConfiguration configuration, IMapper mapper)
     {
       _di = serviceProvider;
+      _mapper = mapper;
       ClientTime = new ClientTimeZone(configuration["ShiftTimeZone"]);
     }
 
@@ -47,7 +50,7 @@ namespace DataAccess.Repository
           .Include(ord => ord.Transactions)
           .ThenInclude(y => y.Product);
         var data = await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
-        return data.ToApi();
+        return data.ToApi(_mapper);
       }
     }
 
@@ -60,7 +63,7 @@ namespace DataAccess.Repository
           .AsNoTracking().ToListAsync().ConfigureAwait(false);
         return data.Select(it =>
         {
-          var mapped = Mapper.Map<ApiOrderAction>(it);
+          var mapped = _mapper.Map<ApiOrderAction>(it);
           mapped.User = it.User.Name;
           return mapped;
         }).ToList();
@@ -80,7 +83,7 @@ namespace DataAccess.Repository
           .Include(ord => ord.CanceledByUser)
           .Include(ord => ord.Transactions).ThenInclude(y => y.Product).ToListAsync().ConfigureAwait(false);
         data.ForEach(it => it.Transactions = it.Transactions.Where(tr => tr.Quantity < 0).ToList());
-        return data.ToApi();
+        return data.ToApi(_mapper);
       }
     }
 

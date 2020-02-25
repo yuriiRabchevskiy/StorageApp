@@ -20,17 +20,19 @@ namespace DataAccess.Repository
   {
 
     private IServiceProvider _di;
+    private readonly IMapper _mapper;
 
-    public CategoriesRepository(IServiceProvider serviceProvider)
+    public CategoriesRepository(IServiceProvider serviceProvider, IMapper mapper)
     {
       _di = serviceProvider;
+      _mapper = mapper;
     }
 
     public List<ApiCategory> Get()
     {
       using (var context = _di.GetService<ApplicationDbContext>())
       {
-        return context.Categories.Where(it => it.IsActive).ToList().Select(Mapper.Map<ApiCategory>).ToList();
+        return context.Categories.Where(it => it.IsActive).ToList().Select(_mapper.Map<ApiCategory>).ToList();
       }
     }
 
@@ -39,7 +41,7 @@ namespace DataAccess.Repository
       using (var context = _di.GetService<ApplicationDbContext>())
       {
         it.IsActive = true;
-        var category = Mapper.Map<Category>(it);
+        var category = _mapper.Map<Category>(it);
         context.Categories.Add(category);
         context.SaveChanges();
         return category.Id;

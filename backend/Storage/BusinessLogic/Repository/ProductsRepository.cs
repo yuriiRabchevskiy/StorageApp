@@ -24,10 +24,12 @@ namespace DataAccess.Repository
   {
 
     private IServiceProvider _di;
+    private readonly IMapper _mapper;
 
-    public ProductsRepository(IServiceProvider serviceProvider)
+    public ProductsRepository(IServiceProvider serviceProvider,  IMapper mapper)
     {
       _di = serviceProvider;
+      _mapper = mapper;
     }
 
     public async Task<List<ApiProduct>> GetAsync()
@@ -37,7 +39,7 @@ namespace DataAccess.Repository
         var products = await context.Products.Where(it => it.IsActive).Include(it => it.State).ToListAsync();
         var data = products.Select(it =>
         {
-          var prod = Mapper.Map<ApiProduct>(it);
+          var prod = _mapper.Map<ApiProduct>(it);
           prod.Balance = it.State.ToDictionary(key => key.WarehouseId, val => val.Quantity);
           return prod;
         }).OrderByDescending(it => it.Balance.Values.Sum() > 0).ToList();
@@ -49,7 +51,7 @@ namespace DataAccess.Repository
     {
       using (var context = _di.GetService<ApplicationDbContext>())
       {
-        var product = Mapper.Map<Product>(it);
+        var product = _mapper.Map<Product>(it);
         it.IsActive = true;
         context.Products.Add(product);
         context.SaveChanges();

@@ -38,7 +38,7 @@ namespace Storage.Controllers
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
-      var data = await _repo.GetAsync(user.Id, isAdmin, DateTime.Now.AddDays(-60), DateTime.Now).ConfigureAwait(false);
+      var data = await _repo.GetAsync(user.Id, isAdmin, DateTime.Now.AddDays(-60), DateTime.Now.AddHours(12)).ConfigureAwait(false);
       return new ApiResponse<ApiOrder>(data);
     }
 
@@ -47,7 +47,7 @@ namespace Storage.Controllers
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
-      var data = await _repo.GetCanceledOrdersAsync(user.Id, isAdmin, DateTime.Now.AddDays(-30), DateTime.Now).ConfigureAwait(false);
+      var data = await _repo.GetCanceledOrdersAsync(user.Id, isAdmin, DateTime.Now.AddDays(-30), DateTime.Now.AddHours(12)).ConfigureAwait(false);
       return new ApiResponse<ApiOrder>(data);
     }
 

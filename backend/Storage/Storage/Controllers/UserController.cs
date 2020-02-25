@@ -20,12 +20,14 @@ namespace Storage.Controllers
   {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IEmailSender _emailSender;
+    private readonly IMapper _mapper;
     Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
-    public UserController(ICategoriesRepository repo, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+    public UserController(ICategoriesRepository repo, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IMapper mapper)
     {
       _userManager = userManager;
       _emailSender = emailSender;
+      _mapper = mapper;
     }
 
     // GET api/values
@@ -34,7 +36,7 @@ namespace Storage.Controllers
     {
       return new ApiResponse<ApiUser>(_userManager.Users.Where(it => it.IsActive).ToList().Select(it =>
       {
-        var user = Mapper.Map<ApiUser>(it);
+        var user = _mapper.Map<ApiUser>(it);
         user.IsAdmin = _userManager.IsInRoleAsync(it, UserRole.Admin).Result;
         return user;
       }).ToList());

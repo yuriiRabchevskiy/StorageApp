@@ -94,9 +94,9 @@ namespace Storage
       services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
       services.AddCors();
-      services.AddMvc(cfg =>
+      services.AddControllers(cfg =>
         {
-        }).AddFluentValidation().AddJsonOptions(opt => opt.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore);
+        }).AddFluentValidation().AddJsonOptions(opt => opt.JsonSerializerOptions.IgnoreNullValues = true);
 
       services.AddAuthorization(options =>
       {
@@ -132,6 +132,8 @@ namespace Storage
       services.AddTransient<IStateInformer, TrackerHub>();
       services.AddTransient<TrackerHub, TrackerHub>();
 
+      services.SetupAutoMapper();
+
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -150,12 +152,12 @@ namespace Storage
       app.UseCors(builder => builder.WithOrigins("http://localhost:1609", "http://localhost:3000", "http://localhost", "http://localhost:4200",
         "localhost:4200").AllowAnyHeader().AllowCredentials().AllowAnyMethod());
 
-      app.UseSignalR(routes =>
+      app.UseRouting();
+      app.UseEndpoints(endpoints =>
       {
-        routes.MapHub<TrackerHub>("/tracker");
+        endpoints.MapControllers();
+        endpoints.MapHub<TrackerHub>("/tracker");
       });
-
-      app.UseMvc();
       app.UseSpa(spa =>
       {
         // To learn more about options for serving an Angular SPA from ASP.NET Core,
@@ -176,7 +178,7 @@ namespace Storage
       // dbContext.Database.EnsureCreated();
       dbContext.Database.Migrate();
 
-      StorageConfiguration.SetupAutoMapper();
+
     }
   }
 }
