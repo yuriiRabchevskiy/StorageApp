@@ -38,6 +38,7 @@ export class MainComponent extends SecuredComponent implements OnInit {
     this.pages = [
       { title: 'Склад', url: 'storage', view: true },
       { title: 'Продажі', url: 'orders', view: true },
+      { title: 'Продажі (Архів)', url: 'orders/archive', view: user.isAdmin },
       { title: 'Звіти', url: 'reports', view: user.isAdmin },
       { title: 'Користувачі', url: 'manage', view: user.isAdmin },
       { title: 'Налаштування', url: 'settings', view: true }

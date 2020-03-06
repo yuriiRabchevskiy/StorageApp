@@ -1,7 +1,10 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "app",
+    "baseUrl": "src",
+    "paths": {
+      "@app/*": ["app/*"]
+    },
     "downlevelIteration": true,
     "importHelpers": true,
     "outDir": "./dist/out-tsc",

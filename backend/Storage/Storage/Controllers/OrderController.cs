@@ -6,11 +6,13 @@ using BusinessLogic.Models.Api;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using BusinessLogic.Abstractions;
+using BusinessLogic.Helpers;
 using BusinessLogic.Models.Api.State;
 using BusinessLogic.Models.User;
 using BusinessLogic.Repository;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.VisualBasic;
 
 namespace Storage.Controllers
 {
@@ -39,6 +41,18 @@ namespace Storage.Controllers
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
       var data = await _repo.GetAsync(user.Id, isAdmin, DateTime.Now.AddDays(-60), DateTime.Now.AddHours(12)).ConfigureAwait(false);
+      return new ApiResponse<ApiOrder>(data);
+    }
+
+    // GET api/values
+    [HttpGet("archive/{from}/{to}")]
+    public async Task<ApiResponse<ApiOrder>> GetArchiveAsync(long from, long to)
+    {
+      var user = await GetCurrentUserAsync().ConfigureAwait(false);
+      var fromDate = from.ToDateTime();
+      var toDate = to.ToDateTime();
+      var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
+      var data = await _repo.GetArchiveAsync(user.Id, isAdmin, fromDate, toDate.AddHours(12)).ConfigureAwait(false);
       return new ApiResponse<ApiOrder>(data);
     }
 

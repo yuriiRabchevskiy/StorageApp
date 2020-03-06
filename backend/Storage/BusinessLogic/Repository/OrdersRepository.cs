@@ -18,6 +18,7 @@ namespace DataAccess.Repository
   public interface IOrdersRepository
   {
     Task<List<ApiOrder>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till);
+    Task<List<ApiOrder>> GetArchiveAsync(string userId, bool isAdmin, DateTime from, DateTime till);
     Task<List<ApiOrder>> GetCanceledOrdersAsync(string userId, bool isAdmin, DateTime from, DateTime till);
 
     Task<IReadOnlyCollection<ApiOrderAction>> GetOrderHistoryAsync(string userId, bool isAdmin, int orderId);
@@ -41,17 +42,28 @@ namespace DataAccess.Repository
 
     public async Task<List<ApiOrder>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
-      using (var context = _di.GetService<ApplicationDbContext>())
-      {
-        // Where(it => isAdmin || it.ResponsibleUserId == userId)
-        var query = context.Orders
-          .Where(it => it.Status != OrderStatus.Canceled && it.OpenDate >= from && it.OpenDate <= till)
-          .Include(ord => ord.ResponsibleUser)
-          .Include(ord => ord.Transactions)
-          .ThenInclude(y => y.Product);
-        var data = await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
-        return data.ToApi(_mapper);
-      }
+      await using var context = _di.GetService<ApplicationDbContext>();
+      // Where(it => isAdmin || it.ResponsibleUserId == userId)
+      var query = context.Orders
+        .Where(it => it.Status != OrderStatus.Canceled && it.OpenDate >= @from && it.OpenDate <= till)
+        .Include(ord => ord.ResponsibleUser)
+        .Include(ord => ord.Transactions)
+        .ThenInclude(y => y.Product);
+      var data = await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
+      return data.ToApi(_mapper);
+    }
+
+    public async Task<List<ApiOrder>> GetArchiveAsync(string userId, bool isAdmin, DateTime from, DateTime till)
+    {
+      await using var context = _di.GetService<ApplicationDbContext>();
+      // Where(it => isAdmin || it.ResponsibleUserId == userId)
+      var query = context.Orders
+        .Where(it => it.Status == OrderStatus.Closed && it.OpenDate >= @from && it.OpenDate <= till)
+        .Include(ord => ord.ResponsibleUser)
+        .Include(ord => ord.Transactions)
+        .ThenInclude(y => y.Product);
+      var data = await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
+      return data.ToApi(_mapper);
     }
 
     public async Task<IReadOnlyCollection<ApiOrderAction>> GetOrderHistoryAsync(string userId, bool isAdmin, int orderId)

@@ -35,6 +35,11 @@ export class ApiService extends ApiBase {
     }
 
     // orders method
+    getOrdersArchive(from: Date, to: Date): Observable<ApiResponse<IOrder>> {
+        return this.doGet(`order/archive/${from.getTime()}/${to.getTime()}`);
+    }
+
+    // orders method
     getOrderHistory(id: number): Observable<ApiResponse<IOrderAction>> {
         return this.doGet<IOrderAction>(`order/${id}/history`).pipe(
             tap(res => {
