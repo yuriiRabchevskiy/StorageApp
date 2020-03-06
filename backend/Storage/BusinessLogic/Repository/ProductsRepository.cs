@@ -26,7 +26,7 @@ namespace DataAccess.Repository
     private IServiceProvider _di;
     private readonly IMapper _mapper;
 
-    public ProductsRepository(IServiceProvider serviceProvider,  IMapper mapper)
+    public ProductsRepository(IServiceProvider serviceProvider, IMapper mapper)
     {
       _di = serviceProvider;
       _mapper = mapper;
@@ -40,7 +40,7 @@ namespace DataAccess.Repository
         var data = products.Select(it =>
         {
           var prod = _mapper.Map<ApiProduct>(it);
-          prod.Balance = it.State.ToDictionary(key => key.WarehouseId, val => val.Quantity);
+          prod.Balance = it.State.ToDictionary(key => key.WarehouseId.ToString(), val => val.Quantity);
           return prod;
         }).OrderByDescending(it => it.Balance.Values.Sum() > 0).ToList();
         return data;

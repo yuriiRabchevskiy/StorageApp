@@ -16,6 +16,6 @@ namespace BusinessLogic.Models.Api
     public double RecommendedSalePrice { get; set; }
     public bool IsActive { get; set; }
 
-    public Dictionary<int, int> Balance { get; set; }
+    public Dictionary<string, int> Balance { get; set; }
   }
 }

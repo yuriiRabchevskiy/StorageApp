@@ -7,6 +7,7 @@ import { ControlsModule } from '../controls/controls.module';
 import { OrdersComponent } from './orders/orders.component';
 import { OrderComponent } from './orders/order/order.component';
 import { OrderHistoryComponent } from './controls/order-history/order-history.component';
+import { ArchiveComponent } from './orders/archive/archive/archive.component';
 
 @NgModule({
   imports: [
@@ -15,7 +16,7 @@ import { OrderHistoryComponent } from './controls/order-history/order-history.co
     ControlsModule,
     ShareModule
   ],
-  declarations: [OrdersComponent, OrderComponent, OrderHistoryComponent],
+  declarations: [OrdersComponent, OrderComponent, OrderHistoryComponent, ArchiveComponent],
   providers: []
 })
 export class OrdersModule { }

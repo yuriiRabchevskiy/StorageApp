@@ -21,6 +21,7 @@ using FluentValidation;
 using BusinessLogic.Models.Api;
 using Storage.Code.Services;
 using BusinessLogic.Repository.Reports;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -97,7 +98,8 @@ namespace Storage
       services.AddCors();
       services.AddControllers(cfg =>
         {
-        }).AddFluentValidation().AddJsonOptions(opt => opt.JsonSerializerOptions.IgnoreNullValues = true);
+        }).AddFluentValidation().AddJsonOptions(opt => opt.JsonSerializerOptions.IgnoreNullValues = true)
+        .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
       services.AddAuthorization(options =>
       {
@@ -154,6 +156,7 @@ namespace Storage
         "localhost:4200").AllowAnyHeader().AllowCredentials().AllowAnyMethod());
 
       app.UseRouting();
+      app.UseAuthorization();
       app.UseEndpoints(endpoints =>
       {
         endpoints.MapControllers();
