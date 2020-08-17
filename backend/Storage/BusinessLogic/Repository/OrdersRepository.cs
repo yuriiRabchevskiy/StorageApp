@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using DataAccess.Models;
 using BusinessLogic.Models.Api;
 using BusinessLogic.Abstractions;
@@ -49,21 +50,21 @@ namespace DataAccess.Repository
         .Include(ord => ord.ResponsibleUser)
         .Include(ord => ord.Transactions)
         .ThenInclude(y => y.Product);
-      var data = await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
-      return data.ToApi(_mapper);
+      var data = await query.ProjectTo<ApiOrder>(_mapper.ConfigurationProvider).AsNoTracking().ToListAsync().ConfigureAwait(false);
+      return data;
     }
 
     public async Task<List<ApiOrder>> GetArchiveAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
       await using var context = _di.GetService<ApplicationDbContext>();
-      // Where(it => isAdmin || it.ResponsibleUserId == userId)
+      // Where(it => isAdmin || it.ResponsibleUserId == userId)f
       var query = context.Orders
         .Where(it => it.Status == OrderStatus.Closed && it.OpenDate >= @from && it.OpenDate <= till)
         .Include(ord => ord.ResponsibleUser)
         .Include(ord => ord.Transactions)
         .ThenInclude(y => y.Product);
-      var data = await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
-      return data.ToApi(_mapper);
+      var data = await query.ProjectTo<ApiOrder>(_mapper.ConfigurationProvider).AsNoTracking().ToListAsync().ConfigureAwait(false);
+      return data;
     }
 
     public async Task<IReadOnlyCollection<ApiOrderAction>> GetOrderHistoryAsync(string userId, bool isAdmin, int orderId)
@@ -86,17 +87,15 @@ namespace DataAccess.Repository
 
     public async Task<List<ApiOrder>> GetCanceledOrdersAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
-      using (var context = _di.GetService<ApplicationDbContext>())
-      {
-        var data = await context.Orders
-          .Where(it => isAdmin || it.ResponsibleUserId == userId)
-          .Where(it => it.Status == OrderStatus.Canceled && it.CloseDate >= from && it.CloseDate <= till)
-          .Include(ord => ord.ResponsibleUser)
-          .Include(ord => ord.CanceledByUser)
-          .Include(ord => ord.Transactions).ThenInclude(y => y.Product).ToListAsync().ConfigureAwait(false);
-        data.ForEach(it => it.Transactions = it.Transactions.Where(tr => tr.Quantity < 0).ToList());
-        return data.ToApi(_mapper);
-      }
+      await using var context = _di.GetService<ApplicationDbContext>();
+      var data = await context.Orders
+        .Where(it => isAdmin || it.ResponsibleUserId == userId)
+        .Where(it => it.Status == OrderStatus.Canceled && it.CloseDate >= @from && it.CloseDate <= till)
+        .Include(ord => ord.ResponsibleUser)
+        .Include(ord => ord.CanceledByUser)
+        .Include(ord => ord.Transactions).ThenInclude(y => y.Product).ToListAsync().ConfigureAwait(false);
+      data.ForEach(it => it.Transactions = it.Transactions.Where(tr => tr.Quantity < 0).ToList());
+      return data.ToApi(_mapper);
     }
 
     public async Task UpdateAsync(string userId, bool isAdmin, ApiOrder it)
