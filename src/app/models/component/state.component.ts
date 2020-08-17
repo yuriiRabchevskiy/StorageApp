@@ -1,7 +1,8 @@
 import { Router, ActivatedRoute } from '@angular/router';
-import { OnInit } from '@angular/core';
+import { OnInit, Directive } from '@angular/core';
 import { Location } from '@angular/common';
 
+@Directive()
 export abstract class RouteStateComponent<T> implements OnInit {
 
     protected isLazyList: boolean = false;

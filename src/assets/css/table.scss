@@ -66,8 +66,8 @@
     }
 
     .ui-table-tbody tr:hover:not(.expanded-row) {
-        color: $hoverColor !important;
-        background-color: $disabledText !important;
+        // color: $hoverColor !important;
+        // background-color: $disabledText !important;
     }
 
     th {
@@ -79,10 +79,9 @@
 
     p-sorticon {
         position: absolute;
-        right: 2px;
+        right: 12px;
         width: 12px;
         height: 12px;
-        margin-top: 4px;
     }
 
     .ui-sortable-column-icon {

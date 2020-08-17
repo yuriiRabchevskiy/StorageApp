@@ -1,6 +1,6 @@
 import {MessageService} from 'primeng/api';
-import { Observable } from 'rxjs/Observable';
-import { ReflectiveInjector } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ReflectiveInjector, Directive } from '@angular/core';
 
 import { WorkProgress } from './work-progress';
 import { ApiResponse, IApiErrorInfo } from '../api';
@@ -69,6 +69,7 @@ export abstract class SecuredComponent {
 
 }
 
+@Directive()
 export abstract class BaseApiComponent<T> extends SecuredComponent {
   work: WorkProgress;
 

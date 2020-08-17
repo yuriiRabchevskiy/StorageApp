@@ -1,6 +1,7 @@
-import { Injectable, ReflectiveInjector } from '@angular/core';
-import { CanActivate, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
+import { catchError, map, take } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { UserService } from './user.service';
 
@@ -37,10 +38,12 @@ export class AuthGuard implements CanActivate {
     if (!this.userService.getLocal()) return this.registerResult(false, state.url);
     const handler = new AuthConnectionErrorHandler(this, state.url);
 
-    const rez = this.checkServer(state.url).catch((err) => handler.handleConnectionError(err));
+    const rez = this.checkServer(state.url).pipe(catchError ((err) => handler.handleConnectionError(err)));
 
     if (!this.canBeAsync()) { // first request, sync mode
-      return rez.take(1);
+      return rez.pipe(
+        take(1)
+      );
     } else {
       rez.subscribe();
     }
@@ -48,16 +51,16 @@ export class AuthGuard implements CanActivate {
   }
 
   checkServer(url: string): Observable<boolean> {
-    return this.apiService.checkAuth().map(res => {
+    return this.apiService.checkAuth().pipe(map(res => {
       console.log('auth OK');
       return this.registerResult(res.item, url);
     },
       err => {
         console.log('auth error');
-        return this.registerResult(false, url)
+        return this.registerResult(false, url);
       },
 
-    );
+    ));
   }
 
   public registerResult(result: boolean, url?: string): boolean {
