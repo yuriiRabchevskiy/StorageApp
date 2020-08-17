@@ -2,7 +2,7 @@
     [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4" [rows]="100"
     [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" #dt
     [globalFilterFields]="['category', 'quantity', 'sales', 'buyPrice', 'profit']"
-    dataKey="id">
+    dataKey="id" selectionMode="single">
     <ng-template pTemplate="caption">
         <div class="flex-row flex-wrap table-header">
             <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">

@@ -10,6 +10,7 @@
     </div>
     <div class="page-body">
         <p-table class="prime-table" [value]="viewData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
+            selectionMode="single"
             [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="100%"
             dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
           'clientPhone', 'clientName', 'clientAddress', 'payment', 'seller', 'canceledBy',

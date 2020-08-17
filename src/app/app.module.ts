@@ -21,7 +21,6 @@ import { SpinnerModule } from 'primeng/spinner';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
-import 'rxjs/Rx';
 import { AppComponent } from './app.component';
 import { routing } from './app.routing';
 import { ApiService } from './shared/services/api.service';

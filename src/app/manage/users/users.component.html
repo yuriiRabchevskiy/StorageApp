@@ -1,7 +1,7 @@
 <div class="page-wrap">
     <p-table class="prime-table" [value]="filteredData"
         [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
-        [pageLinks]="4" [rows]="100"
+        [pageLinks]="4" [rows]="100" selectionMode="single"
         [responsive]="true" scrollable="true" scrollWidth="100%"
         scrollHeight="calc(100% - 54px)" #dt dataKey="id"
         [globalFilterFields]="['login', 'email', 'name', 'surname', 'phone', 'isAdmin']">

@@ -1,6 +1,7 @@
-<p-table class="prime-table report-table" [value]="filteredData" selectionMode="single" [(selection)]="selectedItem"
+<p-table class="prime-table report-table" [value]="filteredData" [(selection)]="selectedItem"
   [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4" [rows]="100"
-  [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" #dt dataKey="id"
+  [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" #dt 
+  dataKey="id" selectionMode="single"
   [globalFilterFields]="['date', 'user', 'warehouse', 'productId', 'productString',
         'operation', 'quantity', 'description']">
   <ng-template pTemplate="caption">

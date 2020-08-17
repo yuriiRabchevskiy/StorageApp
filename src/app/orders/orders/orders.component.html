@@ -10,7 +10,7 @@
       [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="100%"
       dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
         'clientPhone', 'clientName', 'clientAddress', 'payment', 'seller', 'canceledBy',
-        'itemsName', 'other', 'totalPrice']" (onSort)="onSort()">
+        'itemsName', 'other', 'totalPrice']" (onSort)="onSort()" selectionMode="single">
       <ng-template pTemplate="caption">
         <div class="flex-row flex-wrap table-header">
           <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
