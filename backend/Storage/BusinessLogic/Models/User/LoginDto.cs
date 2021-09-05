@@ -5,6 +5,7 @@ namespace BusinessLogic.Models.User
   public static class UserRole
   {
     public const string Admin = "Admin";
+    public const string AdminAssistant = nameof(AdminAssistant);
     public const string User = "User";
   }
 
@@ -31,9 +32,10 @@ namespace BusinessLogic.Models.User
     public string Surname { get; set; }
     public string Phone { get; set; }
     public bool IsAdmin { get; set; } = false;
+    public bool IsAdminAssistant { get; set; } = false;
   }
 
-  public class RegisterDto: UserDto
+  public class RegisterDto : UserDto
   {
     [Required]
     [StringLength(100, ErrorMessage = "PASSWORD_MIN_LENGTH", MinimumLength = 6)]
@@ -44,7 +46,8 @@ namespace BusinessLogic.Models.User
   {
     public string Token { get; set; }
     public string UserName { get; set; }
-    public bool IsAdmin { get; set; } = true;
+    public bool IsAdmin { get; set; } = false;
+    public bool IsAdminAssistant { get; set; } = false;
   }
 
   public class ForgotPasswordModel

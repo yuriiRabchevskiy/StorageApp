@@ -9,8 +9,15 @@
                     <input matInput placeholder="Логін" formControlName="login" required>
                 </mat-form-field>
                 <mat-form-field class="s-input-wrapper">
-                    <mat-select placeholder="Роль" formControlName="isAdmin">
+                    <mat-select placeholder="Роль 1" formControlName="isAdmin">
                         <mat-option *ngFor="let rol of userRoles" [value]="rol.value">
+                            {{rol.label}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="s-input-wrapper">
+                    <mat-select placeholder="Роль 2" formControlName="isAdminAssistant">
+                        <mat-option *ngFor="let rol of userAssistantRoles" [value]="rol.value">
                             {{rol.label}}
                         </mat-option>
                     </mat-select>

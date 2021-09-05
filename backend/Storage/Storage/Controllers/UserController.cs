@@ -1,5 +1,3 @@
-using System;
-using DataAccess.Repository;
 using Microsoft.AspNetCore.Mvc;
 using SharedDataContracts.Api.Response;
 using BusinessLogic.Models.Api;
@@ -23,7 +21,7 @@ namespace Storage.Controllers
     private readonly IMapper _mapper;
     Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
-    public UserController(ICategoriesRepository repo, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IMapper mapper)
+    public UserController(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IMapper mapper)
     {
       _userManager = userManager;
       _emailSender = emailSender;
@@ -31,13 +29,14 @@ namespace Storage.Controllers
     }
 
     // GET api/values
-    [HttpGet]    
+    [HttpGet]
     public ApiResponse<ApiUser> Get()
     {
       return new ApiResponse<ApiUser>(_userManager.Users.Where(it => it.IsActive).ToList().Select(it =>
       {
         var user = _mapper.Map<ApiUser>(it);
         user.IsAdmin = _userManager.IsInRoleAsync(it, UserRole.Admin).Result;
+        user.IsAdminAssistant = _userManager.IsInRoleAsync(it, UserRole.AdminAssistant).Result;
         return user;
       }).ToList());
     }
@@ -52,10 +51,15 @@ namespace Storage.Controllers
       user.UserName = model.Login;
       user.Phone = model.Phone;
       var result = await _userManager.UpdateAsync(user);
+
       if (!result.Succeeded) return new ApiResponseBase(new ApiError("code", "Виникла помилка редагування користувача"));
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
+      var isAdminAssistant = await _userManager.IsInRoleAsync(user, UserRole.AdminAssistant).ConfigureAwait(false);
       if (model.IsAdmin && !isAdmin) await this._userManager.AddToRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
       if (!model.IsAdmin && isAdmin) await this._userManager.RemoveFromRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
+
+      if (model.IsAdminAssistant && !isAdminAssistant) await this._userManager.AddToRoleAsync(user, UserRole.AdminAssistant).ConfigureAwait(false);
+      if (!model.IsAdminAssistant && isAdminAssistant) await this._userManager.RemoveFromRoleAsync(user, UserRole.AdminAssistant).ConfigureAwait(false);
       return new ApiResponseBase();
     }
 
@@ -73,7 +77,12 @@ namespace Storage.Controllers
       };
       var result = await _userManager.CreateAsync(user, model.Password);
       if (!result.Succeeded) return new ApiResponseBase(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
-      await _userManager.AddToRoleAsync(user, model.IsAdmin ? "Admin" : "User");
+      await _userManager.AddToRoleAsync(user, model.IsAdmin ? UserRole.Admin : UserRole.User);
+
+      if (model.IsAdminAssistant)
+      {
+        await _userManager.AddToRoleAsync(user, UserRole.AdminAssistant);
+      }
 
       var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
       var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);

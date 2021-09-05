@@ -26,5 +26,10 @@ namespace Storage.Controllers.Reports
     {
       return _userManager.IsInRoleAsync(user, UserRole.Admin);
     }
+
+    protected Task<bool> GetIsAdminAssistantAsync(ApplicationUser user)
+    {
+      return _userManager.IsInRoleAsync(user, UserRole.AdminAssistant);
+    }
   }
 }
