@@ -1,8 +1,6 @@
 <div class="page-wrap">
-    <p-table class="prime-table" [value]="filteredData"
-        [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
-        [pageLinks]="4" [rows]="100" selectionMode="single"
-        [responsive]="true" scrollable="true" scrollWidth="100%"
+    <p-table class="prime-table" [value]="filteredData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
+        [pageLinks]="4" [rows]="100" selectionMode="single" [responsive]="true" scrollable="true" scrollWidth="100%"
         scrollHeight="calc(100% - 54px)" #dt dataKey="id"
         [globalFilterFields]="['login', 'email', 'name', 'surname', 'phone', 'isAdmin']">
         <ng-template pTemplate="caption">
@@ -23,16 +21,16 @@
             </div>
         </ng-template>
         <ng-template pTemplate="colgroup">
-                <colgroup>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col width="120px">
-                    <col>
-                </colgroup>
-            </ng-template>
+            <colgroup>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col width="120px">
+                <col>
+            </colgroup>
+        </ng-template>
         <ng-template pTemplate="header">
             <tr>
                 <th pSortableColumn="login">
@@ -70,7 +68,8 @@
                 <td>{{rowData.surname}}</td>
                 <td>{{rowData.phone}}</td>
 
-                <td>{{rowData.isAdmin ? 'Адміністратор' : 'Продавець'}}</td>
+                <td>{{rowData.isAdmin ? 'Адміністратор' : rowData.isAdminAssistant ? 'Помічник Адміністратора' : 'Продавець'}}
+                </td>
 
                 <td>{{rowData.notes}}</td>
             </tr>

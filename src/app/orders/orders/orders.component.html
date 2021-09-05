@@ -24,7 +24,7 @@
             <app-i-button *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
               [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="i-closeOrder" title="Закрити продажу"
               (iClick)="confirmation()"></app-i-button>
-            <app-i-button *ngIf="canView && !isCancelTab" icon="i-returnOrder" title="Повернути замовлення"
+            <app-i-button *ngIf="(canView || isAdminAssistant) && !isCancelTab" icon="i-returnOrder" title="Повернути замовлення"
               (iClick)="confCancel()" [disabled]="viewData.length < 1 || selectedItems.length > 1">
             </app-i-button>
             <app-i-button *ngIf="canView" icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"

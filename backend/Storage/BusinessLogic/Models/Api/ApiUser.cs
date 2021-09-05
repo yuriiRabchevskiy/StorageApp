@@ -16,5 +16,7 @@ namespace BusinessLogic.Models.Api
     public string Password { get; set; }
     public bool IsActive { get; set; }
     public bool IsAdmin { get; set; }
+    public bool IsAdminAssistant { get; set; }
+    
   }
 }

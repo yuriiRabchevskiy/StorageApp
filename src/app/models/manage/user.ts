@@ -5,6 +5,7 @@ export interface IUserToEdit {
     surname: string;
     phone: string;
     isAdmin: boolean;
+    isAdminAssistant: boolean;
     notes?: string;
 }
 
@@ -15,6 +16,7 @@ export class UserToEdit implements IUserToEdit {
     surname: string;
     phone: string;
     isAdmin: boolean;
+    isAdminAssistant: boolean;
     notes?: string;
 
     public constructor(val) {
@@ -25,6 +27,7 @@ export class UserToEdit implements IUserToEdit {
         this.phone = val.phone;
         this.notes = val.notes;
         this.isAdmin = val.isAdmin;
+        this.isAdminAssistant = val.isAdminAssistant;
     }
 }
 
@@ -39,12 +42,14 @@ export interface ISUser {
     password: string;
     isActive?: boolean;
     isAdmin: boolean;
+    isAdminAssistant: boolean;
 }
 
 export interface IUser {
     userName: string;
     token: string;
     isAdmin: boolean;
+    isAdminAssistant: boolean;
 }
 
 export class User implements ISUser {
@@ -59,6 +64,7 @@ export class User implements ISUser {
     password: string;
     isActive?: boolean = false;
     isAdmin: boolean = false;
+    isAdminAssistant: boolean = false;
 
     public constructor() { }
 }
@@ -71,5 +77,5 @@ export class ChangePassword implements IChangePassword {
     currentPassword: string;
     newPassword: string;
 
-    public constructor() {}
+    public constructor() { }
 }

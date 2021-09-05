@@ -1,4 +1,4 @@
-import {MessageService} from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { Observable } from 'rxjs';
 import { ReflectiveInjector, Directive } from '@angular/core';
 
@@ -10,8 +10,9 @@ import { ViewState } from '../../shared/helpers';
 
 export abstract class SecuredComponent {
   public view: ViewState = new ViewState();
-  canView: boolean;
-  canEdit: boolean = false;
+  public canView: boolean;
+  public canEdit: boolean = false;
+  public isAdminAssistant: boolean = false;
   public userService: UserService;
 
   constructor(protected notifi?: MessageService) {
@@ -20,6 +21,7 @@ export abstract class SecuredComponent {
 
     const user = this.userService.getLocal();
     if (!user) return;
+    this.isAdminAssistant = user.isAdminAssistant;
     this.canView = user.isAdmin;
     this.canEdit = user.isAdmin;
   }

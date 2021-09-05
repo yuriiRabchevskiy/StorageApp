@@ -18,9 +18,15 @@ export class UserEditorComponent implements OnInit {
   phone: FormControl;
   notes: FormControl;
   isAdmin: FormControl;
+  isAdminAssistant: FormControl;
 
   userRoles = [
     { label: 'Адміністратор', value: true },
+    { label: 'Продавець', value: false }
+  ];
+
+  userAssistantRoles = [
+    { label: 'Помічник Адміністратора', value: true },
     { label: 'Продавець', value: false }
   ];
 
@@ -53,6 +59,7 @@ export class UserEditorComponent implements OnInit {
     this.surname = new FormControl(this.userToEdit.surname);
     this.phone = new FormControl(this.userToEdit.phone);
     this.isAdmin = new FormControl(this.userToEdit.isAdmin);
+    this.isAdminAssistant = new FormControl(this.userToEdit.isAdminAssistant);
     this.notes = new FormControl(this.userToEdit.notes);
   }
 
@@ -63,6 +70,7 @@ export class UserEditorComponent implements OnInit {
       surname: this.surname,
       phone: this.phone,
       isAdmin: this.isAdmin,
+      isAdminAssistant: this.isAdminAssistant,
       notes: this.notes,
     });
   }
