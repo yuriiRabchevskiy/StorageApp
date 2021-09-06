@@ -47,14 +47,17 @@ namespace Storage.Controllers
       {
         var appUser = _userManager.Users.SingleOrDefault(r => (r.UserName ?? "").ToLower() == (model.Login ?? "").ToLower());
         if (!appUser.IsActive) throw new AuthenticationException("User is deactivated");
-        return new ApiResponse<LoginResult>(new LoginResult
+        var response = new ApiResponse<LoginResult>(new LoginResult
         {
           Token = generateJwtToken(model.Login, appUser),
           UserName = appUser.UserName,
           IsAdmin = await _userManager.IsInRoleAsync(appUser, UserRole.Admin).ConfigureAwait(false),
           IsAdminAssistant = await _userManager.IsInRoleAsync(appUser, UserRole.AdminAssistant).ConfigureAwait(false),
         });
+        return response;
       }
+
+
       return new ApiResponse<LoginResult>(OperationError.LoginOrPasswordIsInvalid, "User with such login and password does not exist");
     }
 
@@ -137,8 +140,12 @@ namespace Storage.Controllers
             new Claim(JwtRegisteredClaimNames.Sub, email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Role, _userManager.IsInRoleAsync(user, UserRole.Admin).Result ? UserRole.Admin : UserRole.User)
           };
+
+      // Get User roles and add them to claims
+      var roles = _userManager.GetRolesAsync(user).Result;
+      addRolesToClaims(claims, roles);
+
 
       var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
       var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -153,6 +160,15 @@ namespace Storage.Controllers
       );
 
       return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private void addRolesToClaims(List<Claim> claims, IEnumerable<string> roles)
+    {
+      foreach (var role in roles)
+      {
+        var roleClaim = new Claim(ClaimTypes.Role, role);
+        claims.Add(roleClaim);
+      }
     }
 
   }

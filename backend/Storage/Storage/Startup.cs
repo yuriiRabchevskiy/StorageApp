@@ -105,7 +105,7 @@ namespace Storage
       services.AddAuthorization(options =>
       {
         options.AddPolicy("RequireAdmin", policy => policy.RequireRole($"{UserRole.Admin}"));
-        options.AddPolicy("RequireAdminOrAssistant", policy => policy.RequireRole($"{UserRole.Admin},{UserRole.AdminAssistant}"));
+        options.AddPolicy("RequireAdminOrAssistant", policy => policy.RequireRole($"{UserRole.Admin}, {UserRole.AdminAssistant}"));
       });
 
       services.Configure<IISOptions>(options => { });
