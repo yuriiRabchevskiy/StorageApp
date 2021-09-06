@@ -82,12 +82,14 @@ namespace Storage.Controllers
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
+      isAdmin = isAdmin || await _userManager.IsInRoleAsync(user, UserRole.AdminAssistant).ConfigureAwait(false);
       await _repo.UpdateAsync(user.Id, isAdmin, product);
       return new ApiResponseBase();
     }
 
     [HttpPost("reject/{id}")]
-    [Authorize(Policy = "RequireAdminOrAssistant")]
+    // [Authorize(Roles = "RequireAdminOrAssistant")]
+    [Authorize(Roles = "AdminAssistant, Admin")]
     public async Task<ApiResponse<bool>> CancelOrder(int id, [FromBody] ApiOrderCancel model)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
