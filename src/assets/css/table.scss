@@ -8,6 +8,16 @@
 .prime-table {
     display: block;
     @include wH(100%, 100%);
+    overflow: auto;
+
+    .p-datatable {
+        .p-datatable-tbody {
+            tr.disabled-row {
+                background-color: #e9ecef;
+            }
+        }
+    }
+
 
     * {
         outline: 0;

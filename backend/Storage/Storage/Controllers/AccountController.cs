@@ -51,7 +51,8 @@ namespace Storage.Controllers
         {
           Token = generateJwtToken(model.Login, appUser),
           UserName = appUser.UserName,
-          IsAdmin = await _userManager.IsInRoleAsync(appUser, UserRole.Admin).ConfigureAwait(false)
+          IsAdmin = await _userManager.IsInRoleAsync(appUser, UserRole.Admin).ConfigureAwait(false),
+          IsAdminAssistant = await _userManager.IsInRoleAsync(appUser, UserRole.AdminAssistant).ConfigureAwait(false),
         });
       }
       return new ApiResponse<LoginResult>(OperationError.LoginOrPasswordIsInvalid, "User with such login and password does not exist");

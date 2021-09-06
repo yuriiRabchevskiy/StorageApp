@@ -19,6 +19,7 @@ using DataAccess.Models;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using BusinessLogic.Models.Api;
+using BusinessLogic.Models.User;
 using Storage.Code.Services;
 using BusinessLogic.Repository.Reports;
 using Microsoft.AspNetCore.Mvc;
@@ -103,7 +104,8 @@ namespace Storage
 
       services.AddAuthorization(options =>
       {
-        options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
+        options.AddPolicy("RequireAdmin", policy => policy.RequireRole($"{UserRole.Admin}"));
+        options.AddPolicy("RequireAdminOrAssistant", policy => policy.RequireRole($"{UserRole.Admin},{UserRole.AdminAssistant}"));
       });
 
       services.Configure<IISOptions>(options => { });

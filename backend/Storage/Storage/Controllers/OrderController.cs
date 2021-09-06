@@ -87,7 +87,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("reject/{id}")]
-    [Authorize(Policy = "RequireAdmin")]
+    [Authorize(Policy = "RequireAdminOrAssistant")]
     public async Task<ApiResponse<bool>> CancelOrder(int id, [FromBody] ApiOrderCancel model)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
