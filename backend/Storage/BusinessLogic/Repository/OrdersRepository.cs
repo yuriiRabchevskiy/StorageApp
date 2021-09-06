@@ -49,9 +49,9 @@ namespace DataAccess.Repository
         .Where(it => it.Status != OrderStatus.Canceled && it.OpenDate >= @from && it.OpenDate <= till)
         .Include(ord => ord.ResponsibleUser)
         .Include(ord => ord.Transactions)
-        .ThenInclude(y => y.Product);
-      var data = await query.ProjectTo<ApiOrder>(_mapper.ConfigurationProvider).AsNoTracking().ToListAsync().ConfigureAwait(false);
-      return data;
+        .ThenInclude(y => y.Product).AsNoTracking();
+      var data = await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
+      return data.ToApi(_mapper);
     }
 
     public async Task<List<ApiOrder>> GetArchiveAsync(string userId, bool isAdmin, DateTime from, DateTime till)
@@ -63,8 +63,8 @@ namespace DataAccess.Repository
         .Include(ord => ord.ResponsibleUser)
         .Include(ord => ord.Transactions)
         .ThenInclude(y => y.Product);
-      var data = await query.ProjectTo<ApiOrder>(_mapper.ConfigurationProvider).AsNoTracking().ToListAsync().ConfigureAwait(false);
-      return data;
+      var data = await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
+      return data.ToApi(_mapper);
     }
 
     public async Task<IReadOnlyCollection<ApiOrderAction>> GetOrderHistoryAsync(string userId, bool isAdmin, int orderId)

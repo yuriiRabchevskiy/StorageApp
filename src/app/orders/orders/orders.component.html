@@ -244,7 +244,7 @@
 </app-spinner>
 
 <app-order *ngIf="orderDialog" [order]="selectedItem" (iSave)="save($event)" (onCloseDialog)="closeEditDialog($event)"
-  [canEdit]="canEdit">
+  [canEdit]="(canEdit || isAdminAssistant)">
 </app-order>
 
 <app-confirm (confirm)="confirmCloseOrder($event)" *ngIf="showConfirm">
