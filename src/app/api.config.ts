@@ -13,8 +13,8 @@ export class ApiEndpointsConfig {
 
     public static getAppEndpoint() {
         if (ApiEndpointsConfig.isDebug()) {
-            return 'http://localhost:4577/';
-            // return 'https://sweetkeys.azurewebsites.net/';
+            // return 'http://localhost:4577/';
+            return 'https://sweetkeys.azurewebsites.net/';
         }
 
         const path = location.pathname;

@@ -1,21 +1,16 @@
-<p-table class="prime-table report-table" [value]="filteredData" [(selection)]="selectedItem"
-  [paginator]="true" [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4" [rows]="100"
-  [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" #dt 
-  dataKey="id" selectionMode="single"
-  [globalFilterFields]="['date', 'user', 'warehouse', 'productId', 'productString',
-        'operation', 'quantity', 'description']">
-  <ng-template pTemplate="caption">
-    <div class="flex-row flex-wrap table-header">
-      <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
-        <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
-      </app-button-group>
+<div class="page-body-actions">
+  <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
+    <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
+  </app-button-group>
 
-      <div class="button-wrap">
-        <input class="s-serche" type="text" placeholder="Пошук"
-          (input)="dt.filterGlobal($event.target.value, 'contains')">
-      </div>
-    </div>
-  </ng-template>
+  <div class="button-wrap">
+    <input class="s-serche" type="text" placeholder="Пошук" (input)="dt.filterGlobal($event.target.value, 'contains')">
+  </div>
+</div>
+<p-table class="prime-table report-table" [value]="filteredData" [(selection)]="selectedItem" [paginator]="true"
+  [rowsPerPageOptions]="[100,50,30]" [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true"
+  scrollWidth="100%" scrollHeight="calc(100% - 54px)" #dt dataKey="id" selectionMode="single" [globalFilterFields]="['date', 'user', 'warehouse', 'productId', 'productString',
+        'operation', 'quantity', 'description']">
   <ng-template pTemplate="colgroup">
     <colgroup>
       <col width="130">

@@ -15,6 +15,11 @@
             tr.disabled-row {
                 background-color: #848484;
             }
+            tr.s-selected-row
+            {
+                background: #FFC107;
+                color: #212529;
+            }
         }
     }
 
@@ -101,9 +106,8 @@
         vertical-align: top;
     }
 
-    .table-header {
-        justify-content: space-between;
-    }
+
+
 
     .ui-inputtext:not(.s-serche) {
         width: 100%;
