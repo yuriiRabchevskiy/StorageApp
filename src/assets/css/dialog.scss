@@ -1,4 +1,13 @@
 @import 'globals';
+
+.s-dialog-foot {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    max-width: 800px;
+    margin: 0px auto;
+}
+
 .s-dialog .ui-dialog {
     @include wH(100vw !important, 536px);
     left: 0px !important;
@@ -8,10 +17,12 @@
     border-radius: 0px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background: #fff;
+
     @include customMaxWidth(800px) {
         height: 100vh;
         top: 0px !important;
     }
+
     .ui-dialog-titlebar,
     .ui-dialog-footer {
         text-align: center;
@@ -22,23 +33,27 @@
         border: none;
         border-radius: 0px;
         color: #fff;
+
         @include customMaxWidth(800px) {
             height: 40px;
             padding: 0px;
             font-size: 14px;
         }
     }
+
     .sell-header {
         display: flex;
         position: relative;
         @include wH(100%, 100%);
         justify-content: center;
     }
+
     .d-header-title {
         flex-grow: 1;
         flex-shrink: 1;
         padding: 0px 40px;
     }
+
     .ui-dialog-content {
         height: calc(536px - 128px) !important;
         padding: 12px 0px;
@@ -46,36 +61,35 @@
         max-width: 800px;
         overflow-y: hidden;
         border: none;
+
         @include customMaxWidth(800px) {
             height: calc(100vh - 80px) !important;
         }
     }
+
     .s-cb {
         display: block;
         margin-right: 12px;
     }
+
     .ui-dialog-buttonpane {
         margin: 0px auto;
         max-width: 1000px;
         display: flex;
         flex-direction: row-reverse;
     }
-    .s-dialog-foot {
-        display: flex;
-        justify-content: flex-end;
-        width: 100%;
-        max-width: 800px;
-        margin: 0px auto;
-    }
+
     .foot-group {
         display: flex;
         justify-content: flex-end;
         margin-left: 80px;
+
         @include customMaxWidth(800px) {
             width: 100vw;
             margin-left: 0px;
         }
     }
+
     .step-grop-footer {
         @include customMaxWidth(800px) {
             display: none;
@@ -86,30 +100,37 @@
 .dialog-body {
     @extend .flex-col;
     @include wH(100%, 100%);
+
     @include customMaxWidth(800px) {
         padding: 0px 4px;
     }
 }
+
 .d-body-header {
     flex-shrink: 0;
 }
+
 .d-page-wrap {
     @extend .flex-col;
     display: flex;
     flex-grow: 1;
     flex-shrink: 1;
     overflow: auto;
+
     @include customMaxWidth(800px) {
         align-items: center;
     }
+
     .flex-wrap {
         width: 100%;
     }
 }
+
 .product-name {
     height: 40px;
     line-height: 40px;
     font-size: 18px;
+
     @include customMaxWidth(800px) {
         line-height: 20px;
         font-size: 14px;
@@ -122,10 +143,12 @@
     flex-grow: 1;
     flex-shrink: 1;
     justify-content: flex-start;
+
     @include customMaxWidth(800px) {
         margin: 0px auto 12px auto;
         justify-content: center;
     }
+
     @include customMaxWidth(450px) {
         max-width: calc(100% - 40px);
     }
@@ -135,20 +158,24 @@
     display: inline-block;
     width: calc(50% - 12px);
 }
+
 .l-data-balance {
     @extend .data-balance;
     margin-right: 12px;
 }
+
 .r-data-balance {
     @extend .data-balance;
     margin-left: 12px;
 }
+
 .balance-label {
     height: 18px;
     margin-bottom: 2px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+
     @include customMaxWidth(499px) {
         font-size: 12px;
     }
@@ -164,32 +191,39 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+
     @include customMaxWidth(499px) {
         font-size: 24px;
     }
 }
+
 .price-wrap {
     width: 100%;
     min-width: 260px;
     max-width: 400px;
     margin: 0px;
     flex-shrink: 0;
+
     @include customMaxWidth(800px) {
         margin: 0px auto 12px auto;
     }
 }
+
 .row-fullWidth {
     width: 100%;
 }
+
 .flex-area-wrap {
     flex-grow: 1;
     flex-shrink: 1;
     width: 100%;
     min-height: 120px;
 }
+
 .area-xs {
     min-height: 80px;
 }
+
 .d-cb-wrap {
     flex-shrink: 0;
     height: 40px;
