@@ -9,37 +9,35 @@
         </div>
     </div>
     <div class="page-body">
+        <div class="page-body-actions">
+            <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
+                <app-i-button [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="edit-icon"
+                    title="Редагувати продажу" (iClick)="showToEdit()">
+                </app-i-button>
+                <app-i-button *ngIf="canView" icon="i-history" title="Історія замовлення"
+                    (iClick)="showHistory()" [disabled]="viewData.length < 1 || selectedItems.length > 1">
+                </app-i-button>
+                <app-i-button icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
+                    [disabled]="viewData.length < 1 || selectedItems.length > 1">
+                </app-i-button>
+                <app-i-button icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
+                    [disabled]="viewData.length < 1 || selectedItems.length > 1">
+                </app-i-button>
+                <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()">
+                </app-i-button>
+            </app-button-group>
+
+            <div class="button-wrap">
+                <input class="s-serche" type="text" placeholder="Пошук"
+                    (input)="dt.filterGlobal($event.target.value, 'contains')">
+            </div>
+        </div>
         <p-table class="prime-table" [value]="viewData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
             selectionMode="single"
             [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="100%"
             dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
           'clientPhone', 'clientName', 'clientAddress', 'payment', 'seller', 'canceledBy',
           'itemsName', 'other', 'totalPrice']" (onSort)="onSort()">
-            <ng-template pTemplate="caption">
-                <div class="flex-row flex-wrap table-header">
-                    <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
-                        <app-i-button [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="edit-icon"
-                            title="Редагувати продажу" (iClick)="showToEdit()">
-                        </app-i-button>
-                        <app-i-button *ngIf="canView" icon="i-history" title="Історія замовлення"
-                            (iClick)="showHistory()" [disabled]="viewData.length < 1 || selectedItems.length > 1">
-                        </app-i-button>
-                        <app-i-button icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
-                            [disabled]="viewData.length < 1 || selectedItems.length > 1">
-                        </app-i-button>
-                        <app-i-button icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
-                            [disabled]="viewData.length < 1 || selectedItems.length > 1">
-                        </app-i-button>
-                        <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()">
-                        </app-i-button>
-                    </app-button-group>
-
-                    <div class="button-wrap">
-                        <input class="s-serche" type="text" placeholder="Пошук"
-                            (input)="dt.filterGlobal($event.target.value, 'contains')">
-                    </div>
-                </div>
-            </ng-template>
             <ng-template pTemplate="colgroup">
                 <colgroup>
                     <!--Expanded-->

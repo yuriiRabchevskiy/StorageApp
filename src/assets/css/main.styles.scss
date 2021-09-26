@@ -1,4 +1,5 @@
 @import 'globals';
+
 html,
 body {
     margin: 0px;
@@ -30,9 +31,11 @@ html {
     display: flex;
     flex-direction: row;
 }
+
 .wh-100 {
     @include wH(100%, 100%);
 }
+
 .flex-wrap {
     flex-wrap: wrap;
     flex-shrink: 0;
@@ -50,6 +53,7 @@ html {
     max-height: 100vh;
     box-sizing: border-box;
     padding-top: 64px;
+
     @include customMaxWidth(1023px) {
         padding-top: 40px;
     }
@@ -65,10 +69,12 @@ html {
     box-sizing: border-box;
     padding: 12px;
     background-color: $pageBackColor;
+
     @include customMaxWidth(1023px) {
         height: calc(100vh - 40px);
     }
 }
+
 .page-head {
     @extend .flex-row;
     height: 40px;
@@ -77,13 +83,16 @@ html {
     position: relative;
     justify-content: space-between;
 }
+
 .page-body {
-    @extend .flex-row;
+    display: flex;
+    flex-direction: column;
     flex: 1 1 100%;
     overflow: hidden;
     min-height: calc(100% - 52px);
     max-height: 100%;
 }
+
 .page-body-with-foot {
     @extend .page-body;
     overflow-x: hidden;
@@ -91,12 +100,28 @@ html {
     min-height: calc(100% - 104px);
     max-height: calc(100% - 104px);
 }
+
+.page-body-actions {
+    background: #f8f9fa;
+    color: #495057;
+    border: 1px solid #e9ecef;
+    border-width: 1px 0 1px 0;
+    padding: 1rem 1rem;
+    font-weight: 600;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+}
+
 .page-foot {
     @extend .page-head;
     justify-content: flex-end;
     margin-bottom: 0px;
     margin-top: 12px;
 }
+
 .u-input-wrapper {
     display: flex;
     flex-direction: column-reverse;
@@ -119,5 +144,5 @@ html {
     left: 0px;
     top: 0px;
     z-index: 7;
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
 }
