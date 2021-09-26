@@ -10,12 +10,14 @@
     </div>
     <div class="page-body">
         <div class="page-body-actions">
+            <div *ngIf="view.isMobile">
+            </div>
             <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
                 <app-i-button [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="edit-icon"
                     title="Редагувати продажу" (iClick)="showToEdit()">
                 </app-i-button>
-                <app-i-button *ngIf="canView" icon="i-history" title="Історія замовлення"
-                    (iClick)="showHistory()" [disabled]="viewData.length < 1 || selectedItems.length > 1">
+                <app-i-button *ngIf="canView" icon="i-history" title="Історія замовлення" (iClick)="showHistory()"
+                    [disabled]="viewData.length < 1 || selectedItems.length > 1">
                 </app-i-button>
                 <app-i-button icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
                     [disabled]="viewData.length < 1 || selectedItems.length > 1">
@@ -33,13 +35,16 @@
             </div>
         </div>
         <p-table class="prime-table" [value]="viewData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
-            selectionMode="single"
-            [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="100%"
-            dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
+            selectionMode="single" [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true" scrollWidth="100%"
+            scrollHeight="100%" dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
           'clientPhone', 'clientName', 'clientAddress', 'payment', 'seller', 'canceledBy',
           'itemsName', 'other', 'totalPrice']" (onSort)="onSort()">
             <ng-template pTemplate="colgroup">
-                <colgroup>
+                <colgroup *ngIf="view.isMobile">
+                    <col>
+                </colgroup>
+
+                <colgroup *ngIf="!view.isMobile">
                     <!--Expanded-->
                     <col width="20">
                     <!--Id-->

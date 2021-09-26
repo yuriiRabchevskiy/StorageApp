@@ -7,6 +7,8 @@
   </div>
   <div class="page-body">
     <div class="page-body-actions">
+      <div *ngIf="view.isMobile">
+      </div>
       <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
         <app-i-button *ngIf="selectedTab.value !== 1 && !isCancelTab"
           [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="edit-icon" title="Редагувати продажу"
@@ -41,26 +43,32 @@
       </div>
     </div>
     <p-table class="prime-table" [value]="viewData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
-      [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="100%"
-      dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
+      [resizableColumns]="true" [pageLinks]="4" [rows]="100" [responsive]="true" scrollable="true" scrollWidth="100%"
+      scrollHeight="100%" dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
         'clientPhone', 'clientName', 'clientAddress', 'payment', 'seller', 'canceledBy',
         'itemsName', 'other', 'totalPrice']" (onSort)="onSort()" selectionMode="single">
       <ng-template pTemplate="colgroup">
-        <colgroup>
+
+        <!-- in mobile view use all space-->
+        <colgroup *ngIf="view.isMobile">
+          <col>
+        </colgroup>
+
+        <colgroup *ngIf="!view.isMobile">
           <!--Expanded-->
-          <col width="20">
+          <col width="20" *ngIf="!view.isMobile">
           <!--Id-->
           <col width="50">
           <!--Date-->
-          <col width="126">
+          <col width="114">
           <!--Close Date-->
-          <col width="126" *ngIf="selectedTab.value === 1">
+          <col width="114" *ngIf="selectedTab.value === 1">
           <!--Cancel Date-->
-          <col width="126" *ngIf="selectedTab.value === 3">
+          <col width="114" *ngIf="selectedTab.value === 3">
           <!--Order No-->
           <col width="126">
           <!--Phone No-->
-          <col width="95">
+          <col width="92">
           <!--Reciver-->
           <col>
           <!--Address-->
@@ -68,67 +76,68 @@
           <!--Kind-->
           <col width="108">
           <!--Seller-->
-          <col width="140px">
+          <col width="118px">
           <col *ngIf="isCancelTab">
           <col width="180">
           <!--Notes-->
           <col>
           <col width="80" *ngIf="!isCancelTab">
         </colgroup>
+
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
           <th></th>
           <th>#</th>
-          <th pSortableColumn="openDate">
+          <th pSortableColumn="openDate" pResizableColumn>
             Дата продажу
             <p-sortIcon field="openDate"></p-sortIcon>
           </th>
-          <th pSortableColumn="closeDate" *ngIf="selectedTab.value === 1">
+          <th pSortableColumn="closeDate" pResizableColumn *ngIf="selectedTab.value === 1">
             Дата закриття
             <p-sortIcon field="closeDate"></p-sortIcon>
           </th>
-          <th pSortableColumn="cancelDate" *ngIf="selectedTab.value === 3">
+          <th pSortableColumn="cancelDate" pResizableColumn *ngIf="selectedTab.value === 3">
             Дата відміни
             <p-sortIcon field="cancelDate"></p-sortIcon>
           </th>
-          <th pSortableColumn="orderNumber">
+          <th pSortableColumn="orderNumber" pResizableColumn>
             Накладна
             <p-sortIcon field="orderNumber"></p-sortIcon>
           </th>
-          <th pSortableColumn="clientPhone">
+          <th pSortableColumn="clientPhone" pResizableColumn>
             Телефон
             <p-sortIcon field="clientPhone"></p-sortIcon>
           </th>
-          <th pSortableColumn="clientName" max-width="140px">
+          <th pSortableColumn="clientName" max-width="140px" pResizableColumn>
             Одержувач
             <p-sortIcon field="clientName"></p-sortIcon>
           </th>
-          <th pSortableColumn="clientAddress">
+          <th pSortableColumn="clientAddress" pResizableColumn>
             Адреса
             <p-sortIcon field="clientAddress"></p-sortIcon>
           </th>
-          <th pSortableColumn="payment">
+          <th pSortableColumn="payment" pResizableColumn>
             Тип Оплати
             <p-sortIcon field="payment"></p-sortIcon>
           </th>
-          <th pSortableColumn="seller">
+          <th pSortableColumn="seller" pResizableColumn>
             Продавець
             <p-sortIcon field="seller"></p-sortIcon>
           </th>
-          <th pSortableColumn="canceledBy" *ngIf="isCancelTab">
+          <th pSortableColumn="canceledBy" *ngIf="isCancelTab" pResizableColumn>
             Скасував
             <p-sortIcon field="canceledBy"></p-sortIcon>
           </th>
-          <th pSortableColumn="itemsName">
+          <th pSortableColumn="itemsName" pResizableColumn>
             Товари
             <p-sortIcon field="itemsName"></p-sortIcon>
           </th>
-          <th pSortableColumn="other">
+          <th pSortableColumn="other" pResizableColumn>
             Нотатки
             <p-sortIcon field="other"></p-sortIcon>
           </th>
-          <th pSortableColumn="totalPrice" *ngIf="!isCancelTab">
+          <th pSortableColumn="totalPrice" pResizableColumn *ngIf="!isCancelTab">
             Сума
             <p-sortIcon field="totalPrice"></p-sortIcon>
           </th>
