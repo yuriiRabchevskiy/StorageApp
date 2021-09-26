@@ -1,4 +1,5 @@
-<p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
+<p-dialog class="s-dialog ui-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true"
+    [closable]="false">
     <p-header class="sell-header">
         <app-i-button class="nav-button nav-back" *ngIf="items.length > 0 && view.isMobile" icon="i-close"
             (iClick)="back()" [disabled]="sellCount === 0 || page === 1"></app-i-button>
@@ -41,14 +42,27 @@
                 </li>
             </ul>
             <div *ngIf="items.length > 0" class="flex-col">
-                <div class="smile-label">Сума замовлення <span class="card-price">{{getOrderTotal()}}</span> грн</div>
+                <div class="smile-label">Сума замовлення <span class="card-price">{{getOrderTotal()}}</span> грн
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+
             </div>
             <div *ngIf="items.length <= 0" class="smile-wrap flex-col">
                 <div class="smile-icon"></div>
-                <div class="smile-label">Кошик пустий</div>
+                <div class="smile-label">
+                    Кошик пустий
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
             </div>
         </div>
-        <app-order-editor #orderEditor [item]="order" class="d-page-wrap" [class.s-hidden]="page !== clientPage" [canEdit]="canEdit">
+        <app-order-editor #orderEditor [item]="order" class="d-page-wrap" [class.s-hidden]="page !== clientPage"
+            [canEdit]="canEdit">
         </app-order-editor>
     </div>
     <p-footer class="s-dialog-foot">
