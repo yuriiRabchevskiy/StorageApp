@@ -8,6 +8,8 @@
     <div class="page-body">
 
         <div class="page-body-actions">
+            <div *ngIf="view.isMobile">
+            </div>
             <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile && canView">
                 <app-i-button *ngIf="canView" icon="add-icon" title="Додати Продукт" (iClick)="showDialogToAdd()">
                 </app-i-button>
@@ -41,7 +43,11 @@
             #dt dataKey="id" selectionMode="single" [globalFilterFields]="globalSearchFields">
 
             <ng-template pTemplate="colgroup">
-                <colgroup>
+                <colgroup *ngIf="view.isMobile">
+                    <col>
+                </colgroup>
+
+                <colgroup *ngIf="!view.isMobile">
                     <col>
                     <col>
                     <col width="80px">

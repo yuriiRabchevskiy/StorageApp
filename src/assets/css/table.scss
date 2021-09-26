@@ -2,7 +2,7 @@
 
 .t-i-button-group {
     position: absolute;
-    left: 4px;
+    left: 20px;
 }
 
 .prime-table {
@@ -12,11 +12,23 @@
 
     .p-datatable {
         .p-datatable-tbody {
+
+
+            // .p-datatable-scrollable-body>table>.p-datatable-tbody>tr>td:last-child {
+            //     border-width: 0 1px 0 0;
+            // }
+
+            tr {
+                td:not(:last-child) {
+                    border-width: 0px 1px 1px 0px;
+                }
+            }
+
             tr.disabled-row {
                 background-color: #848484;
             }
-            tr.s-selected-row
-            {
+
+            tr.s-selected-row {
                 background: #FFC107;
                 color: #212529;
             }

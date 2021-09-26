@@ -116,6 +116,7 @@
     flex-grow: 1;
     flex-shrink: 1;
     overflow: auto;
+    overflow-x: unset;
 
     @include customMaxWidth(800px) {
         align-items: center;
