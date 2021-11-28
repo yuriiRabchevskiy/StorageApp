@@ -9,6 +9,7 @@ using BusinessLogic.Repository.Reports;
 using Storage.Controllers.Reports;
 using Microsoft.Extensions.Configuration;
 using BusinessLogic.Helpers;
+using System;
 
 namespace Storage.Controllers
 {
@@ -28,8 +29,8 @@ namespace Storage.Controllers
     [HttpGet]
     public async Task<ApiResponse<string>> Get(long from, long to)
     {
-      var dFrom = ClientTime.GetLocal(from.ToDateTime());
-      var dTo = ClientTime.GetLocal(to.ToDateTime());
+      var dFrom = from.ToDateTime();
+      var dTo = to.ToDateTime();
 
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await GetIsAdminAsync(user);
@@ -43,7 +44,7 @@ namespace Storage.Controllers
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await GetIsAdminAsync(user);
-      var now = ClientTime.Now;
+      var now = DateTime.UtcNow;
       var data = await _repo.GetLightweightAsync(user.Id, isAdmin, now.AddDays(-30), now).ConfigureAwait(false);
       return new ApiResponse<string>(data);
     }

@@ -30,8 +30,8 @@ namespace Storage.Controllers
     [HttpGet("{from}/{to}")]
     public async Task<ApiResponse<ApiOrdersOverview>> Get(long from, long to)
     {
-      var dFrom = ClientTime.GetLocal(from.ToDateTime());
-      var dTo = ClientTime.GetLocal(to.ToDateTime());
+      var dFrom = from.ToDateTime();
+      var dTo = to.ToDateTime();
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await GetIsAdminAsync(user);
       var data = await _repo.GetAsync(user.Id, isAdmin, dFrom, dTo).ConfigureAwait(false);

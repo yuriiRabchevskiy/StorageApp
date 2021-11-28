@@ -44,7 +44,6 @@ namespace BusinessLogic.Repository
     {
       _di = serviceProvider;
       _mapper = mapper;
-      ClientTime = new ClientTimeZone(configuration["ShiftTimeZone"]);
   }
 
   public List<ApiWarehouse> Get()
@@ -113,7 +112,7 @@ namespace BusinessLogic.Repository
           to.Quantity += info.Quantity;
           context.SaveChanges();
 
-          var date = ClientTime.Now;
+          var date = ClientTime.UtcNow;
           context.ProductsTrqansactions.Add(new ProductAction
           {
             ProductId = productId,
@@ -164,7 +163,7 @@ namespace BusinessLogic.Repository
       {
         using (var transaction = context.Database.BeginTransaction(IsolationLevel.ReadCommitted))
         {
-          var date = ClientTime.Now;
+          var date = ClientTime.UtcNow;
           var order = _mapper.Map<Order>(oi);
           order.OpenDate = date;
           order.Status = OrderStatus.Open;
@@ -226,7 +225,8 @@ namespace BusinessLogic.Repository
 
         if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Поточне замовлення уже скасовано");
         order.Status = OrderStatus.Canceled;
-        order.CloseDate = DateTime.Now;
+        order.CloseDate = DateTime.UtcNow;
+        order.CanceledDate = DateTime.UtcNow;
         order.CanceledByUserId = userId;
         order.CancelReason = reason;
 
@@ -234,7 +234,7 @@ namespace BusinessLogic.Repository
         var warehouses = context.WarehouseProducts.Include(it => it.Product);
         var revertActions = new List<ProductAction>();
 
-        var date = ClientTime.Now;
+        var date = ClientTime.UtcNow;
         foreach (var action in order.Transactions)
         {
           var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
@@ -287,7 +287,7 @@ namespace BusinessLogic.Repository
         try
         {
 
-          var date = ClientTime.Now;
+          var date = ClientTime.UtcNow;
           var action = new ProductAction()
           {
             ProductId = productId,
@@ -333,7 +333,7 @@ namespace BusinessLogic.Repository
         {
           context.SaveChanges();
 
-          var date = ClientTime.Now;
+          var date = ClientTime.UtcNow;
           context.ProductsTrqansactions.Add(new ProductAction()
           {
             ProductId = productId,
