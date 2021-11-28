@@ -1,7 +1,7 @@
 import { IApiSalePerUser, IApiWarehouseAction, IApiSale, IApiOrdersOverview } from './../../models/api/reports/sales';
 import { UserService } from './user.service';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import { ApiBase } from '../api/base';
 import { ApiResponse } from './../../models/api';

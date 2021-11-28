@@ -1,6 +1,6 @@
 import {MessageService} from 'primeng/api';
 import { OnInit, AfterViewInit, Directive } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { WorkProgress } from './work-progress';
 import { ListComponent } from './list.component';
 import { ApiResponse } from '../api';
