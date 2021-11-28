@@ -14,12 +14,9 @@ namespace Storage.Controllers.Reports
     private readonly UserManager<ApplicationUser> _userManager;
     protected Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
-    protected ClientTimeZone ClientTime { get; }
-
     public ReportsControllerBase(UserManager<ApplicationUser> userManager, IConfiguration configuration)
     {
       _userManager = userManager;
-      ClientTime = new ClientTimeZone(configuration["ShiftTimeZone"]);
     }
 
     protected Task<bool> GetIsAdminAsync(ApplicationUser user)

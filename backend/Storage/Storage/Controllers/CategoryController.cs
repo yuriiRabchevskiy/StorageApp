@@ -2,10 +2,7 @@ using DataAccess.Repository;
 using Microsoft.AspNetCore.Mvc;
 using SharedDataContracts.Api.Response;
 using BusinessLogic.Models.Api;
-using BusinessLogic.Repository;
-using System;
 using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 
@@ -17,8 +14,6 @@ namespace Storage.Controllers
   {
     private ICategoriesRepository _repo;
     private UserManager<ApplicationUser> _userManager;
-    Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
-
 
     public CategoryController(ICategoriesRepository repo, UserManager<ApplicationUser> userManager)
     {

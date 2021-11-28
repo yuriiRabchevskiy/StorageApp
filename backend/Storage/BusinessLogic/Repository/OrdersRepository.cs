@@ -31,14 +31,12 @@ namespace DataAccess.Repository
     private readonly IServiceProvider _di;
     private readonly IMapper _mapper;
     IStateInformer Informer => _di.GetService<IStateInformer>();
-    private ClientTimeZone ClientTime { get; set; }
 
 
-    public OrdersRepository(IServiceProvider serviceProvider, IConfiguration configuration, IMapper mapper)
+    public OrdersRepository(IServiceProvider serviceProvider,IMapper mapper)
     {
       _di = serviceProvider;
       _mapper = mapper;
-      ClientTime = new ClientTimeZone(configuration["ShiftTimeZone"]);
     }
 
     public async Task<List<ApiOrder>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
@@ -113,10 +111,10 @@ namespace DataAccess.Repository
         order.Other = it.Other;
         order.Status = it.Status ?? OrderStatus.Open;
         order.Payment = it.Payment;
-        if (it.Status == OrderStatus.Closed && order.CloseDate == null) order.CloseDate = ClientTime.Now;
+        if (it.Status == OrderStatus.Closed && order.CloseDate == null) order.CloseDate = DateTime.UtcNow;
         if (it.Status == OrderStatus.Canceled && order.CanceledDate == null)
         {
-          order.CanceledDate = ClientTime.Now;
+          order.CanceledDate = DateTime.UtcNow;
           order.CanceledByUserId = userId;
         }
 
@@ -134,7 +132,7 @@ namespace DataAccess.Repository
 
         order.OrderEditions = new List<OrderAction>(new[] {
             new OrderAction {
-              Date = ClientTime.Now,
+              Date = DateTime.UtcNow,
               OrderId = order.Id,
               UserId = userId,
               Note = note,

@@ -7,24 +7,13 @@ namespace BusinessLogic.Helpers
   public class ClientTimeZone
   {
     private TimeSpan _tzOffset;
-    public DateTime Now
+    public DateTime UtcNow
     {
-      get { return DateTime.Now.Add(_tzOffset); }
+      get { return DateTime.UtcNow; }
     }
 
-    public ClientTimeZone(string clientTz = "2")
+    public ClientTimeZone()
     {
-      clientTz = clientTz ?? "2";
-      if (!int.TryParse(clientTz, out var hours))
-      {
-        hours = 2;
-      }
-      _tzOffset = TimeSpan.FromHours(hours);
-    }
-
-    public DateTime GetLocal(DateTime d)
-    {
-      return d.Add(_tzOffset);
     }
   }
 }

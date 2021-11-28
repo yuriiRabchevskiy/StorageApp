@@ -11,6 +11,7 @@ using System.Linq;
 using Storage.Controllers.Reports;
 using Microsoft.Extensions.Configuration;
 using BusinessLogic.Helpers;
+using System;
 
 namespace Storage.Controllers
 {
@@ -30,11 +31,11 @@ namespace Storage.Controllers
     [HttpGet("{from}/{to}")]
     public async Task<ApiResponse<ApiSalePerUser>> Get(long from, long to)
     {
-      var dFrom = ClientTime.GetLocal(from.ToDateTime());
-      var dTo = ClientTime.GetLocal(to.ToDateTime());
+      var dFrom = from.ToDateTime();
+      var dTo = to.ToDateTime();
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await GetIsAdminAsync(user);
-      var now = ClientTime.Now;
+      var now = DateTime.UtcNow;
       var data = await _repo.GetAsync(user.Id, isAdmin, dFrom, dTo).ConfigureAwait(false);
       return new ApiResponse<ApiSalePerUser>(data.OrderBy(it => it.Category));
     }
