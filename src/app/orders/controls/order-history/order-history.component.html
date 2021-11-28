@@ -4,11 +4,11 @@
     </p-header>
     <div class="dialog-body">
 
-        <div *ngIf="!initialAction">
+        <div *ngIf="!orderHistory">
             Завантажую історію...
         </div>
 
-        <p-table class="prime-table" [value]="diffs" [paginator]="true" [rowsPerPageOptions]="[10,5,3]" [pageLinks]="4"
+        <p-table *ngIf="orderHistory && orderHistory.length" class="prime-table" [value]="diffs" [paginator]="true" [rowsPerPageOptions]="[10,5,3]" [pageLinks]="4"
             [rows]="10" [responsive]="false" scrollable="true" scrollWidth="100%" scrollHeight="100%" dataKey="id" #dt
             selectionMode="single">
 
@@ -53,11 +53,11 @@
 
         </p-table>
 
-
-        <!-- 
-        {{initialOrder}} -->
-
+        <div *ngIf="orderHistory && !orderHistory.length">
+            Замовлення не редагувалося
+        </div>
     </div>
+
     <p-footer class="s-dialog-foot">
         <button class="d-s-button-cancel" type="button" pButton icon="pi pi-times" label="Закрити"
             (click)="closeDialog()">

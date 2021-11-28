@@ -20,7 +20,7 @@ export class OrderHistoryComponent implements OnInit {
     this.diffs = this.calculateDiff(value);
   }
 
-  public initialAction: IOrderAction;
+
   public diffs: IDiff[] = [];
 
   constructor() { }
@@ -34,11 +34,10 @@ export class OrderHistoryComponent implements OnInit {
 
   private calculateDiff(orders: IOrderAction[]) {
     if (!orders || orders.length === 0) {
-      this.initialAction = undefined;
       this.diffs = [];
       return;
     }
-    this.initialAction = orders[0]; // ??
+    const initialAction = orders[0]; // ??
     let lastOne = orders[0].orderJson;
     let lastKeys = Object.keys(lastOne);
     const diffs = orders.slice(1, orders.length - 1).map(current => {
@@ -56,7 +55,7 @@ export class OrderHistoryComponent implements OnInit {
       return diff;
     });
 
-    diffs.unshift(this.initialAction as IDiff);
+    diffs.unshift(initialAction as IDiff);
     return diffs;
   }
 
