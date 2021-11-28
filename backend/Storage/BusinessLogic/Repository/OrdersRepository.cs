@@ -72,8 +72,7 @@ namespace DataAccess.Repository
       using var context = _di.GetService<ApplicationDbContext>();
       // Where(it => isAdmin || it.ResponsibleUserId == userId)
 
-      var query = context.OrderAction.Where(it => it.OrderId == orderId).Include(it => it.User)
-        .AsNoTracking();
+      var query = context.OrderAction.AsNoTracking().Include(it => it.User).Where(it => it.OrderId == orderId);
 
       var data = await query.ToListAsync().ConfigureAwait(false);
       return data.Select(it =>
