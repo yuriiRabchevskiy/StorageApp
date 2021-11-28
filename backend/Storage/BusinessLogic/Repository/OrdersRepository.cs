@@ -69,18 +69,19 @@ namespace DataAccess.Repository
 
     public async Task<IReadOnlyCollection<ApiOrderAction>> GetOrderHistoryAsync(string userId, bool isAdmin, int orderId)
     {
-      using (var context = _di.GetService<ApplicationDbContext>())
+      using var context = _di.GetService<ApplicationDbContext>();
+      // Where(it => isAdmin || it.ResponsibleUserId == userId)
+
+      var query = context.OrderAction.Where(it => it.OrderId == orderId).Include(it => it.User)
+        .AsNoTracking();
+
+      var data = await query.ToListAsync().ConfigureAwait(false);
+      return data.Select(it =>
       {
-        // Where(it => isAdmin || it.ResponsibleUserId == userId)
-        var data = await context.OrderAction.Where(it => it.OrderId == orderId).Include(it => it.User)
-          .AsNoTracking().ToListAsync().ConfigureAwait(false);
-        return data.Select(it =>
-        {
-          var mapped = _mapper.Map<ApiOrderAction>(it);
-          mapped.User = it.User.Name;
-          return mapped;
-        }).ToList();
-      }
+        var mapped = _mapper.Map<ApiOrderAction>(it);
+        mapped.User = it.User.Name;
+        return mapped;
+      }).ToList();
     }
 
 
@@ -100,40 +101,39 @@ namespace DataAccess.Repository
 
     public async Task UpdateAsync(string userId, bool isAdmin, ApiOrder it)
     {
-      using (var context = _di.GetService<ApplicationDbContext>())
+      using var context = _di.GetService<ApplicationDbContext>();
+      var order = context.Orders.Find(it.Id);
+
+      if (order != null)
       {
-        var order = context.Orders.Find(it.Id);
-
-        if (order != null)
+        if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
+        order.ClientName = it.ClientName;
+        order.ClientAddress = it.ClientAddress;
+        order.ClientPhone = it.ClientPhone;
+        order.OrderNumber = it.OrderNumber;
+        order.Other = it.Other;
+        order.Status = it.Status ?? OrderStatus.Open;
+        order.Payment = it.Payment;
+        if (it.Status == OrderStatus.Closed && order.CloseDate == null) order.CloseDate = ClientTime.Now;
+        if (it.Status == OrderStatus.Canceled && order.CanceledDate == null)
         {
-          if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
-          order.ClientName = it.ClientName;
-          order.ClientAddress = it.ClientAddress;
-          order.ClientPhone = it.ClientPhone;
-          order.OrderNumber = it.OrderNumber;
-          order.Other = it.Other;
-          order.Status = it.Status ?? OrderStatus.Open;
-          order.Payment = it.Payment;
-          if (it.Status == OrderStatus.Closed && order.CloseDate == null) order.CloseDate = ClientTime.Now;
-          if (it.Status == OrderStatus.Canceled && order.CanceledDate == null)
-          {
-            order.CanceledDate = ClientTime.Now;
-            order.CanceledByUserId = userId;
-          }
+          order.CanceledDate = ClientTime.Now;
+          order.CanceledByUserId = userId;
+        }
 
-          var note = order.ResponsibleUserId != userId ? "Відредаговано іншим продавцем" : null;
-          var operation = OrderOperation.Created;
-          if (order.Id != 0)
+        var note = order.ResponsibleUserId != userId ? "Відредаговано іншим продавцем" : null;
+        var operation = OrderOperation.Created;
+        if (order.Id != 0)
+        {
+          switch (order.Status)
           {
-            switch (order.Status)
-            {
-              case OrderStatus.Canceled: operation = OrderOperation.Canceled; break;
-              case OrderStatus.Closed: operation = OrderOperation.Closed; break;
-              default: operation = OrderOperation.Updated; break;
-            }
+            case OrderStatus.Canceled: operation = OrderOperation.Canceled; break;
+            case OrderStatus.Closed: operation = OrderOperation.Closed; break;
+            default: operation = OrderOperation.Updated; break;
           }
+        }
 
-          order.OrderEditions = new List<OrderAction>(new[] {
+        order.OrderEditions = new List<OrderAction>(new[] {
             new OrderAction {
               Date = ClientTime.Now,
               OrderId = order.Id,
@@ -143,16 +143,15 @@ namespace DataAccess.Repository
               OrderJson = JsonConvert.SerializeObject(it)}
             });
 
-          it.Products = null; // we do not want to sent this back to the client.
-          await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
+        it.Products = null; // we do not want to sent this back to the client.
+        await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
           {
             OrderId = order.Id,
             Order = it,
             ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
           } }).ConfigureAwait(false);
-        }
-        await context.SaveChangesAsync().ConfigureAwait(false);
       }
+      await context.SaveChangesAsync().ConfigureAwait(false);
     }
   }
 }

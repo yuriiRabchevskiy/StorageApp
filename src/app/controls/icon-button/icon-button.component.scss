@@ -189,6 +189,17 @@
     background-position: -986px -1px;
 }
 
+.i-history,
+.i-button.i-disabled:hover .i-history {
+    background-position: -1327px -49px;
+    
+}
+
+.i-button:hover .i-history,
+.i-button:focus .i-history {
+    background-position: -1328px -4px;
+}
+
 .i-closeOrder,
 .i-button.i-disabled:hover .i-closeOrder {
     background-position: -1041px -47px;
