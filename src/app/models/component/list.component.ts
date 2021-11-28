@@ -20,8 +20,8 @@ export abstract class ListComponent<TCol> extends SecuredComponent {
 
     public filters: Filter<TCol>[] = [this.strFilter]; // filters which can reduce amount of shown items;
 
-    constructor(notifi: MessageService) {
-        super(notifi);
+    constructor(notify: MessageService) {
+        super(notify);
     }
 
     get searchText() {
@@ -48,14 +48,14 @@ export abstract class ListComponent<TCol> extends SecuredComponent {
     }
 
     removeById(id: string) {
-        let item = this.data.find(it => this.getId(it) === id);
+        const item = this.data.find(it => this.getId(it) === id);
         if (!item) return;
         this.remove(item);
     }
 
     remove(item: TCol) {
         // remove from list
-        let index = this.data.indexOf(item);
+        const index = this.data.indexOf(item);
         if (index > -1) {
             this.data = this.data.filter(it => it !== item);
         }
@@ -91,7 +91,7 @@ export abstract class ListComponent<TCol> extends SecuredComponent {
 
     doFilter(items: TCol[]): TCol[] {
         if (items && this.filters && this.filters.some(it => it.isActive)) {
-            let active = this.filters.filter(it => it.isActive);
+            const active = this.filters.filter(it => it.isActive);
             let fData = items;
             for (let i: number = 0; i < active.length; i++) {
                 fData = active[i].filter(fData);
@@ -122,7 +122,7 @@ export abstract class ListComponent<TCol> extends SecuredComponent {
     }
 
     selectById(id: string) {
-        let item = this.data.find(it => this.getId(it) === id);
+        const item = this.data.find(it => this.getId(it) === id);
         if (!item) return;
         this.select(item);
     }

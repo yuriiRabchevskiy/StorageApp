@@ -1,9 +1,9 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import {MessageService} from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { INDictionary } from '../../models';
 import { ApiResponse } from '../../models/api';
-import { ApiListComponent } from '../../models/component/list-api.component';
+import { ApiListComponent, ITableColumn } from '../../models/component/list-api.component';
 import { IProduct, ISell, ITransfer, Product, Sell } from '../../models/storage';
 import { ICategory } from '../../models/storage/categories';
 import { ApiService } from '../../shared/services/api.service';
@@ -20,6 +20,18 @@ import { ISaveResult } from './product/product.component';
   styleUrls: ['./app-stock.component.scss']
 })
 export class AppStockComponent extends ApiListComponent<IProduct> implements OnDestroy {
+
+
+  public columns: ITableColumn[] = [
+    { title: 'Ім\'я', field: 'productType' },
+    { title: 'Виробник', field: 'producer' },
+    { title: 'Модель', field: 'model', width: 80 },
+    { title: 'Розмір', field: 'size' },
+    { title: 'Колір', field: 'color' },
+    { title: 'Нотатки', field: 'freeNote', width: 300 },
+    { title: 'Ціна покупки', field: 'recommendedBuyPrice', width: 110, hideFilter: true, shouldHideFunc: () => !this.canView },
+    { title: 'Ціна продажу', field: 'recommendedSalePrice', width: 110, hideFilter: true },
+  ];
 
   selectedItem: IProduct;
   oldItem: IProduct;
@@ -131,7 +143,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   save(val: ISaveResult) {
-    let product = val.product;
+    const product = val.product;
     if ((<any>product).isNew) {
       this.isBalance = false;
       this.apiService.addProduct(product).subscribe(
