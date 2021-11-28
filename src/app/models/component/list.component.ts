@@ -1,5 +1,4 @@
 import {MessageService} from 'primeng/api';
-import { Observable } from 'rxjs/Observable';
 import { SecuredComponent } from './base-api.component';
 import { Input, Directive } from '@angular/core';
 import { StringFilter, Filter } from '../filtering/filters';

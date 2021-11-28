@@ -6,7 +6,7 @@ import { Location } from '@angular/common';
 export abstract class RouteStateComponent<T> implements OnInit {
 
     protected isLazyList: boolean = false;
-    abstract baseUrl: string = 'reports/basic';
+    abstract baseUrl;
     abstract itemToUrlFunc: (it: T) => string;
     private desiredItem: string;
     private highlight: string;

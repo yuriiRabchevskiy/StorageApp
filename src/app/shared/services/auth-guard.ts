@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { UserService } from './user.service';
@@ -11,7 +11,7 @@ class AuthConnectionErrorHandler {
 
   public handleConnectionError(error: Response | any) {
     this.owner.registerResult(false, this.url);
-    return Observable.throw('error while checking connection to server');
+    return throwError(() => new Error('error while checking connection to server'));
   }
 }
 
