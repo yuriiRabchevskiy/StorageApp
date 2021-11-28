@@ -48,79 +48,36 @@
                 </colgroup>
 
                 <colgroup *ngIf="!view.isMobile">
-                    <col>
-                    <col>
-                    <col width="80px">
-                    <col>
-                    <col>
-                    <col width="300">
-                    <col width="110px">
-                    <col width="110px">
+                    <ng-container *ngFor="let column of columns">
+                        <col *ngIf="!(column.shouldHideFunc && column.shouldHideFunc())" [width]="column.width" />
+                    </ng-container>
                     <col *ngFor="let col of wereHouses" width="80px">
                 </colgroup>
             </ng-template>
 
             <ng-template pTemplate="header">
                 <tr>
-                    <th pSortableColumn="productType">
-                        Ім'я
-                        <p-sortIcon field="productType"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="producer">
-                        Виробник
-                        <p-sortIcon field="producer"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="model">
-                        Модель
-                        <p-sortIcon field="model"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="size">
-                        Розмір
-                        <p-sortIcon field="size"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="color">
-                        Колір
-                        <p-sortIcon field="color"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="freeNote">
-                        Нотатки
-                        <p-sortIcon field="freeNote"></p-sortIcon>
-                    </th>
-                    <th *ngIf="canView" pSortableColumn="recommendedBuyPrice">
-                        Ціна покупки
-                        <p-sortIcon field="recommendedBuyPrice"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="recommendedSalePrice">
-                        Ціна продажу
-                        <p-sortIcon field="recommendedSalePrice"></p-sortIcon>
-                    </th>
+                    <ng-container *ngFor="let column of columns">
+                        <th [pSortableColumn]="column?.field"
+                            *ngIf="!(column.shouldHideFunc && column.shouldHideFunc())">
+                            {{column?.title}}
+                            <p-sortIcon [field]="column?.field"></p-sortIcon>
+                        </th>
+                    </ng-container>
+
                     <th *ngFor="let col of wereHouses" [pSortableColumn]="'wh_'+col.id">
                         {{col.name}}
                         <p-sortIcon [field]="'wh_'+col.id"></p-sortIcon>
                     </th>
                 </tr>
+                <!--search filters-->
                 <tr>
-                    <th>
-                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'productType')">
-                    </th>
-                    <th>
-                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'producer')">
-                    </th>
-                    <th>
-                        <input pInputText type="text" [style.width]="'100%'"
-                            (input)="dt.filter($event.target.value, 'model')">
-                    </th>
-                    <th>
-                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'size')">
-                    </th>
-                    <th>
-                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'color')">
-                    </th>
-                    <th>
-                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'freeNote')">
-                    </th>
-                    <th *ngIf="canView"></th>
-                    <th></th>
+                    <ng-container *ngFor="let column of columns">
+                        <th *ngIf="!(column.shouldHideFunc && column.shouldHideFunc())">
+                            <input *ngIf="!column.hideFilter" pInputText type="text" [style.width]="'100%'"
+                                (input)="dt.filter($event.target.value, column.field)" />
+                        </th>
+                    </ng-container>
                     <th *ngFor="let col of wereHouses"></th>
                 </tr>
             </ng-template>
@@ -128,14 +85,11 @@
             <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
                 <tr (click)="onRowClick(rowData)" [class]="disabledRow(rowData)" [pSelectableRow]="rowData"
                     [ngClass]="{'s-selected-row': rowData.id === selectedItem.id}">
-                    <td>{{rowData.productType}}</td>
-                    <td>{{rowData.producer}}</td>
-                    <td>{{rowData.model}}</td>
-                    <td>{{rowData.size}}</td>
-                    <td>{{rowData.color}}</td>
-                    <td>{{rowData.freeNote}}</td>
-                    <td *ngIf="canView">{{rowData.recommendedBuyPrice}}</td>
-                    <td>{{rowData.recommendedSalePrice}}</td>
+                    <ng-container *ngFor="let column of columns">
+                        <td *ngIf="!(column.shouldHideFunc && column.shouldHideFunc())">
+                            {{rowData[column.field]}}
+                        </td>
+                    </ng-container>
                     <td *ngFor="let col of wereHouses">{{rowData['wh_'+col.id]}}</td>
                 </tr>
             </ng-template>

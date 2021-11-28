@@ -5,6 +5,14 @@ import { WorkProgress } from './work-progress';
 import { ListComponent } from './list.component';
 import { ApiResponse } from '../api';
 
+export interface ITableColumn {
+    title: string;
+    field: string;
+    width?: number;
+    hideFilter?: boolean;
+    shouldHideFunc?: () => boolean;
+}
+
 
 @Directive()
 export abstract class ApiListComponentBase<T, TCol> extends ListComponent<TCol> implements OnInit, AfterViewInit {
@@ -36,8 +44,10 @@ export abstract class ApiListComponentBase<T, TCol> extends ListComponent<TCol> 
 @Directive()
 export abstract class ApiListComponent<T> extends ApiListComponentBase<T, T> {
 
-    constructor(notifi: MessageService) {
-        super(notifi);
+    public columns: ITableColumn[] = [];
+
+    constructor(notify: MessageService) {
+        super(notify);
     }
 
     onDataReceived(res: ApiResponse<T>) {
