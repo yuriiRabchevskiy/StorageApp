@@ -265,7 +265,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     }
 
     getDifference(val) {
-        const diff = (val.quantity * val.price) - (val.quantity * val.product.recommendedBuyPrice);
+        const diff = (val.quantity * val.price) - (val.quantity * val.buyPrice);
         return diff;
     }
     getProfit(val) {

@@ -137,7 +137,7 @@ export class ArchiveComponent extends ApiListComponent<IOrder> {
   }
 
   getDifference(val: ITransaction) {
-    const diff = (val.quantity * val.price) - (val.quantity * val.product.recommendedBuyPrice);
+    const diff = (val.quantity * val.price) - (val.quantity * val.buyPrice);
     return diff;
   }
 
