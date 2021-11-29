@@ -6,6 +6,40 @@ app-i-button {
     margin: 2px;
 }
 
+.i-menu-button {
+    display: inline-block;
+    position: relative;
+    @include wH(40px, 40px);
+    background-color: $appRedColor;
+    border: none;
+    border-radius: 0px;
+    outline: 0px;
+    padding: 0px;
+    cursor: pointer;
+    margin: 2px 0px 0px 2px;
+    &:focus,
+    &:hover {
+        outline: none;
+        background-color: $appRedHoverColor;
+        color: white;
+    }
+    &:disabled,
+    &:disabled:hover {
+        cursor: default;
+        background-color: $appRedDisabledColor;
+    }
+}
+
+.i-menu-button-active {
+    color: $buttonActive;
+}
+
+.dripicons {
+    font-size: 28px;
+}
+
+
+
 .i-s-tooltip {
     position: fixed;
     left: unset !important;

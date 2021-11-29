@@ -1,10 +1,11 @@
-import { IApiSalePerUser, IApiWarehouseAction } from './../../models/api/reports/sales';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { ApiService } from '../../shared/services/api.service';
-import { ApiListComponent } from '../../models/component/list-api.component';
-import { ApiResponse } from '../../models/api';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import {MessageService} from 'primeng/api';
+import { PreferenceService } from '@app/shared/services/preference.service';
+import { MessageService } from 'primeng/api';
+import { ApiResponse } from '../../models/api';
+import { ApiListComponent } from '../../models/component/list-api.component';
+import { ApiService } from '../../shared/services/api.service';
+import { IApiWarehouseAction } from './../../models/api/reports/sales';
 
 @Component({
   selector: 'app-warehouse-actions',
@@ -31,8 +32,8 @@ export class WarehouseActionsComponent extends ApiListComponent<IApiWarehouseAct
   selectedItem: IApiWarehouseAction;
   totals: IApiWarehouseAction = <any>{};
 
-  constructor(private apiService: ApiService, public router: Router, notifi: MessageService) {
-    super(notifi);
+  constructor(private apiService: ApiService, public router: Router, notify: MessageService, preferences: PreferenceService) {
+    super(notify, preferences);
   }
 
   doGetData() {

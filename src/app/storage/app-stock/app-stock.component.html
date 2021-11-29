@@ -28,7 +28,10 @@
                 <app-i-button icon="sell-icon" title="Додати до кошика" (iClick)="showSellDialog()"
                     [disabled]="!selectedItem || !isBalance"></app-i-button>
                 <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
-                <app-i-button icon="i-refresh" title="Колонки" (iClick)="showColumnsPicker = true"></app-i-button>
+                <button class="i-menu-button" title="Колонки" (click)="showColumnsPicker = true"
+                 [ngClass]="{'i-menu-button-active': hiddenColumns.size}">
+                    <i class="dripicons dripicons-gear"> </i>
+                </button>
             </app-button-group>
             <div class="button-wrap">
                 <app-i-button *ngIf="sellList.length > 0" icon="i-basket" title="Оформити замовлення"
@@ -131,6 +134,6 @@
 </app-spinner>
 
 <app-columns-picker *ngIf="showColumnsPicker" [columns]="columns" [hiddenColumns]="hiddenColumns"
-    (closeDialog)="showColumnsPicker = false">
+    (closeDialog)="onColumnsPickerClosed($event)">
 
 </app-columns-picker>

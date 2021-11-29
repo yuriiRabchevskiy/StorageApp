@@ -1,5 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { PreferenceService } from '@app/shared/services/preference.service';
 import { MessageService } from 'primeng/api';
 import { INDictionary } from '../../models';
 import { ApiResponse } from '../../models/api';
@@ -67,9 +68,9 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.filter();
   }
 
-  constructor(private apiService: ApiService, public router: Router, notifi: MessageService,
-    private tracker: TrackerService) {
-    super(notifi);
+  constructor(private apiService: ApiService, public router: Router, private tracker: TrackerService,
+    notify: MessageService, preferences: PreferenceService) {
+    super(notify, preferences);
 
     this.tracker.productsCountChanged.on(this.onProductsCountChanged);
     this.selectedTab = this.tabs[0];
@@ -77,6 +78,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.filters.push(this.typeFilter);
     this.loadCategory();
     this.loadWereHouse();
+
+    this.initHiddenColumns('stockColumns');
   }
 
   selectTab(index: number) {
