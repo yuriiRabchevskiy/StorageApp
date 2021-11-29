@@ -35,7 +35,6 @@ namespace BusinessLogic.Repository
 
     private readonly IServiceProvider _di;
     private readonly IMapper _mapper;
-    private ClientTimeZone ClientTime { get; set; }
     static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
     IStateInformer Informer => _di.GetService<IStateInformer>();
@@ -112,7 +111,7 @@ namespace BusinessLogic.Repository
           to.Quantity += info.Quantity;
           context.SaveChanges();
 
-          var date = ClientTime.UtcNow;
+          var date = DateTime.UtcNow;
           context.ProductsTrqansactions.Add(new ProductAction
           {
             ProductId = productId,
@@ -163,7 +162,7 @@ namespace BusinessLogic.Repository
       {
         using (var transaction = context.Database.BeginTransaction(IsolationLevel.ReadCommitted))
         {
-          var date = ClientTime.UtcNow;
+          var date = DateTime.UtcNow;
           var order = _mapper.Map<Order>(oi);
           order.OpenDate = date;
           order.Status = OrderStatus.Open;
@@ -234,7 +233,7 @@ namespace BusinessLogic.Repository
         var warehouses = context.WarehouseProducts.Include(it => it.Product);
         var revertActions = new List<ProductAction>();
 
-        var date = ClientTime.UtcNow;
+        var date = DateTime.UtcNow;
         foreach (var action in order.Transactions)
         {
           var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
@@ -287,7 +286,7 @@ namespace BusinessLogic.Repository
         try
         {
 
-          var date = ClientTime.UtcNow;
+          var date = DateTime.UtcNow;
           var action = new ProductAction()
           {
             ProductId = productId,
@@ -333,7 +332,7 @@ namespace BusinessLogic.Repository
         {
           context.SaveChanges();
 
-          var date = ClientTime.UtcNow;
+          var date = DateTime.UtcNow;
           context.ProductsTrqansactions.Add(new ProductAction()
           {
             ProductId = productId,
