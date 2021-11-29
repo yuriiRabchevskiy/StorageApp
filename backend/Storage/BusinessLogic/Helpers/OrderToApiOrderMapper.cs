@@ -1,11 +1,8 @@
 using AutoMapper;
 using BusinessLogic.Models.Api;
 using DataAccess.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using BusinessLogic.Helpers;
 
 namespace BusinessLogic.Helpers
 {
@@ -33,7 +30,7 @@ namespace BusinessLogic.Helpers
           BuyPrice = it.BuyPrice,
           Product = mapper.Map<ApiProduct>(it.Product),
           TotalPrice = -it.Price * it.Quantity
-        });
+        }).ToList();
         return api;
       }).ToList();
     }
