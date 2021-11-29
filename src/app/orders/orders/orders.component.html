@@ -220,7 +220,7 @@
                       <br *ngIf="prod.product.freeNote" />
                       <span class="prod-notes">{{prod.product.freeNote}}</span>
                     </td>
-                    <td class="check-td" *ngIf="canView">{{prod.product.recommendedBuyPrice}} </td>
+                    <td class="check-td" *ngIf="canView">{{prod.buyPrice}} </td>
                     <td class="check-td">{{prod.price}}</td>
                     <td class="check-td" *ngIf="canView">{{getDifference(prod)}}</td>
                     <td class="check-td">{{prod.totalPrice}}</td>
