@@ -45,6 +45,12 @@ export abstract class ApiListComponentBase<T, TCol> extends ListComponent<TCol> 
 export abstract class ApiListComponent<T> extends ApiListComponentBase<T, T> {
 
     public columns: ITableColumn[] = [];
+    public hiddenColumns: Set<string> = new Set<string>();
+    public showColumnsPicker: boolean = false;
+
+    public visibleColumn(column: ITableColumn) {
+        return !(this.hiddenColumns.has(column.field) || (column.shouldHideFunc && column.shouldHideFunc()));
+    }
 
     constructor(notify: MessageService) {
         super(notify);

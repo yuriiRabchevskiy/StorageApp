@@ -97,7 +97,7 @@ export class TransferComponent implements OnInit {
   @Output() transfer: EventEmitter<ITransfer> = new EventEmitter<ITransfer>();
 
   constructor(private apiService: ApiService) {
-    let date = Date.now();
+    const date = Date.now();
     this.dateNow = moment(new Date(Number(date))).format('DD/MM/YYYY');
   }
 
@@ -113,7 +113,7 @@ export class TransferComponent implements OnInit {
   }
 
   save() {
-    let newTransfer = new TransferItem();
+    const newTransfer = new TransferItem();
     newTransfer.fromId = this.selectedFrom;
     newTransfer.toId = this.selectedTo;
     newTransfer.quantity = this.transferCount;

@@ -1,0 +1,18 @@
+<p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
+    <p-header>Видимі колонки</p-header>
+    <ul>
+        <li *ngFor="let column of columns">
+            <label>
+                <input type="checkbox" [checked]="!hiddenCopy?.has(column.field)" (change)="onColumnChange(column, $event)" />
+                {{column.title}}
+            </label>
+        </li>
+    </ul>
+    <p-footer class="s-dialog-foot">
+        <button class="d-s-button" type="button" pButton icon="pi pi-check" (click)="save()" label="Зберегти">
+        </button>
+        <button class="d-s-button-cancel" type="button" pButton icon="pi pi-times" label="Закрити"
+            (click)="close()">
+        </button>
+    </p-footer>
+</p-dialog>
