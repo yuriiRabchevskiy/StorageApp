@@ -1,11 +1,12 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { PreferenceService } from '@app/shared/services/preference.service';
 import * as moment from 'moment-mini';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ApiResponse } from '../../models/api';
 import { ApiOrdersChanges } from '../../models/api/state/state';
-import { ApiListComponent } from '../../models/component/list-api.component';
+import { ApiListComponent, ITableColumn } from '../../models/component/list-api.component';
 import { NumberFilter, StringFilter } from '../../models/filtering/filters';
 import { IOrder, ITransaction, OrderStatus, IOrderAction } from '../../models/storage';
 import { ApiService } from '../../shared/services/api.service';
@@ -54,6 +55,31 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     private _canceledLoadTimeMs: number = undefined;
     public clickInfo: IDoubleClick = {};
 
+    public columns: ITableColumn[] = [
+        { title: 'Дата продажу', field: 'openDate', width: 114, template: 'date', format: 'dd/MM/yy HH:mm', },
+        {
+            title: 'Дата закриття', field: 'closeDate', width: 114, template: 'date', format: 'dd/MM/yy HH:mm',
+            shouldHideFunc: () => this.selectedTab.value !== 1
+        },
+        {
+            title: 'Дата відміни', field: 'cancelDate', width: 114, template: 'date', format: 'dd/MM/yy HH:mm',
+            shouldHideFunc: () => this.selectedTab.value !== 3
+        },
+        { title: 'Накладна', field: 'orderNumber', width: 126, template: 'pageSpecial1' },
+        { title: 'Телефон', field: 'clientPhone', width: 92, },
+        { title: 'Одержувач', field: 'clientName'},
+        { title: 'Адреса', field: 'clientAddress', maxWidth: 140 },
+        { title: 'Тип Оплати', field: 'payment', width: 108, template: 'pageSpecial2' },
+        { title: 'Продавець', field: 'seller', width: 118 },
+        { title: 'Скасував', field: 'canceledBy', shouldHideFunc: () => !this.isCancelTab },
+        { title: 'Товари', field: 'itemsName', width: 180 },
+        { title: 'Нотатки', field: 'other' },
+        {
+            title: 'Сума', field: 'totalPrice', width: 80,
+            shouldHideFunc: () => this.isCancelTab
+        },
+    ];
+
     get rowMetadata() {
         return this.isCancelTab ? this.canceledRowGroupMetadata : this.rowGroupMetadata;
     }
@@ -96,9 +122,10 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
     itemsFormatted = [];
 
-    constructor(private apiService: ApiService, public router: Router, notifi: MessageService,
-        private tracker: TrackerService) {
-        super(notifi);
+    constructor(private apiService: ApiService, public router: Router, private tracker: TrackerService,
+        notify: MessageService, preferences: PreferenceService) {
+        super(notify, preferences);
+
 
         this.tracker.orderChanged.on(this.onOrdersChanged);
         const isAdmin = this.userService.getLocal().isAdmin;
@@ -106,6 +133,8 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this.selectedTab = this.tabs[0];
         this.typeFilter.getNumber = (it) => it.status;
         this.filters.push(this.typeFilter);
+
+        this.initHiddenColumns('ordersColumns');
     }
 
     onFiltered() {
@@ -131,8 +160,6 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             date: now,
             element: event
         };
-
-
 
     }
 

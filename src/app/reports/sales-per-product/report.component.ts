@@ -5,6 +5,7 @@ import { ApiListComponent } from '../../models/component/list-api.component';
 import { ApiResponse } from '../../models/api';
 import { Router } from '@angular/router';
 import {MessageService} from 'primeng/api';
+import { PreferenceService } from '@app/shared/services/preference.service';
 
 @Component({
   selector: 'app-sales-per-product',
@@ -30,8 +31,8 @@ export class SalesPerProductComponent extends ApiListComponent<IApiSale> {
   selectedItem: IApiSale;
   totals: IApiSale = <any>{};
 
-  constructor(private apiService: ApiService, public router: Router, notifi: MessageService) {
-    super(notifi);
+  constructor(private apiService: ApiService, public router: Router, notify: MessageService, preferences: PreferenceService) {
+    super(notify, preferences);
   }
 
   doGetData() {

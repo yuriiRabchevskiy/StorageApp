@@ -8,6 +8,8 @@ import * as moment from 'moment-mini';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ApiResponse } from '@app/models/api/api/api';
+import { PreferenceService } from '@app/shared/services/preference.service';
+import { ITableColumn } from '@app/models/component/list-api.component';
 
 interface IDoubleClick {
   date?: number;
@@ -54,12 +56,28 @@ export class ArchiveComponent extends ApiListComponent<IOrder> {
 
   itemsFormatted = [];
 
-  constructor(private apiService: ApiService, notify: MessageService) {
-    super(notify);
+  public columns: ITableColumn[] = [
+    { title: 'Дата продажу', field: 'openDate', width: 126, template: 'date', format: 'dd/MM/yy HH:mm', },
+    { title: 'Дата закриття', field: 'closeDate', width: 126, template: 'date', format: 'dd/MM/yy HH:mm' },
+    { title: 'Накладна', field: 'orderNumber', width: 126, template: 'pageSpecial1' },
+    { title: 'Телефон', field: 'clientPhone', width: 95, },
+    { title: 'Одержувач', field: 'clientName', },
+    { title: 'Адреса', field: 'clientAddress', maxWidth: 140 },
+    { title: 'Тип Оплати', field: 'payment', width: 108, template: 'pageSpecial2' },
+    { title: 'Продавець', field: 'seller', width: 140 },
+    { title: 'Товари', field: 'itemsName', width: 180 },
+    { title: 'Нотатки', field: 'other' },
+    { title: 'Сума', field: 'totalPrice', width: 80 },
+  ];
+
+  constructor(private apiService: ApiService, notify: MessageService, preferences: PreferenceService) {
+    super(notify, preferences);
 
     const date = new Date(Date.now());
     this.archiveFrom = new Date(date.getFullYear(), date.getMonth() - 3, 1);
     this.archiveTo = new Date(date.getFullYear(), date.getMonth() - 2, 1);
+
+    this.initHiddenColumns('ordersArchiveColumns');
   }
 
   doGetData() {

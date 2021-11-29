@@ -27,6 +27,11 @@
                 </app-i-button>
                 <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()">
                 </app-i-button>
+
+                <button class="i-menu-button" title="Колонки" (click)="showColumnsPicker = true"
+                    [ngClass]="{'i-menu-button-active': hiddenColumns.size}">
+                    <i class="dripicons dripicons-gear"> </i>
+                </button>
             </app-button-group>
 
             <div class="button-wrap">
@@ -39,88 +44,39 @@
             scrollHeight="100%" dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
           'clientPhone', 'clientName', 'clientAddress', 'payment', 'seller', 'canceledBy',
           'itemsName', 'other', 'totalPrice']" (onSort)="onSort()">
+
             <ng-template pTemplate="colgroup">
+
                 <colgroup *ngIf="view.isMobile">
-                    <col>
+                    <col />
                 </colgroup>
 
                 <colgroup *ngIf="!view.isMobile">
-                    <!--Expanded-->
-                    <col width="20">
-                    <!--Id-->
-                    <col width="50">
-                    <!--Date-->
-                    <col width="126">
-                    <!--Close Date-->
-                    <col width="126">
-                    <!--Order No-->
-                    <col width="126">
-                    <!--Phone No-->
-                    <col width="95">
-                    <!--Reciver-->
-                    <col>
-                    <!--Address-->
-                    <col>
-                    <!--Kind-->
-                    <col width="108">
-                    <!--Seller-->
-                    <col width="140px">
-                    <col width="180">
-                    <!--Notes-->
-                    <col>
-                    <col width="80">
+                    <col />
+                    <!--coll for expand-->
+                    <col [width]="50" />
+
+                    <ng-container *ngFor="let column of columns">
+                        <col *ngIf="visibleColumn(column)" [width]="column.width" />
+                    </ng-container>
                 </colgroup>
             </ng-template>
+
             <ng-template pTemplate="header">
                 <tr>
+                    <!--cols for expand and id-->
                     <th></th>
                     <th>#</th>
-                    <th pSortableColumn="openDate">
-                        Дата продажу
-                        <p-sortIcon field="openDate"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="closeDate">
-                        Дата закриття
-                        <p-sortIcon field="closeDate"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="orderNumber">
-                        Накладна
-                        <p-sortIcon field="orderNumber"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="clientPhone">
-                        Телефон
-                        <p-sortIcon field="clientPhone"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="clientName" max-width="140px">
-                        Одержувач
-                        <p-sortIcon field="clientName"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="clientAddress">
-                        Адреса
-                        <p-sortIcon field="clientAddress"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="payment">
-                        Тип Оплати
-                        <p-sortIcon field="payment"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="seller">
-                        Продавець
-                        <p-sortIcon field="seller"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="itemsName">
-                        Товари
-                        <p-sortIcon field="itemsName"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="other">
-                        Нотатки
-                        <p-sortIcon field="other"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="totalPrice">
-                        Сума
-                        <p-sortIcon field="totalPrice"></p-sortIcon>
-                    </th>
+                    <ng-container *ngFor="let column of columns">
+                        <th [pSortableColumn]="column?.field" *ngIf="visibleColumn(column)">
+                            {{column?.title}}
+                            <p-sortIcon [field]="column?.field"></p-sortIcon>
+                        </th>
+                    </ng-container>
                 </tr>
             </ng-template>
+
+
             <ng-template pTemplate="body" let-expanded="expanded" let-rowData let-rowIndex="rowIndex">
 
                 <tr class="ui-widget-header" *ngIf="rowMetadata[getDateKey(rowData.openDate)].index === rowIndex">
@@ -136,27 +92,29 @@
                             [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
                     </td>
                     <td>{{rowData.id}}</td>
-                    <td>{{rowData.openDate | date: 'dd/MM/yy HH:mm'}}</td>
-                    <td>{{rowData.closeDate | date: 'dd/MM/yy HH:mm'}}</td>
-                    <td>
-                        <a href="https://novaposhta.ua/tracking/?cargo_number={{rowData.orderNumber}}" target="_blank">
-                            <span>{{rowData.orderNumber}}</span>
-                        </a>
-                    </td>
-
-                    <td>{{rowData.clientPhone}}</td>
-                    <td>{{rowData.clientName}}</td>
-                    <td>{{rowData.clientAddress}}</td>
-                    <td>{{rowData.payment === 0 ? 'Оплачено' : 'Наложний'}}</td>
-                    <td>{{rowData.seller}}</td>
-                    <td><span class="order-items-name">{{rowData.itemsName}}</span></td>
-                    <td>{{rowData.other}}</td>
-                    <td><span class="total-order-cell">{{rowData.totalPrice}}</span></td>
+                    <ng-container *ngFor="let column of columns">
+                        <td *ngIf="visibleColumn(column)">
+                            <ng-container *ngIf="!column.template">
+                                {{rowData[column.field]}}
+                            </ng-container>
+                            <ng-container *ngIf="column.template === 'date'">
+                                {{rowData[column.field] | date: column.format}}
+                            </ng-container>
+                            <ng-container *ngIf="column.template === 'pageSpecial1'">
+                                <a href="https://novaposhta.ua/tracking/?cargo_number={{rowData.orderNumber}}"
+                                    target="_blank">
+                                    <span>{{rowData.orderNumber}}</span>
+                                </a>
+                            </ng-container>
+                            <ng-container *ngIf="column.template === 'pageSpecial2'">
+                                {{rowData.payment === 0 ? 'Оплачено' : 'Наложний'}}
+                            </ng-container>
+                        </td>
+                    </ng-container>
                 </tr>
             </ng-template>
 
             <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['date']}}</ng-template>
-
 
             <ng-template let-item pTemplate="rowexpansion">
                 <tr class="expanded-row">
@@ -231,3 +189,7 @@
 <app-order-history [order]="selectedItem" [orderHistory]="orderHistory" *ngIf="showOrderHistory"
     (onCloseDialog)="showOrderHistory=$event">
 </app-order-history>
+
+<app-columns-picker *ngIf="showColumnsPicker" [columns]="columns" [hiddenColumns]="hiddenColumns"
+    (closeDialog)="onColumnsPickerClosed($event)">
+</app-columns-picker>

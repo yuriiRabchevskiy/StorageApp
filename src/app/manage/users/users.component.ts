@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { PreferenceService } from '@app/shared/services/preference.service';
 import { MessageService } from 'primeng/api';
 import { ApiResponse } from '../../models/api';
 import { ApiListComponent } from '../../models/component/list-api.component';
@@ -18,8 +19,8 @@ export class UsersComponent extends ApiListComponent<ISUser> {
   displayEditDialog: boolean = false;
   showConfirm: boolean = false;
 
-  constructor(private apiService: ApiService, public router: Router, notifi: MessageService) {
-    super(notifi);
+  constructor(private apiService: ApiService, public router: Router, notify: MessageService, preferences: PreferenceService) {
+    super(notify, preferences);
   }
 
   onRowClick(user: ISUser) {
