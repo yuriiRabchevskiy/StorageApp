@@ -28,6 +28,7 @@
                 <app-i-button icon="sell-icon" title="Додати до кошика" (iClick)="showSellDialog()"
                     [disabled]="!selectedItem || !isBalance"></app-i-button>
                 <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
+                <app-i-button icon="i-refresh" title="Колонки" (iClick)="showColumnsPicker = true"></app-i-button>
             </app-button-group>
             <div class="button-wrap">
                 <app-i-button *ngIf="sellList.length > 0" icon="i-basket" title="Оформити замовлення"
@@ -49,7 +50,7 @@
 
                 <colgroup *ngIf="!view.isMobile">
                     <ng-container *ngFor="let column of columns">
-                        <col *ngIf="!(column.shouldHideFunc && column.shouldHideFunc())" [width]="column.width" />
+                        <col *ngIf="visibleColumn(column)" [width]="column.width" />
                     </ng-container>
                     <col *ngFor="let col of wereHouses" width="80px">
                 </colgroup>
@@ -58,8 +59,7 @@
             <ng-template pTemplate="header">
                 <tr>
                     <ng-container *ngFor="let column of columns">
-                        <th [pSortableColumn]="column?.field"
-                            *ngIf="!(column.shouldHideFunc && column.shouldHideFunc())">
+                        <th [pSortableColumn]="column?.field" *ngIf="visibleColumn(column)">
                             {{column?.title}}
                             <p-sortIcon [field]="column?.field"></p-sortIcon>
                         </th>
@@ -73,7 +73,7 @@
                 <!--search filters-->
                 <tr>
                     <ng-container *ngFor="let column of columns">
-                        <th *ngIf="!(column.shouldHideFunc && column.shouldHideFunc())">
+                        <th *ngIf="visibleColumn(column)">
                             <input *ngIf="!column.hideFilter" pInputText type="text" [style.width]="'100%'"
                                 (input)="dt.filter($event.target.value, column.field)" />
                         </th>
@@ -86,7 +86,7 @@
                 <tr (click)="onRowClick(rowData)" [class]="disabledRow(rowData)" [pSelectableRow]="rowData"
                     [ngClass]="{'s-selected-row': rowData.id === selectedItem.id}">
                     <ng-container *ngFor="let column of columns">
-                        <td *ngIf="!(column.shouldHideFunc && column.shouldHideFunc())">
+                        <td *ngIf="visibleColumn(column)">
                             {{rowData[column.field]}}
                         </td>
                     </ng-container>
@@ -96,29 +96,41 @@
         </p-table>
     </div>
 </div>
+
 <app-product *ngIf="displayDialog" [categories]="categories" (onCloseDialog)="closeDialog($event)"
-    (saveProduct)="save($event)" [product]="selectedItem"></app-product>
+    (saveProduct)="save($event)" [product]="selectedItem">
+</app-product>
 
 <app-transfer *ngIf="transferDialog" [product]="selectedItem" [locations]="wereHouses"
-    (onCloseDialog)="closeTransferDialog($event)" (transfer)="doTransfer($event)"></app-transfer>
+    (onCloseDialog)="closeTransferDialog($event)" (transfer)="doTransfer($event)">
+</app-transfer>
 
 <app-addition *ngIf="additionDialog" [product]="selectedItem" [locations]="wereHouses"
-    (onCloseDialog)="closeAdditionDialog($event)" (addition)="saveAddition($event)"></app-addition>
+    (onCloseDialog)="closeAdditionDialog($event)" (addition)="saveAddition($event)">
+</app-addition>
 
 <app-prod-removal *ngIf="removalDialog" [product]="selectedItem" [locations]="wereHouses"
     (onCloseDialog)="closeRemovalDialog($event)" (removeRequested)="removeProducts($event)">
-
 </app-prod-removal>
 
 <app-sell *ngIf="sellDialog" [product]="selectedItem" [locations]="wereHouses" [sell]="sell"
-    (onCloseDialog)="closeSellDialog($event)" (sale)="sale($event)"></app-sell>
+    (onCloseDialog)="closeSellDialog($event)" (sale)="sale($event)">
+</app-sell>
 
 <app-basket *ngIf="basketDialog" [items]="sellList" [locations]="wereHouses" (onCloseDialog)="closeBasketDialog($event)"
-    (removeItem)="turnFromBasket($event)"></app-basket>
+    (removeItem)="turnFromBasket($event)">
+</app-basket>
 
 <app-confirm [title]="selectedItem.productType" (confirm)="confirmDelete($event)" *ngIf="showConfirm">
     <span header class="confirm-title">Ви впевнені, що бажаєте видалити продукт:
         <b>{{selectedItem.productType}}</b>
     </span>
 </app-confirm>
-<app-spinner *ngIf="showSpinner"></app-spinner>
+
+<app-spinner *ngIf="showSpinner">
+</app-spinner>
+
+<app-columns-picker *ngIf="showColumnsPicker" [columns]="columns" [hiddenColumns]="hiddenColumns"
+    (closeDialog)="showColumnsPicker = false">
+
+</app-columns-picker>
