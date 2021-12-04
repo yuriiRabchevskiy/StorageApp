@@ -3,7 +3,7 @@ using BusinessLogic.Models.Api;
 using BusinessLogic.Models.Api.Reports;
 using DataAccess.Models;
 using Microsoft.Extensions.DependencyInjection;
-
+using System.Linq;
 
 namespace Storage.Code
 {
@@ -28,6 +28,8 @@ namespace Storage.Code
         cfg.CreateMap<ApiWarehouse, Warehouse>();
         cfg.CreateMap<ApiWarehouseAction, ProductAction>();
         cfg.CreateMap<ProductAction, ApiWarehouseAction>();
+        cfg.CreateMap<ApiProduct, CsvProduct>().ForMember(it => it.TotalBalance, opt => opt.MapFrom(src =>
+        src.Balance.Keys.Select(key => src.Balance[key]).Sum()));
       });
       var mapper = config.CreateMapper();
       services.AddSingleton(mapper);

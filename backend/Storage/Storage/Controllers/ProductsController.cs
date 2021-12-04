@@ -9,6 +9,10 @@ using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Storage.Code.Helpers;
 using Storage.Code.Hubs;
+using Storage.Code.Services;
+using Microsoft.AspNetCore.Hosting;
+using AutoMapper;
+using System.Linq;
 
 namespace Storage.Controllers
 {
@@ -36,6 +40,18 @@ namespace Storage.Controllers
       var data = await _repo.GetAsync().ConfigureAwait(false);
       return new ApiResponse<ApiProduct>(data);
     }
+
+    [HttpPost("export/generate")]
+    [AllowAnonymous]
+    public async Task<ApiResponseBase> GenerateExportAsync([FromServices] IWebHostEnvironment environment, [FromServices] IMapper mapper)
+    {
+      var data = await _repo.GetAsync().ConfigureAwait(false);
+      var exportItems = data.Select(it => mapper.Map<ApiProduct, CsvProduct>(it)).ToList();
+      var exportService = new ExportService(environment, "products.csv");
+      await exportService.ExportAsync(exportItems).ConfigureAwait(false);
+      return new ApiResponseBase();
+    }
+
 
 
     // POST api/values
