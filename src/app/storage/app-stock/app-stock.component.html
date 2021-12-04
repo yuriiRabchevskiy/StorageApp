@@ -43,7 +43,7 @@
 
         <!--todo - fix it [rowStyleClass]="disabledRow" -->
         <p-table class="prime-table" [value]="filteredData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
-            [rows]="100" [pageLinks]="4" [responsive]="true" scrollable="true" scrollWidth="100%" scrollHeight="100%"
+            [rows]="100" [pageLinks]="4" [responsive]="true" [scrollable]="false" scrollWidth="100%" scrollHeight="100%"
             #dt dataKey="id" selectionMode="single" [globalFilterFields]="globalSearchFields">
 
             <ng-template pTemplate="colgroup">

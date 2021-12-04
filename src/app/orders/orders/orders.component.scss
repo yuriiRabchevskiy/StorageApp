@@ -4,6 +4,14 @@
     margin: 4px 0px 8px 0px;
 }
 
+.notes {
+    max-width: 280px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .check-order {
     background-color: #fff;
     border: 1px solid black;

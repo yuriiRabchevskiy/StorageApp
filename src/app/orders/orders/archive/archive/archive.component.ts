@@ -10,6 +10,7 @@ import { Table } from 'primeng/table';
 import { ApiResponse } from '@app/models/api/api/api';
 import { PreferenceService } from '@app/shared/services/preference.service';
 import { ITableColumn } from '@app/models/component/list-api.component';
+import { groupBy } from 'lodash';
 
 interface IDoubleClick {
   date?: number;
@@ -64,9 +65,9 @@ export class ArchiveComponent extends ApiListComponent<IOrder> {
     { title: 'Одержувач', field: 'clientName', },
     { title: 'Адреса', field: 'clientAddress', maxWidth: 140 },
     { title: 'Тип Оплати', field: 'payment', width: 108, template: 'pageSpecial2' },
-    { title: 'Продавець', field: 'seller', width: 140 },
+    { title: 'Продавець', field: 'sellerShort', width: 90 },
     { title: 'Товари', field: 'itemsName', width: 180 },
-    { title: 'Нотатки', field: 'other' },
+    { title: 'Нотатки', field: 'other', template: 'pageSpecial3' },
     { title: 'Сума', field: 'totalPrice', width: 80 },
   ];
 
@@ -90,6 +91,13 @@ export class ArchiveComponent extends ApiListComponent<IOrder> {
         it.openDate = new Date(it.openDate);
         it.date = moment(it.openDate).format('DD/MM/YYYY');
         it.itemsName = this.getItemsName(it.products);
+        const sellerSrName = it.seller?.split(' ');
+        if (sellerSrName && sellerSrName.length > 1) {
+          it.sellerShort = `${sellerSrName[0]} ${sellerSrName[1][0]}.`;
+        } else {
+          it.sellerShort = it.seller;
+        }
+
       });
       res.items.sort(this.orderByDate);
     }
@@ -113,7 +121,12 @@ export class ArchiveComponent extends ApiListComponent<IOrder> {
   }
 
   getItemsName(val: ITransaction[]) {
-    return val.map(it => it.product.productType).join('\n');
+    const allTypes = val.map(it => it.product.productType);
+    const group = groupBy(allTypes);
+    const keys = Object.keys(group);
+    const unique = keys.filter(it => group[it].length < 2);
+    const duplicates = keys.filter(it => group[it].length >= 2).map(it => `${it} x${group[it].length}`);
+    return unique.concat(duplicates).sort().join(',');
   }
 
   onFiltered() {

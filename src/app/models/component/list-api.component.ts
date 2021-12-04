@@ -12,7 +12,7 @@ export interface ITableColumn {
     width?: number;
     maxWidth?: number;
     hideFilter?: boolean;
-    template?: 'date' | 'pageSpecial1' | 'pageSpecial2' | undefined;
+    template?: 'date' | 'pageSpecial1' | 'pageSpecial2' | 'pageSpecial3' | undefined;
     format?: string;
     dataClass?: string;
     shouldHideFunc?: () => boolean;
@@ -56,6 +56,12 @@ export abstract class ApiListComponent<T> extends ApiListComponentBase<T, T> {
 
     public visibleColumn(column: ITableColumn) {
         return !(this.hiddenColumns.has(column.field) || (column.shouldHideFunc && column.shouldHideFunc()));
+    }
+
+    public flexBasis(column: ITableColumn) {
+        return null;
+        if (!column.width) return null;
+        return { 'flex-basis': `${column.width}px` };
     }
 
     constructor(notify: MessageService, protected preferences: PreferenceService) {

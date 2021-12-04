@@ -21,6 +21,7 @@ export interface IOrder {
 
     // client properties
     date?: string;
+    sellerShort?: string;
     itemsName?: string;
 }
 
