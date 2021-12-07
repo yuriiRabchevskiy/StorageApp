@@ -28,8 +28,9 @@ namespace Storage.Code
         cfg.CreateMap<ApiWarehouse, Warehouse>();
         cfg.CreateMap<ApiWarehouseAction, ProductAction>();
         cfg.CreateMap<ProductAction, ApiWarehouseAction>();
-        cfg.CreateMap<ApiProduct, CsvProduct>().ForMember(it => it.TotalBalance, opt => opt.MapFrom(src =>
-        src.Balance.Keys.Select(key => src.Balance[key]).Sum()));
+        cfg.CreateMap<ApiProduct, CsvProduct>()
+          .ForMember(it => it.TotalBalance, opt => opt.MapFrom(src => src.Balance.Keys.Select(key => src.Balance[key]).Sum()))
+          .ForMember(it => it.Price, opt => opt.MapFrom(src => src.RecommendedSalePrice));
       });
       var mapper = config.CreateMapper();
       services.AddSingleton(mapper);

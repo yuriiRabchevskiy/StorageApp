@@ -71,7 +71,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         { title: 'Одержувач', field: 'clientName'},
         { title: 'Адреса', field: 'clientAddress', maxWidth: 140 },
         { title: 'Тип Оплати', field: 'payment', width: 108, template: 'pageSpecial2' },
-        { title: 'Продавець', field: 'seller', width: 90 },
+        { title: 'Продавець', field: 'sellerShort', width: 90 },
         { title: 'Скасував', field: 'canceledBy', shouldHideFunc: () => !this.isCancelTab },
         { title: 'Товари', field: 'itemsName', width: 180 },
         { title: 'Нотатки', field: 'other', template: 'pageSpecial3' },
