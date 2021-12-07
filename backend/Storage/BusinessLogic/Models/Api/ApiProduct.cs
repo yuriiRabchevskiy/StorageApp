@@ -31,5 +31,7 @@ namespace BusinessLogic.Models.Api
     public string FreeNote { get; set; }
     public bool IsActive { get; set; }
     public int TotalBalance { get; set; }
+
+    public double Price { get; set; }
   }
 }

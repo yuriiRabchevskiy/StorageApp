@@ -1,3 +1,4 @@
+using System;
 using DataAccess.Repository;
 using Microsoft.AspNetCore.Mvc;
 using SharedDataContracts.Api.Response;
@@ -13,6 +14,7 @@ using Storage.Code.Services;
 using Microsoft.AspNetCore.Hosting;
 using AutoMapper;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace Storage.Controllers
 {
@@ -43,13 +45,21 @@ namespace Storage.Controllers
 
     [HttpPost("export/generate")]
     [AllowAnonymous]
-    public async Task<ApiResponseBase> GenerateExportAsync([FromServices] IWebHostEnvironment environment, [FromServices] IMapper mapper)
+    public async Task<ApiResponse<string>> GenerateExportAsync([FromServices] IConfiguration configuration, [FromServices] IMapper mapper)
     {
-      var data = await _repo.GetAsync().ConfigureAwait(false);
-      var exportItems = data.Select(it => mapper.Map<ApiProduct, CsvProduct>(it)).ToList();
-      var exportService = new ExportService(environment, "products.csv");
-      await exportService.ExportAsync(exportItems).ConfigureAwait(false);
-      return new ApiResponseBase();
+      try
+      {
+        var data = await _repo.GetAsync().ConfigureAwait(false);
+        var exportItems = data.Select(it => mapper.Map<ApiProduct, CsvProduct>(it)).ToList();
+        var exportService = new ExportService(configuration, "products.csv");
+        await exportService.ExportAsync(exportItems).ConfigureAwait(false);
+        return new ApiResponse<string>("Success");
+      }
+      catch (Exception e)
+      {
+        return new ApiResponse<string>(e.Message + e.InnerException?.Message + e.GetType().ToString());
+      }
+
     }
 
 
