@@ -1,10 +1,6 @@
-import { IApiSalePerUser } from './../../models/api/reports/sales';
 import { Component } from '@angular/core';
 import { ApiService } from '../../shared/services/api.service';
-import { ApiListComponent } from '../../models/component/list-api.component';
 import { ApiResponse } from '../../models/api';
-import { Router } from '@angular/router';
-import {MessageService} from 'primeng/api';
 import { BaseApiComponent } from '../../models/component';
 import { DomSanitizer } from '@angular/platform-browser';
 
