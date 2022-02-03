@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { matchOtherValidator } from '../../../shared/directive/math-validator';
 import { ApiService } from '../../../shared/services/api.service';
 import { ISUser } from './../../../models/manage';
-import { User } from './../../../models/manage/user';
+import { User, UserRoleName } from './../../../models/manage/user';
 
 export function nameValidator(items: ISUser[]): ValidatorFn {
   return (control: AbstractControl): any => {
@@ -33,10 +33,12 @@ export class UserComponent implements OnInit {
   pass: FormGroup;
   password: FormControl;
   confirmPassword: FormControl;
-  isAdmin: FormControl;
+  role: FormControl;
   userRoles = [
-    { label: 'Адміністратор', value: true },
-    { label: 'Продавець', value: false }
+    { label: 'Адміністратор', value: UserRoleName.admin },
+    { label: 'Помічник Адміністратора', value: UserRoleName.adminAssistant },
+    { label: 'Продавець', value: UserRoleName.user },
+    { label: 'Клієнт', value: UserRoleName.client }
   ];
 
   user: ISUser;
@@ -83,7 +85,7 @@ export class UserComponent implements OnInit {
       Validators.minLength(6),
       matchOtherValidator('password')
     ]);
-    this.isAdmin = new FormControl(this.userRoles[1].value, Validators.required);
+    this.role = new FormControl(this.userRoles[2].value, Validators.required);
   }
 
   showValue() {
@@ -102,7 +104,7 @@ export class UserComponent implements OnInit {
         password: this.password,
         confirmPassword: this.confirmPassword,
       }),
-      isAdmin: this.isAdmin
+      role: this.role
     });
   }
 
@@ -113,24 +115,25 @@ export class UserComponent implements OnInit {
       this.saveUser.emit(this.user);
     }
   }
-  createUser(val) {
-    if (!val) {
-      return;
-    } else {
-      let newUser = new User();
-      newUser.email = val.email;
-      newUser.login = val.login;
-      newUser.password = val.pass.password;
-      newUser.isActive = true;
-      newUser.isAdmin = val.isAdmin;
-      newUser.name = val.name;
-      newUser.surname = val.surName;
-      newUser.phone = val.phone;
-      newUser.notes = val.notes;
-      this.user = newUser;
-    }
+  createUser(val: any) {
+    if (!val) return;
+
+    const newUser = new User();
+    newUser.email = val.email;
+    newUser.login = val.login;
+    newUser.password = val.pass.password;
+    newUser.isActive = true;
+    newUser.isAdmin = val.role === UserRoleName.admin;
+    newUser.role = val.role;
+    newUser.name = val.name;
+    newUser.surname = val.surName;
+    newUser.phone = val.phone;
+    newUser.notes = val.notes;
+    this.user = newUser;
+
     return this.user;
   }
+
   closeDialog() {
     this.onCloseDialog.emit(false);
   }
@@ -150,7 +153,7 @@ export class UserComponent implements OnInit {
     return this.name.hasError('required') ? "І'мя не введено" : '';
   }
   getErrorPass() {
-    let regex = "a-z і A-Z, 0-9, #?!@$%^_+&*-";
+    const regex = "a-z і A-Z, 0-9, #?!@$%^_+&*-";
     return this.password.hasError('required') ? "Пароль не введено" :
       this.password.hasError('minlength') ? 'Мінімально 6 символів' :
         this.password.hasError('pattern') ? 'Пароль повинен містити ' + regex : '';

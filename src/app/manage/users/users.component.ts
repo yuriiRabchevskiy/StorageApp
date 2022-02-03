@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { PreferenceService } from '@app/shared/services/preference.service';
+import { UserService } from '@app/shared/services/user.service';
 import { MessageService } from 'primeng/api';
 import { ApiResponse } from '../../models/api';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { ApiService } from '../../shared/services/api.service';
 import { ISUser, IUserToEdit } from './../../models/manage';
+import { IUser, UserRoleName } from './../../models/manage/user';
 
 @Component({
   selector: 'app-users',
@@ -19,8 +21,18 @@ export class UsersComponent extends ApiListComponent<ISUser> {
   displayEditDialog: boolean = false;
   showConfirm: boolean = false;
 
-  constructor(private apiService: ApiService, public router: Router, notify: MessageService, preferences: PreferenceService) {
-    super(notify, preferences);
+  constructor(userService: UserService, private apiService: ApiService,
+    public router: Router, notify: MessageService, preferences: PreferenceService) {
+    super(userService, notify, preferences);
+  }
+
+  getUserRole(user: IUser) {
+    if (user.isAdmin) return 'Адміністратор';
+    switch (user.role) {
+      case UserRoleName.adminAssistant: return 'Помічник Адміністратора';
+      case UserRoleName.user: return 'Продавець';
+      default: return 'Клієнт';
+    }
   }
 
   onRowClick(user: ISUser) {
@@ -50,14 +62,14 @@ export class UsersComponent extends ApiListComponent<ISUser> {
 
 
   delete(val: ISUser) {
-    let deleteUser = val;
+    const deleteUser = val;
     this.work.showSpinner = true;
     this.apiService.deleteUser(deleteUser.id).subscribe(
       res => {
         this.work.showSpinner = false;
         if (res.success) {
           this.remove(deleteUser);
-          this.notifi.add(
+          this.notify.add(
             {
               severity: 'success',
               summary: 'Successfully',
@@ -67,7 +79,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
       },
       err => {
         this.work.showSpinner = false;
-        this.notifi.add(
+        this.notify.add(
           {
             severity: 'error',
             summary: 'Error',
@@ -81,12 +93,12 @@ export class UsersComponent extends ApiListComponent<ISUser> {
   }
 
   save(val: ISUser) {
-    let user = val;
+    const user = val;
     this.apiService.addUser(user).subscribe(
       res => {
         if (res.success) {
           user.id = res.item;
-          this.notifi.add(
+          this.notify.add(
             {
               severity: 'success',
               summary: 'Successfully',
@@ -95,7 +107,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
           this.add(user);
           this.selectedItem = user;
         } else {
-          this.notifi.add(
+          this.notify.add(
             {
               severity: 'error',
               summary: 'Error',
@@ -105,7 +117,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
         }
       },
       err => {
-        this.notifi.add(
+        this.notify.add(
           {
             severity: 'error',
             summary: 'Error',
@@ -117,12 +129,12 @@ export class UsersComponent extends ApiListComponent<ISUser> {
   }
 
   saveChange(val: IUserToEdit) {
-    let user = val;
+    const user = val;
     this.updateField(this.selectedItem, val);
     this.apiService.editUser(this.selectedItem.id, user).subscribe(
       res => {
         if (res.success) {
-          this.notifi.add(
+          this.notify.add(
             {
               severity: 'success',
               summary: 'Successfully',
@@ -131,7 +143,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
         }
       },
       err => {
-        this.notifi.add(
+        this.notify.add(
           {
             severity: 'error',
             summary: 'Error',
@@ -163,7 +175,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
     this.selectedItem = this.filteredData[0];
   }
 
-  //for update field in p-table
+  // for update field in p-table
   updateField(user: ISUser, val) {
     Object.keys(val).map(key => user[key] = val[key]);
   }

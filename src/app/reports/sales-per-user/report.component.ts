@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { PreferenceService } from '@app/shared/services/preference.service';
+import { UserService } from '@app/shared/services/user.service';
 import { MessageService } from 'primeng/api';
 import { ApiResponse } from '../../models/api';
 import { ApiListComponent } from '../../models/component/list-api.component';
@@ -28,12 +29,12 @@ export class SalesPerUsersComponent extends ApiListComponent<IApiSalePerUser> {
     return this._refreshData;
   }
   @Output() change: EventEmitter<boolean> = new EventEmitter<boolean>();
-  
+
   selectedItem: IApiSalePerUser;
   totals: IApiSalePerUser = <any>{};
 
-  constructor(private apiService: ApiService, public router: Router, notify: MessageService, preferences: PreferenceService) {
-    super(notify, preferences);
+  constructor(userService: UserService, private apiService: ApiService, public router: Router, notify: MessageService, preferences: PreferenceService) {
+    super(userService, notify, preferences);
   }
 
   doGetData() {

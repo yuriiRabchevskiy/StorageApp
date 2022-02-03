@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { UserService } from '@app/shared/services/user.service';
 import {MessageService} from 'primeng/api';
 import { SecuredComponent } from '../../models/component/base-api.component';
 import { IUser } from '../../models/manage/user';
@@ -25,9 +25,9 @@ export class AppSettingsComponent extends SecuredComponent implements OnInit {
   newPassword: FormControl;
   confirmPassword: FormControl;
 
-  constructor(private router: Router, private apiService: ApiService, notifi: MessageService,
+  constructor(userService: UserService, private apiService: ApiService, notify: MessageService,
     iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
-    super(notifi);
+    super(userService, notify);
     iconRegistry.addSvgIcon(
       'visibility',
       sanitizer.bypassSecurityTrustResourceUrl('assets/matSVG/visibility.svg'));
@@ -75,7 +75,7 @@ export class AppSettingsComponent extends SecuredComponent implements OnInit {
       this.apiService.changePassword(this.newPass).subscribe(
         res => {
           if (res.success) {
-            this.notifi.add(
+            this.notify.add(
               {
                 severity: 'success',
                 summary: 'Successfully',
@@ -84,7 +84,7 @@ export class AppSettingsComponent extends SecuredComponent implements OnInit {
           }
         },
         err => {
-          this.notifi.add(
+          this.notify.add(
             {
               severity: 'error',
               summary: 'Error',

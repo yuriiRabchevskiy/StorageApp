@@ -1,3 +1,4 @@
+import { UserService } from './../shared/services/user.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SecuredComponent } from '../models/component/base-api.component';
@@ -30,18 +31,18 @@ export class MainComponent extends SecuredComponent implements OnInit {
     return this.work.showSpinner;
   }
 
-  constructor(private router: Router, private apiService: ApiService, trackerService: TrackerService) {
-    super();
+  constructor(userService: UserService, private router: Router, private apiService: ApiService, trackerService: TrackerService) {
+    super(userService);
     const user = this.userService.getLocal();
     if (!user) return;
     this.canView = user.isAdmin;
     this.pages = [
       { title: 'Склад', url: 'storage', view: true },
-      { title: 'Продажі', url: 'orders', view: true },
+      { title: 'Продажі', url: 'orders', view: !this.isClient },
       { title: 'Продажі (Архів)', url: 'orders/archive', view: user.isAdmin },
       { title: 'Звіти', url: 'reports', view: user.isAdmin },
       { title: 'Користувачі', url: 'manage', view: user.isAdmin },
-      { title: 'Налаштування', url: 'settings', view: true }
+      { title: 'Налаштування', url: 'settings', view: !this.isClient }
     ];
     this.getCurrentUrl(this.router.url);
     this.work = new WorkProgress(() => this.apiService.logout(), (res) => this.onLogoutConfirmed(res), undefined);

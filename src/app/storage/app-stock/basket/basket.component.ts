@@ -3,9 +3,10 @@ import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core
 import { ApiService } from '../../../shared/services/api.service';
 import { ISaleOrder, IProdOrder, IWarehouse } from '../../../models/storage';
 import { ViewState } from '../../../shared/helpers/index';
-import {MessageService} from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { OrderEditorComponent } from '../../../controls/index';
 import { SecuredComponent } from '../../../models/component';
+import { UserService } from '@app/shared/services/user.service';
 
 @Component({
   selector: 'app-basket',
@@ -15,7 +16,7 @@ import { SecuredComponent } from '../../../models/component';
 
 export class BasketComponent extends SecuredComponent {
   view: ViewState = new ViewState();
-  @ViewChild('orderEditor', {static: true}) orderEditor: OrderEditorComponent;
+  @ViewChild('orderEditor', { static: true }) orderEditor: OrderEditorComponent;
   page: number = 1;
   pages: string[] = ['Список товарів', 'Персональні дані'];
   pageNames: string[] = this.pages;
@@ -47,12 +48,12 @@ export class BasketComponent extends SecuredComponent {
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() sale: EventEmitter<ISaleOrder> = new EventEmitter<ISaleOrder>();
   @Output() removeItem: EventEmitter<any> = new EventEmitter<any>();
-  constructor(private apiService: ApiService, notifi: MessageService) {
-    super(notifi);
+  constructor(userService: UserService, private apiService: ApiService, notify: MessageService) {
+    super(userService, notify);
   }
 
   getLocationName(id: number) {
-    let location = this.locations.find(i => i.id === id);
+    const location = this.locations.find(i => i.id === id);
     return location.name;
   }
 

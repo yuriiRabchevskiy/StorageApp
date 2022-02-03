@@ -1,3 +1,4 @@
+import { UserService } from './../../shared/services/user.service';
 import { Component } from '@angular/core';
 import { ApiService } from '../../shared/services/api.service';
 import { ApiResponse } from '../../models/api';
@@ -12,8 +13,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class OpenOrdersComponent extends BaseApiComponent<string> {
   data: any = 'Немає даних';
 
-  constructor(private apiService: ApiService, private sanitizer: DomSanitizer) {
-    super();
+  constructor(userService: UserService, private apiService: ApiService, private sanitizer: DomSanitizer) {
+    super(userService);
   }
 
   doGetData() {

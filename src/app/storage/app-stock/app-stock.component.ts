@@ -1,6 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { PreferenceService } from '@app/shared/services/preference.service';
+import { UserService } from '@app/shared/services/user.service';
 import { MessageService } from 'primeng/api';
 import { INDictionary } from '../../models';
 import { ApiResponse } from '../../models/api';
@@ -68,9 +69,9 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.filter();
   }
 
-  constructor(private apiService: ApiService, public router: Router, private tracker: TrackerService,
+  constructor(userService: UserService, private apiService: ApiService, public router: Router, private tracker: TrackerService,
     notify: MessageService, preferences: PreferenceService) {
-    super(notify, preferences);
+    super(userService, notify, preferences);
 
     this.tracker.productsCountChanged.on(this.onProductsCountChanged);
     this.selectedTab = this.tabs[0];
@@ -395,7 +396,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
       const product = this.data.find(it => it.id === change.productId);
       const current = product.balance[change.warehouseId];
       if (current !== change.oldCount && current !== change.newCount) {
-        this.notifi.add({
+        this.notify.add({
           severity: 'error',
           summary: 'Виникла розсинхронізація клієнта та сервера. Кількість товарів може не збігатися. Оновіть дані.',
           detail: `Продукт id: ${product.id}: ${product.productType} ${product.producer} - очікувалось ${change.oldCount}, а є ${current}`

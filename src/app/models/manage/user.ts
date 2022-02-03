@@ -1,11 +1,19 @@
+declare type UserRole = 'Admin' | 'AdminAssistant' | 'User' | 'Client';
+
+export class UserRoleName {
+    static admin: UserRole = 'Admin';
+    static adminAssistant: UserRole = 'AdminAssistant';
+    static user: UserRole = 'User';
+    static client: UserRole = 'Client';
+}
+
 export interface IUserToEdit {
     id: string;
     login: string;
     name: string;
     surname: string;
     phone: string;
-    isAdmin: boolean;
-    isAdminAssistant: boolean;
+    role: UserRole;
     notes?: string;
 }
 
@@ -15,19 +23,17 @@ export class UserToEdit implements IUserToEdit {
     name: string;
     surname: string;
     phone: string;
-    isAdmin: boolean;
-    isAdminAssistant: boolean;
     notes?: string;
+    role: UserRole;
 
-    public constructor(val) {
+    public constructor(val: ISUser) {
         this.id = val.id;
         this.login = val.login;
         this.name = val.name;
         this.surname = val.surname;
         this.phone = val.phone;
         this.notes = val.notes;
-        this.isAdmin = val.isAdmin;
-        this.isAdminAssistant = val.isAdminAssistant;
+        this.role = val.role;
     }
 }
 
@@ -42,14 +48,14 @@ export interface ISUser {
     password: string;
     isActive?: boolean;
     isAdmin: boolean;
-    isAdminAssistant: boolean;
+    role: UserRole;
 }
 
 export interface IUser {
     userName: string;
     token: string;
     isAdmin: boolean;
-    isAdminAssistant: boolean;
+    role: UserRole;
 }
 
 export class User implements ISUser {
@@ -64,7 +70,7 @@ export class User implements ISUser {
     password: string;
     isActive?: boolean = false;
     isAdmin: boolean = false;
-    isAdminAssistant: boolean = false;
+    role: UserRole = 'User';
 
     public constructor() { }
 }
