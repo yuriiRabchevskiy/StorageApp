@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { WorkProgress } from './work-progress';
 import { ListComponent } from './list.component';
 import { ApiResponse } from '../api';
+import { UserService } from '@app/shared/services/user.service';
 
 export interface ITableColumn {
     title: string;
@@ -23,8 +24,8 @@ export interface ITableColumn {
 export abstract class ApiListComponentBase<T, TCol> extends ListComponent<TCol> implements OnInit, AfterViewInit {
 
     work = new WorkProgress(() => this.doGetData(), (res) => this.onDataReceived(res), undefined);
-    constructor(notifi: MessageService) {
-        super(notifi);
+    constructor(userService: UserService, notify: MessageService) {
+        super(userService, notify);
     }
 
     ngOnInit() { }
@@ -64,8 +65,8 @@ export abstract class ApiListComponent<T> extends ApiListComponentBase<T, T> {
         return { 'flex-basis': `${column.width}px` };
     }
 
-    constructor(notify: MessageService, protected preferences: PreferenceService) {
-        super(notify);
+    constructor(userService: UserService, notify: MessageService, protected preferences: PreferenceService) {
+        super(userService, notify);
     }
 
     onDataReceived(res: ApiResponse<T>) {

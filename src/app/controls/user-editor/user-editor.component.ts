@@ -1,8 +1,8 @@
-import { ISUser, IUserToEdit, UserToEdit } from './../../models/manage';
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { ApiService } from '../../shared/services/api.service';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FormGroup, FormControl, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
+import { UserRoleName } from '@app/models/manage/user';
+import { ISUser, IUserToEdit, UserToEdit } from './../../models/manage';
 
 @Component({
   selector: 'app-user-editor',
@@ -17,17 +17,13 @@ export class UserEditorComponent implements OnInit {
   surname: FormControl;
   phone: FormControl;
   notes: FormControl;
-  isAdmin: FormControl;
-  isAdminAssistant: FormControl;
+  role: FormControl;
 
   userRoles = [
-    { label: 'Адміністратор', value: true },
-    { label: 'Продавець', value: false }
-  ];
-
-  userAssistantRoles = [
-    { label: 'Помічник Адміністратора', value: true },
-    { label: 'Продавець', value: false }
+    { label: 'Адміністратор', value: UserRoleName.admin },
+    { label: 'Помічник Адміністратора', value: UserRoleName.adminAssistant },
+    { label: 'Продавець', value: UserRoleName.user },
+    { label: 'Клієнт', value: UserRoleName.client }
   ];
 
   _user: ISUser;
@@ -44,7 +40,7 @@ export class UserEditorComponent implements OnInit {
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() saveChange: EventEmitter<IUserToEdit> = new EventEmitter<IUserToEdit>();
 
-  constructor(private apiService: ApiService, public router: Router) {
+  constructor(public router: Router) {
   }
 
   ngOnInit() {
@@ -58,8 +54,7 @@ export class UserEditorComponent implements OnInit {
     this.name = new FormControl(this.userToEdit.name);
     this.surname = new FormControl(this.userToEdit.surname);
     this.phone = new FormControl(this.userToEdit.phone);
-    this.isAdmin = new FormControl(this.userToEdit.isAdmin);
-    this.isAdminAssistant = new FormControl(this.userToEdit.isAdminAssistant);
+    this.role = new FormControl(this.userToEdit.role);
     this.notes = new FormControl(this.userToEdit.notes);
   }
 
@@ -69,17 +64,15 @@ export class UserEditorComponent implements OnInit {
       name: this.name,
       surname: this.surname,
       phone: this.phone,
-      isAdmin: this.isAdmin,
-      isAdminAssistant: this.isAdminAssistant,
+      role: this.role,
       notes: this.notes,
     });
   }
 
-  save(event) {
+  save(event: Event) {
     event.preventDefault();
-    if (this.userForm.valid) {
-      this.saveChange.emit(this.userForm.value);
-    }
+    if (!this.userForm.valid) return;
+    this.saveChange.emit(this.userForm.value);
   }
 
   closeDialog() {

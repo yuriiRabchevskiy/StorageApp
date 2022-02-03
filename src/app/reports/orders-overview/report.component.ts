@@ -4,8 +4,9 @@ import { ApiService } from '../../shared/services/api.service';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { ApiResponse } from '../../models/api';
 import { Router } from '@angular/router';
-import {MessageService} from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { PreferenceService } from '@app/shared/services/preference.service';
+import { UserService } from '@app/shared/services/user.service';
 
 @Component({
   selector: 'app-orders-overview',
@@ -31,8 +32,9 @@ export class OrdersOverviewComponent extends ApiListComponent<IApiOrdersOverview
   selectedItem: IApiOrdersOverview;
   totals: IApiOrdersOverview = <any>{};
 
-  constructor(private apiService: ApiService, public router: Router, notify: MessageService, preferences: PreferenceService) {
-    super(notify, preferences);
+  constructor(userService: UserService, private apiService: ApiService,
+    public router: Router, notify: MessageService, preferences: PreferenceService) {
+    super(userService, notify, preferences);
   }
 
   doGetData() {

@@ -1,9 +1,8 @@
+import { UserService } from './../../../shared/services/user.service';
 import { ICategory } from './../../../models/storage/categories';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { IProduct } from '../../../models/storage';
 import { SecuredComponent } from '../../../models/component/base-api.component';
-import { ApiService } from '../../../shared/services/api.service';
-import { FormControl, Validators } from '@angular/forms';
 
 export interface ISaveResult {
   product: IProduct;
@@ -59,8 +58,8 @@ export class ProductComponent extends SecuredComponent {
 
   @Output() saveProduct: EventEmitter<ISaveResult> = new EventEmitter<ISaveResult>();
 
-  constructor(private apiService: ApiService) {
-    super();
+  constructor(userService: UserService) {
+    super(userService);
   }
   createHeader(val) {
     if (!val.id && !val.categoryId) {
@@ -77,7 +76,7 @@ export class ProductComponent extends SecuredComponent {
       const id = this.selectedCategory || (this.categories[0] ? this.categories[0].id : 0);
       this.product.categoryId = id;
     }
-    this.saveProduct.emit({product: val, more: this.addNext, copy: this.addCopy });
+    this.saveProduct.emit({ product: val, more: this.addNext, copy: this.addCopy });
   }
 
   closeDialog() {

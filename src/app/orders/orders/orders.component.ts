@@ -1,6 +1,7 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { PreferenceService } from '@app/shared/services/preference.service';
+import { UserService } from '@app/shared/services/user.service';
 import { groupBy } from 'lodash';
 import * as moment from 'moment-mini';
 import { MessageService } from 'primeng/api';
@@ -123,9 +124,9 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
     itemsFormatted = [];
 
-    constructor(private apiService: ApiService, public router: Router, private tracker: TrackerService,
+    constructor(userService: UserService, private apiService: ApiService, public router: Router, private tracker: TrackerService,
         notify: MessageService, preferences: PreferenceService) {
-        super(notify, preferences);
+        super(userService, notify, preferences);
 
 
         this.tracker.orderChanged.on(this.onOrdersChanged);

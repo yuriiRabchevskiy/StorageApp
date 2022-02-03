@@ -1,10 +1,11 @@
+import { UserService } from './../../shared/services/user.service';
 import { IApiSale } from './../../models/api/reports/sales';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ApiService } from '../../shared/services/api.service';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { ApiResponse } from '../../models/api';
 import { Router } from '@angular/router';
-import {MessageService} from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { PreferenceService } from '@app/shared/services/preference.service';
 
 @Component({
@@ -31,8 +32,9 @@ export class SalesPerProductComponent extends ApiListComponent<IApiSale> {
   selectedItem: IApiSale;
   totals: IApiSale = <any>{};
 
-  constructor(private apiService: ApiService, public router: Router, notify: MessageService, preferences: PreferenceService) {
-    super(notify, preferences);
+  constructor(userService: UserService, private apiService: ApiService,
+    public router: Router, notify: MessageService, preferences: PreferenceService) {
+    super(userService, notify, preferences);
   }
 
   doGetData() {

@@ -8,12 +8,12 @@
                     <mat-error *ngIf="login.errors && (login.dirty || login.touched)">{{getErrorLogin()}}</mat-error>
                 </mat-form-field>
                 <mat-form-field class="s-input-wrapper">
-                    <mat-select placeholder="Роль" formControlName="isAdmin" required>
+                    <mat-select placeholder="Роль" formControlName="role" required>
                         <mat-option *ngFor="let rol of userRoles" [value]="rol.value">
                             {{rol.label}}
                         </mat-option>
                     </mat-select>
-                    <mat-error *ngIf="isAdmin.errors && (isAdmin.dirty || isAdmin.touched)">Роль не вибрано</mat-error>
+                    <mat-error *ngIf="role.errors && (role.dirty || role.touched)">Роль не вибрано</mat-error>
                 </mat-form-field>
             </div>
             <div class="flex-row flex-wrap" >

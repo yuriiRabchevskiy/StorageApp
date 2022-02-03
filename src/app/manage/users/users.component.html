@@ -73,8 +73,9 @@
                 <td>{{rowData.surname}}</td>
                 <td>{{rowData.phone}}</td>
 
-                <td>{{rowData.isAdmin ? 'Адміністратор' : rowData.isAdminAssistant ? 'Помічник Адміністратора' :
-                    'Продавець'}}
+                <td>
+                    {{ getUserRole(rowData) }}
+
                 </td>
 
                 <td>{{rowData.notes}}</td>
@@ -84,9 +85,11 @@
 </div>
 <app-spinner *ngIf="showSpinner"></app-spinner>
 <app-user [userList]="filteredData" *ngIf="displayDialog" (onCloseDialog)="closeDialog($event)"
-    (saveUser)="save($event)"></app-user>
+    (saveUser)="save($event)">
+</app-user>
 <app-user-editor *ngIf="displayEditDialog" [user]="selectedItem" (onCloseDialog)="closeDialog($event)"
-    (saveChange)="saveChange($event)"></app-user-editor>
+    (saveChange)="saveChange($event)">
+</app-user-editor>
 <app-confirm (confirm)="confirmDelete($event)" *ngIf="showConfirm">
     <span header class="confirm-title">Ви впевнені, що бажаєте видалити користувача:
         <b>{{selectedItem.name}}</b>

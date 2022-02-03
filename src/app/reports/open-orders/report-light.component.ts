@@ -1,12 +1,9 @@
-import { IApiSalePerUser } from './../../models/api/reports/sales';
 import { Component } from '@angular/core';
-import { ApiService } from '../../shared/services/api.service';
-import { ApiListComponent } from '../../models/component/list-api.component';
-import { ApiResponse } from '../../models/api';
-import { Router } from '@angular/router';
-import {MessageService} from 'primeng/api';
-import { BaseApiComponent } from '../../models/component';
 import { DomSanitizer } from '@angular/platform-browser';
+import { UserService } from '@app/shared/services/user.service';
+import { ApiResponse } from '../../models/api';
+import { BaseApiComponent } from '../../models/component';
+import { ApiService } from '../../shared/services/api.service';
 
 @Component({
   selector: 'app-open-orders-light',
@@ -16,8 +13,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class OpenOrdersLightComponent extends BaseApiComponent<string> {
   data: any = 'Немає даних';
 
-  constructor(private apiService: ApiService, private sanitizer: DomSanitizer) {
-    super();
+  constructor(userService: UserService, private apiService: ApiService, private sanitizer: DomSanitizer) {
+    super(userService);
   }
 
   doGetData() {

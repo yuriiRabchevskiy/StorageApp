@@ -11,6 +11,7 @@ import { ApiResponse } from '@app/models/api/api/api';
 import { PreferenceService } from '@app/shared/services/preference.service';
 import { ITableColumn } from '@app/models/component/list-api.component';
 import { groupBy } from 'lodash';
+import { UserService } from '@app/shared/services/user.service';
 
 interface IDoubleClick {
   date?: number;
@@ -71,8 +72,8 @@ export class ArchiveComponent extends ApiListComponent<IOrder> {
     { title: 'Сума', field: 'totalPrice', width: 80 },
   ];
 
-  constructor(private apiService: ApiService, notify: MessageService, preferences: PreferenceService) {
-    super(notify, preferences);
+  constructor(userService: UserService, private apiService: ApiService, notify: MessageService, preferences: PreferenceService) {
+    super(userService, notify, preferences);
 
     const date = new Date(Date.now());
     this.archiveFrom = new Date(date.getFullYear(), date.getMonth() - 3, 1);

@@ -1,27 +1,24 @@
+import { Directive } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Observable } from 'rxjs';
-import { ReflectiveInjector, Directive } from '@angular/core';
-
-import { WorkProgress } from './work-progress';
-import { ApiResponse, IApiErrorInfo } from '../api';
-import { UserService } from '../../shared/services/user.service';
 import { ViewState } from '../../shared/helpers';
-
+import { ApiResponse, IApiErrorInfo } from '../api';
+import { UserService } from './../../shared/services/user.service';
+import { WorkProgress } from './work-progress';
 
 export abstract class SecuredComponent {
   public view: ViewState = new ViewState();
   public canView: boolean;
   public canEdit: boolean = false;
   public isAdminAssistant: boolean = false;
-  public userService: UserService;
+  public isClient: boolean = false;
 
-  constructor(protected notifi?: MessageService) {
-    const injector = ReflectiveInjector.resolveAndCreate([UserService]);
-    this.userService = injector.get(UserService);
+  constructor(public userService: UserService, protected notify?: MessageService) {
 
     const user = this.userService.getLocal();
     if (!user) return;
-    this.isAdminAssistant = user.isAdminAssistant;
+    this.isAdminAssistant = user.role === 'AdminAssistant';
+    this.isClient = user.role === 'Client';
     this.canView = user.isAdmin;
     this.canEdit = user.isAdmin;
   }
@@ -33,7 +30,7 @@ export abstract class SecuredComponent {
   }
 
   showInfoMessage(message: string) {
-    this.notifi.add(
+    this.notify.add(
       {
         severity: 'info',
         summary: 'Інформація',
@@ -42,7 +39,7 @@ export abstract class SecuredComponent {
   }
 
   showSuccessMessage(message: string) {
-    this.notifi.add(
+    this.notify.add(
       {
         severity: 'success',
         summary: 'Успіх!',
@@ -52,7 +49,7 @@ export abstract class SecuredComponent {
 
   showApiErrorMessage(summary: string, errors: IApiErrorInfo[]) {
     const message = errors.map(it => `${it.field}: ${it.message}\n`).reduce((text, line) => text += line, '');
-    this.notifi.add(
+    this.notify.add(
       {
         severity: 'error',
         summary: summary,
@@ -61,7 +58,7 @@ export abstract class SecuredComponent {
   }
 
   showWebErrorMessage(summary: string, error: string) {
-    this.notifi.add(
+    this.notify.add(
       {
         severity: 'error',
         summary: summary,
@@ -80,8 +77,8 @@ export abstract class BaseApiComponent<T> extends SecuredComponent {
     return this.work.showSpinner;
   }
 
-  constructor() {
-    super();
+  constructor(userService: UserService) {
+    super(userService);
     this.work = new WorkProgress(() => this.doGetData(), (res) => this.onDataReceived(res), undefined);
   }
 
