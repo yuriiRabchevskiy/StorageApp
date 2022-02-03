@@ -2,6 +2,7 @@ using DataAccess.Repository;
 using Microsoft.AspNetCore.Mvc;
 using SharedDataContracts.Api.Response;
 using BusinessLogic.Models.Api;
+using BusinessLogic.Models.User;
 using Microsoft.AspNetCore.Identity;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +24,7 @@ namespace Storage.Controllers
 
     // GET api/values
     [HttpGet]
+    [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}, {UserRole.Client}")]
     public ApiResponse<ApiCategory> Get()
     {
       return new ApiResponse<ApiCategory>(_repo.Get());
@@ -31,6 +33,7 @@ namespace Storage.Controllers
 
     // POST api/values
     [HttpPost]
+    [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
     public ApiResponseBase Post([FromBody] ApiCategory product)
     {
       _repo.Update(product);
@@ -39,6 +42,7 @@ namespace Storage.Controllers
 
     // PUT api/values/5
     [HttpPut]
+    [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
     public ApiResponseBase Put([FromBody] ApiCategory product)
     {
       _repo.Add(product);
@@ -47,6 +51,7 @@ namespace Storage.Controllers
 
     // DELETE api/values/5
     [HttpDelete("{id}")]
+    [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
     public ApiResponseBase Delete(int id)
     {
       _repo.Delete(id);

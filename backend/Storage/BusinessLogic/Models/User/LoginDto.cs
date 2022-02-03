@@ -1,13 +1,29 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace BusinessLogic.Models.User
 {
+
   public static class UserRole
   {
-    public const string Admin = "Admin";
+    public const string Admin = nameof(Admin);
     public const string AdminAssistant = nameof(AdminAssistant);
-    public const string User = "User";
+    public const string User = nameof(User);
+    public const string Client = nameof(Client);
+
+    public static List<string> SupportedRoles = new List<string>(new[]
+    {
+      Admin, Client, AdminAssistant, User
+    });
+
+    public static bool IsSupportedRole(string role)
+    {
+      return SupportedRoles.Contains(role);
+    }
   }
+
+
+
 
   public class LoginDto
   {
@@ -32,7 +48,7 @@ namespace BusinessLogic.Models.User
     public string Surname { get; set; }
     public string Phone { get; set; }
     public bool IsAdmin { get; set; } = false;
-    public bool IsAdminAssistant { get; set; } = false;
+    public string Role { get; set; } = User.UserRole.User;
   }
 
   public class RegisterDto : UserDto
@@ -47,7 +63,7 @@ namespace BusinessLogic.Models.User
     public string Token { get; set; }
     public string UserName { get; set; }
     public bool IsAdmin { get; set; } = false;
-    public bool IsAdminAssistant { get; set; } = false;
+    public string Role { get; set; } = User.UserRole.User;
   }
 
   public class ForgotPasswordModel
@@ -57,8 +73,8 @@ namespace BusinessLogic.Models.User
 
   public class ChangePasswordModel
   {
-    public string CurrentPassword;
-    public string NewPassword;
+    public string CurrentPassword { get; set; }
+    public string NewPassword { get; set; }
   }
 
 

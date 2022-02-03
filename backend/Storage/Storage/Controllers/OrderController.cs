@@ -18,6 +18,7 @@ namespace Storage.Controllers
 {
   [Route("api/[controller]")]
   [Authorize]
+  [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
   public class OrderController : Controller
   {
     private IOrdersRepository _repo;
@@ -88,7 +89,6 @@ namespace Storage.Controllers
     }
 
     [HttpPost("reject/{id}")]
-    // [Authorize(Roles = "RequireAdminOrAssistant")]
     [Authorize(Roles = "AdminAssistant, Admin")]
     public async Task<ApiResponse<bool>> CancelOrder(int id, [FromBody] ApiOrderCancel model)
     {
