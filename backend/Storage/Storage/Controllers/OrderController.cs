@@ -5,19 +5,15 @@ using SharedDataContracts.Api.Response;
 using BusinessLogic.Models.Api;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
-using BusinessLogic.Abstractions;
 using BusinessLogic.Helpers;
-using BusinessLogic.Models.Api.State;
 using BusinessLogic.Models.User;
 using BusinessLogic.Repository;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.VisualBasic;
 
 namespace Storage.Controllers
 {
   [Route("api/[controller]")]
-  [Authorize]
   [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
   public class OrderController : Controller
   {
