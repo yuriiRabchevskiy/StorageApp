@@ -47,12 +47,14 @@ namespace Storage.Controllers
       {
         var appUser = _userManager.Users.SingleOrDefault(r => (r.UserName ?? "").ToLower() == (model.Login ?? "").ToLower());
         if (!appUser.IsActive) throw new AuthenticationException("User is deactivated");
+
+        var userRoles = await _userManager.GetRolesAsync(appUser).ConfigureAwait(false);
         var response = new ApiResponse<LoginResult>(new LoginResult
         {
           Token = generateJwtToken(model.Login, appUser),
           UserName = appUser.UserName,
           IsAdmin = await _userManager.IsInRoleAsync(appUser, UserRole.Admin).ConfigureAwait(false),
-          IsAdminAssistant = await _userManager.IsInRoleAsync(appUser, UserRole.AdminAssistant).ConfigureAwait(false),
+          Role = userRoles.FirstOrDefault(),
         });
         return response;
       }

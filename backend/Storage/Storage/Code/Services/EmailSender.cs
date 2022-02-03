@@ -1,9 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using Storage.Services;
 
 namespace Storage.Code.Services
 {
@@ -34,7 +32,7 @@ namespace Storage.Code.Services
       var client = new SendGridClient(apiKey);
       var msg = new SendGridMessage
       {
-        From = new EmailAddress("zakupol.no.replay@gmail.com", "Zakupol Storage"),
+        From = new EmailAddress("sweetkeys.no.replay@gmail.com", "Sweetkeys"),
         Subject = subject,
         PlainTextContent = message,
         HtmlContent = message

@@ -1,4 +1,3 @@
-using BusinessLogic.Helpers;
 using BusinessLogic.Models.User;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Identity;
@@ -22,11 +21,6 @@ namespace Storage.Controllers.Reports
     protected Task<bool> GetIsAdminAsync(ApplicationUser user)
     {
       return _userManager.IsInRoleAsync(user, UserRole.Admin);
-    }
-
-    protected Task<bool> GetIsAdminAssistantAsync(ApplicationUser user)
-    {
-      return _userManager.IsInRoleAsync(user, UserRole.AdminAssistant);
     }
   }
 }

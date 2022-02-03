@@ -47,16 +47,14 @@ namespace BusinessLogic.Repository
 
   public List<ApiWarehouse> Get()
   {
-    using (var context = _di.GetService<ApplicationDbContext>())
-    {
-      return context.Warehouses.Where(it => it.IsActive).ToList().Select(_mapper.Map<ApiWarehouse>).ToList();
-    }
+    using var context = _di.GetService<ApplicationDbContext>();
+    return context.Warehouses.Where(it => it.IsActive).ToList().Select(_mapper.Map<ApiWarehouse>).ToList();
   }
 
   public int Add(ApiWarehouse api)
   {
     var it = _mapper.Map<Warehouse>(api);
-    using (var context = _di.GetService<ApplicationDbContext>())
+    using (var context = _di.GetRequiredService<ApplicationDbContext>())
     {
       it.IsActive = true;
       context.Warehouses.Add(it);
@@ -67,87 +65,79 @@ namespace BusinessLogic.Repository
 
   public void Update(ApiWarehouse it)
   {
-    using (var context = _di.GetService<ApplicationDbContext>())
+    using var context = _di.GetService<ApplicationDbContext>();
+    var real = context.Warehouses.Find(it.Id);
+    if (real != null)
     {
-      var real = context.Warehouses.Find(it.Id);
-      if (real != null)
-      {
-        real.Address = it.Address;
-        real.Description = it.Description;
-        real.Name = real.Name;
-      }
-      context.SaveChanges();
+      real.Address = it.Address;
+      real.Description = it.Description;
+      real.Name = real.Name;
     }
+    context.SaveChanges();
   }
 
   public void Delete(int id)
   {
-    using (var context = _di.GetService<ApplicationDbContext>())
-    {
-      var product = context.Warehouses.Find(id);
-      if (product == null) return;
-      product.IsActive = false;
-      context.SaveChanges();
-    }
+    using var context = _di.GetService<ApplicationDbContext>();
+    var product = context.Warehouses.Find(id);
+    if (product == null) return;
+    product.IsActive = false;
+    context.SaveChanges();
   }
 
   public void TransferProduct(string userId, int productId, ApiProdTransfer info)
   {
-    using (var context = _di.GetService<ApplicationDbContext>())
+    using var context = _di.GetService<ApplicationDbContext>();
+    var from = getStockAndVerify(productId, info, context);
+
+    using var transaction = context.Database.BeginTransaction();
+    try
     {
-      var from = getStockAndVerify(productId, info, context);
-
-      using (var transaction = context.Database.BeginTransaction())
+      var to = context.WarehouseProducts.FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.ToId);
+      if (to == null)
       {
-        try
-        {
-          var to = context.WarehouseProducts.FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.ToId);
-          if (to == null)
-          {
-            to = new WarehouseProducts() { ProductId = productId, WarehouseId = info.ToId, Quantity = 0 };
-            context.WarehouseProducts.Add(to);
-          }
-
-          to.Quantity += info.Quantity;
-          context.SaveChanges();
-
-          var date = DateTime.UtcNow;
-          context.ProductsTrqansactions.Add(new ProductAction
-          {
-            ProductId = productId,
-            Quantity = -info.Quantity,
-            WarehouseId = info.FromId,
-            UserId = userId,
-            Date = date,
-            Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Зменшення)",
-            Operation = OperationDescription.TransferRemove,
-            Price = 0,
-          });
-          context.SaveChanges();
-
-          context.ProductsTrqansactions.Add(new ProductAction()
-          {
-            ProductId = productId,
-            Quantity = info.Quantity,
-            WarehouseId = info.ToId,
-            UserId = userId,
-            Date = date,
-            Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Збільшення)",
-            Operation = OperationDescription.TransferAdd,
-            Price = 0,
-          });
-          context.SaveChanges();
-
-          // Commit transaction if all commands succeed, transaction will auto-rollback
-          // when disposed if either commands fails
-          transaction.Commit();
-        }
-        catch (Exception ex)
-        {
-          // TODO: Handle failure
-          throw ex;
-        }
+        to = new WarehouseProducts() { ProductId = productId, WarehouseId = info.ToId, Quantity = 0 };
+        context.WarehouseProducts.Add(to);
       }
+
+      to.Quantity += info.Quantity;
+      context.SaveChanges();
+
+      var date = DateTime.UtcNow;
+      context.ProductsTrqansactions.Add(new ProductAction
+      {
+        ProductId = productId,
+        Quantity = -info.Quantity,
+        WarehouseId = info.FromId,
+        UserId = userId,
+        Date = date,
+        Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Зменшення)",
+        Operation = OperationDescription.TransferRemove,
+        Price = 0,
+      });
+      context.SaveChanges();
+
+      context.ProductsTrqansactions.Add(new ProductAction()
+      {
+        ProductId = productId,
+        Quantity = info.Quantity,
+        WarehouseId = info.ToId,
+        UserId = userId,
+        Date = date,
+        Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Збільшення)",
+        Operation = OperationDescription.TransferAdd,
+        Price = 0,
+      });
+      context.SaveChanges();
+
+      // Commit transaction if all commands succeed, transaction will auto-rollback
+      // when disposed if either commands fails
+      transaction.Commit();
+    }
+    catch (Exception ex)
+    {
+      // TODO: Handle failure
+      throw ex;
     }
   }
 
@@ -158,9 +148,9 @@ namespace BusinessLogic.Repository
     await _semaphoreSlim.WaitAsync();
     try
     {
-      using (var context = _di.GetService<ApplicationDbContext>())
+      await using (var context = _di.GetService<ApplicationDbContext>())
       {
-        using (var transaction = context.Database.BeginTransaction(IsolationLevel.ReadCommitted))
+        await using (var transaction = context.Database.BeginTransaction(IsolationLevel.ReadCommitted))
         {
           var date = DateTime.UtcNow;
           var order = _mapper.Map<Order>(oi);
@@ -215,9 +205,9 @@ namespace BusinessLogic.Repository
   {
     var changesNotes = new List<ApiProdCountChange>();
 
-    using (var context = _di.GetService<ApplicationDbContext>())
+    await using (var context = _di.GetService<ApplicationDbContext>())
     {
-      using (var transaction = context.Database.BeginTransaction())
+      await using (var transaction = context.Database.BeginTransaction())
       {
         var order = await context.Orders.Include(it => it.Transactions)
           .FirstOrDefaultAsync(it => it.Id == id).ConfigureAwait(false);
@@ -277,40 +267,36 @@ namespace BusinessLogic.Repository
 
   public void RemoveProduct(string userId, int productId, ApiProdAction info)
   {
-    using (var context = _di.GetService<ApplicationDbContext>())
+    using var context = _di.GetService<ApplicationDbContext>();
+    var from = getStockAndVerify(productId, info, context);
+
+    using var transaction = context.Database.BeginTransaction();
+    try
     {
-      var from = getStockAndVerify(productId, info, context);
 
-      using (var transaction = context.Database.BeginTransaction())
+      var date = DateTime.UtcNow;
+      var action = new ProductAction()
       {
-        try
-        {
+        ProductId = productId,
+        Quantity = -info.Quantity,
+        WarehouseId = info.FromId,
+        Description = info.Description,
+        UserId = userId,
+        Date = date,
+        Operation = OperationDescription.Delete
+      };
+      context.ProductsTrqansactions.Add(action);
+      context.SaveChanges();
 
-          var date = DateTime.UtcNow;
-          var action = new ProductAction()
-          {
-            ProductId = productId,
-            Quantity = -info.Quantity,
-            WarehouseId = info.FromId,
-            Description = info.Description,
-            UserId = userId,
-            Date = date,
-            Operation = OperationDescription.Delete
-          };
-          context.ProductsTrqansactions.Add(action);
-          context.SaveChanges();
-
-          // Commit transaction if all commands succeed,
-          // transaction will auto-rollback when disposed if either commands fails
-          transaction.Commit();
-        }
-        catch (Exception ex)
-        {
-          Console.WriteLine(ex.ToString());
-          // TODO: Handle failure
-          throw;
-        }
-      }
+      // Commit transaction if all commands succeed,
+      // transaction will auto-rollback when disposed if either commands fails
+      transaction.Commit();
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine(ex.ToString());
+      // TODO: Handle failure
+      throw;
     }
   }
 

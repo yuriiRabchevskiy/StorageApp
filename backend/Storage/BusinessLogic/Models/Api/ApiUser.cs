@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using BusinessLogic.Models.User;
 
 namespace BusinessLogic.Models.Api
 {
@@ -16,7 +17,7 @@ namespace BusinessLogic.Models.Api
     public string Password { get; set; }
     public bool IsActive { get; set; }
     public bool IsAdmin { get; set; }
-    public bool IsAdminAssistant { get; set; }
-    
+    public string Role { get; set; } = User.UserRole.User;
+
   }
 }
