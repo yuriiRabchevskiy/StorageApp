@@ -10,7 +10,7 @@ namespace Storage.Controllers
   [Route("api/[controller]")]
   public class WarehouseController
     {
-    private IWarehouseRepository _repo;
+    private readonly IWarehouseRepository _repo;
     public WarehouseController(IWarehouseRepository repo)
     {
       _repo = repo;

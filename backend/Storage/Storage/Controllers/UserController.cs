@@ -19,7 +19,6 @@ namespace Storage.Controllers
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IEmailSender _emailSender;
     private readonly IMapper _mapper;
-    Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
     public UserController(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IMapper mapper)
     {
@@ -95,9 +94,18 @@ namespace Storage.Controllers
         await _userManager.AddToRoleAsync(user, UserRole.User);
       }
 
-      var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-      var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
-      await _emailSender.SendEmailAsync(model.Email, "Підтвердження аккаунту", $"Будьласка підтвердіть ваш аккаунт перейшовши за посиланням: <a href='{callbackUrl}'>посилання</a>");
+      try
+      {
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(false);
+      }
+      catch
+      {
+        // optional feature
+      }
+
+      //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
+      //await _emailSender.SendEmailAsync(model.Email, "Підтвердження аккаунту", $"Будь ласка підтвердіть ваш аккаунт перейшовши за посиланням: <a href='{callbackUrl}'>посилання</a>");
 
       return new ApiResponseBase();
     }
