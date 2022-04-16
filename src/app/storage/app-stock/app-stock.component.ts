@@ -339,6 +339,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   showSellDialog() {
+    if (this.isClient) return;
     this.sellDialog = true;
     const newSell = new Sell(this.selectedItem.recommendedSalePrice);
     newSell.idProduct = this.selectedItem.id;

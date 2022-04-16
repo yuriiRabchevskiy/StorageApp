@@ -32,13 +32,14 @@ namespace BusinessLogic.Repository.Reports
     {
 
       List<ApiOrder> orders;
-      using (var context = _di.GetService<ApplicationDbContext>())
+      await using (var context = _di.GetRequiredService<ApplicationDbContext>())
       {
         var data = await context.Orders
         .Where(it => isAdmin || it.ResponsibleUserId == userId)
         .Where(it => from <= it.OpenDate && it.OpenDate <= till)
         .Include(ord => ord.ResponsibleUser)
-        .Include(ord => ord.Transactions).ThenInclude(y => y.Product).ToListAsync().ConfigureAwait(false);
+        .Include(ord => ord.Transactions).ThenInclude(y => y.Product)
+        .AsNoTracking().ToListAsync().ConfigureAwait(false);
 
         orders = data.ToApi(_mapper);
 
@@ -47,8 +48,8 @@ namespace BusinessLogic.Repository.Reports
       var res = orders.GroupBy(it => it.Seller).Select(it =>
       {
         var canceled = it.Where(order => order.Status == OrderStatus.Canceled).ToList();
-        var closed = it.Where(order => order.Status == OrderStatus.Closed).ToList();
-        var open = it.Where(order => order.Status == OrderStatus.Open || order.Status == OrderStatus.Processing).ToList();
+        var closed = it.Where(order => order.Status == OrderStatus.Delivered).ToList();
+        var open = it.Where(order => order.Status != OrderStatus.Canceled && order.Status != OrderStatus.Delivered).ToList();
 
         return new ApiOrdersOverview
         {

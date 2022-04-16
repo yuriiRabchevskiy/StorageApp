@@ -26,13 +26,16 @@ export class OrderEditorComponent implements OnInit {
   @Input() item: IOrder = { id: 0 };
   @Input() canEdit: boolean;
 
-  payments = [{ label: 'Оплачено', value: PaymentKind.payed },
-  { label: 'Наложений платіж', value: PaymentKind.cashOnDelivery }
+  payments = [
+    { label: 'Оплачено', value: PaymentKind.payed },
+    { label: 'Наложений платіж', value: PaymentKind.cashOnDelivery }
   ];
 
-  statuses = [{ label: 'Прийнятий', value: OrderStatus.Open },
-  { label: 'Відправлений', value: OrderStatus.Processing },
-  { label: 'Отриманий', value: OrderStatus.Closed },
+  statuses = [
+    { label: 'Прийнятий', value: OrderStatus.Open },
+    { label: 'Комплектується', value: OrderStatus.Processing },
+    { label: 'Відправлений', value: OrderStatus.Shipping },
+    { label: 'Отриманий', value: OrderStatus.Delivered },
     // { label: 'Відмінений', value: OrderStatus.Canceled }
   ];
 

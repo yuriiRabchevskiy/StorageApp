@@ -1,7 +1,7 @@
 import { ISell } from './sell';
 import { IProduct } from './products';
 
-export enum OrderStatus { Open = 0, Closed = 1, Processing = 2, Canceled = 3 }
+export enum OrderStatus { Open = 0, Delivered = 1, Shipping = 2, Canceled = 3, Processing = 4 }
 export enum PaymentKind { payed = 0, cashOnDelivery = 1 }
 
 export interface IOrder {

@@ -8,9 +8,9 @@
             Завантажую історію...
         </div>
 
-        <p-table *ngIf="orderHistory && orderHistory.length" class="prime-table" [value]="diffs" [paginator]="true" [rowsPerPageOptions]="[10,5,3]" [pageLinks]="4"
-            [rows]="10" [responsive]="false" scrollable="true" scrollWidth="100%" scrollHeight="100%" dataKey="id" #dt
-            selectionMode="single">
+        <p-table *ngIf="orderHistory && orderHistory.length" class="prime-table" [value]="diffs" [paginator]="true"
+            [rowsPerPageOptions]="[10,5,3]" [pageLinks]="4" [rows]="10" [responsive]="false" scrollWidth="100%"
+            scrollHeight="100%" dataKey="id" #dt [scrollable]="false" selectionMode="single">
 
             <ng-template pTemplate="colgroup">
                 <colgroup>

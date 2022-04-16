@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using DataAccess.Models;
 using BusinessLogic.Models.Api;
 using BusinessLogic.Abstractions;
@@ -11,7 +10,6 @@ using BusinessLogic.Helpers;
 using BusinessLogic.Models.Api.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace DataAccess.Repository
@@ -57,7 +55,7 @@ namespace DataAccess.Repository
       await using var context = _di.GetService<ApplicationDbContext>();
       // Where(it => isAdmin || it.ResponsibleUserId == userId)f
       var query = context.Orders
-        .Where(it => it.Status == OrderStatus.Closed && it.OpenDate >= @from && it.OpenDate <= till)
+        .Where(it => it.Status == OrderStatus.Delivered && it.OpenDate >= @from && it.OpenDate <= till)
         .Include(ord => ord.ResponsibleUser)
         .Include(ord => ord.Transactions)
         .ThenInclude(y => y.Product);
@@ -67,7 +65,7 @@ namespace DataAccess.Repository
 
     public async Task<IReadOnlyCollection<ApiOrderAction>> GetOrderHistoryAsync(string userId, bool isAdmin, int orderId)
     {
-      using var context = _di.GetService<ApplicationDbContext>();
+      await using var context = _di.GetService<ApplicationDbContext>();
       // Where(it => isAdmin || it.ResponsibleUserId == userId)
 
       var query = context.OrderAction.AsNoTracking().Include(it => it.User).Where(it => it.OrderId == orderId);
@@ -98,8 +96,8 @@ namespace DataAccess.Repository
 
     public async Task UpdateAsync(string userId, bool isAdmin, ApiOrder it)
     {
-      using var context = _di.GetService<ApplicationDbContext>();
-      var order = context.Orders.Find(it.Id);
+      await using var context = _di.GetRequiredService<ApplicationDbContext>();
+      var order = await context.Orders.FindAsync(it.Id);
 
       if (order != null)
       {
@@ -111,7 +109,7 @@ namespace DataAccess.Repository
         order.Other = it.Other;
         order.Status = it.Status ?? OrderStatus.Open;
         order.Payment = it.Payment;
-        if (it.Status == OrderStatus.Closed && order.CloseDate == null) order.CloseDate = DateTime.UtcNow;
+        if (it.Status == OrderStatus.Delivered && order.CloseDate == null) order.CloseDate = DateTime.UtcNow;
         if (it.Status == OrderStatus.Canceled && order.CanceledDate == null)
         {
           order.CanceledDate = DateTime.UtcNow;
@@ -125,7 +123,7 @@ namespace DataAccess.Repository
           switch (order.Status)
           {
             case OrderStatus.Canceled: operation = OrderOperation.Canceled; break;
-            case OrderStatus.Closed: operation = OrderOperation.Closed; break;
+            case OrderStatus.Delivered: operation = OrderOperation.Closed; break;
             default: operation = OrderOperation.Updated; break;
           }
         }

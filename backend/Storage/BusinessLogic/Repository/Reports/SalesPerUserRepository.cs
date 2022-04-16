@@ -32,14 +32,15 @@ namespace BusinessLogic.Repository.Reports
     public async Task<IEnumerable<ApiSalePerUser>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
       List<ApiOrder> orders;
-      using (var context = _di.GetService<ApplicationDbContext>())
+      await using (var context = _di.GetService<ApplicationDbContext>())
       {
         var data = await context.Orders
           .Where(it => isAdmin || it.ResponsibleUserId == userId)
-          .Where(it => it.Status == OrderStatus.Closed)
+          .Where(it => it.Status == OrderStatus.Delivered)
           .Where(it => from <= it.OpenDate && it.OpenDate <= till)
           .Include(ord => ord.ResponsibleUser)
-          .Include(ord => ord.Transactions).ThenInclude(y => y.Product).ToListAsync().ConfigureAwait(false);
+          .Include(ord => ord.Transactions).ThenInclude(y => y.Product)
+          .AsNoTracking().ToListAsync().ConfigureAwait(false);
         orders = data.ToApi(_mapper);
       }
 
