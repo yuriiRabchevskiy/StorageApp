@@ -43,172 +43,170 @@ namespace BusinessLogic.Repository
     {
       _di = serviceProvider;
       _mapper = mapper;
-  }
-
-  public List<ApiWarehouse> Get()
-  {
-    using var context = _di.GetService<ApplicationDbContext>();
-    return context.Warehouses.Where(it => it.IsActive).ToList().Select(_mapper.Map<ApiWarehouse>).ToList();
-  }
-
-  public int Add(ApiWarehouse api)
-  {
-    var it = _mapper.Map<Warehouse>(api);
-    using (var context = _di.GetRequiredService<ApplicationDbContext>())
-    {
-      it.IsActive = true;
-      context.Warehouses.Add(it);
-      context.SaveChanges();
     }
-    return it.Id;
-  }
 
-  public void Update(ApiWarehouse it)
-  {
-    using var context = _di.GetService<ApplicationDbContext>();
-    var real = context.Warehouses.Find(it.Id);
-    if (real != null)
+    public List<ApiWarehouse> Get()
     {
-      real.Address = it.Address;
-      real.Description = it.Description;
-      real.Name = real.Name;
+      using var context = _di.GetService<ApplicationDbContext>();
+      return context.Warehouses.Where(it => it.IsActive).ToList().Select(_mapper.Map<ApiWarehouse>).ToList();
     }
-    context.SaveChanges();
-  }
 
-  public void Delete(int id)
-  {
-    using var context = _di.GetService<ApplicationDbContext>();
-    var product = context.Warehouses.Find(id);
-    if (product == null) return;
-    product.IsActive = false;
-    context.SaveChanges();
-  }
-
-  public void TransferProduct(string userId, int productId, ApiProdTransfer info)
-  {
-    using var context = _di.GetService<ApplicationDbContext>();
-    var from = getStockAndVerify(productId, info, context);
-
-    using var transaction = context.Database.BeginTransaction();
-    try
+    public int Add(ApiWarehouse api)
     {
-      var to = context.WarehouseProducts.FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.ToId);
-      if (to == null)
+      var it = _mapper.Map<Warehouse>(api);
+      using (var context = _di.GetRequiredService<ApplicationDbContext>())
       {
-        to = new WarehouseProducts() { ProductId = productId, WarehouseId = info.ToId, Quantity = 0 };
-        context.WarehouseProducts.Add(to);
+        it.IsActive = true;
+        context.Warehouses.Add(it);
+        context.SaveChanges();
       }
-
-      to.Quantity += info.Quantity;
-      context.SaveChanges();
-
-      var date = DateTime.UtcNow;
-      context.ProductsTrqansactions.Add(new ProductAction
-      {
-        ProductId = productId,
-        Quantity = -info.Quantity,
-        WarehouseId = info.FromId,
-        UserId = userId,
-        Date = date,
-        Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Зменшення)",
-        Operation = OperationDescription.TransferRemove,
-        Price = 0,
-      });
-      context.SaveChanges();
-
-      context.ProductsTrqansactions.Add(new ProductAction()
-      {
-        ProductId = productId,
-        Quantity = info.Quantity,
-        WarehouseId = info.ToId,
-        UserId = userId,
-        Date = date,
-        Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Збільшення)",
-        Operation = OperationDescription.TransferAdd,
-        Price = 0,
-      });
-      context.SaveChanges();
-
-      // Commit transaction if all commands succeed, transaction will auto-rollback
-      // when disposed if either commands fails
-      transaction.Commit();
+      return it.Id;
     }
-    catch (Exception ex)
-    {
-      // TODO: Handle failure
-      throw ex;
-    }
-  }
 
-  public async Task SellOrderAsync(string userId, ApiSellOrder info)
-  {
-    var oi = info;
-    var changesNotes = new List<ApiProdCountChange>();
-    await _semaphoreSlim.WaitAsync();
-    try
+    public void Update(ApiWarehouse it)
     {
-      await using (var context = _di.GetService<ApplicationDbContext>())
+      using var context = _di.GetService<ApplicationDbContext>();
+      var real = context.Warehouses.Find(it.Id);
+      if (real != null)
       {
-        await using (var transaction = context.Database.BeginTransaction(IsolationLevel.ReadCommitted))
+        real.Address = it.Address;
+        real.Description = it.Description;
+        real.Name = real.Name;
+      }
+      context.SaveChanges();
+    }
+
+    public void Delete(int id)
+    {
+      using var context = _di.GetService<ApplicationDbContext>();
+      var product = context.Warehouses.Find(id);
+      if (product == null) return;
+      product.IsActive = false;
+      context.SaveChanges();
+    }
+
+    public void TransferProduct(string userId, int productId, ApiProdTransfer info)
+    {
+      using var context = _di.GetService<ApplicationDbContext>();
+      var from = getStockAndVerify(productId, info, context);
+
+      using var transaction = context.Database.BeginTransaction();
+      try
+      {
+        var to = context.WarehouseProducts.FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.ToId);
+        if (to == null)
         {
-          var date = DateTime.UtcNow;
-          var order = _mapper.Map<Order>(oi);
-          order.OpenDate = date;
-          order.Status = OrderStatus.Open;
-          order.ResponsibleUserId = userId;
-          order.Transactions = new List<ProductAction>();
-
-          foreach (var productOrder in info.ProductOrders)
-          {
-            var from = getStockAndVerify(productOrder.IdProduct, productOrder, context);
-
-            changesNotes.Add(new ApiProdCountChange
-            {
-              ProductId = productOrder.IdProduct,
-              WarehouseId = productOrder.FromId,
-              NewCount = from.Quantity,
-              OldCount = from.Quantity + productOrder.Quantity
-            });
-
-            var prodOrder = new ProductAction
-            {
-              Date = date,
-              ProductId = productOrder.IdProduct,
-              Quantity = -productOrder.Quantity,
-              WarehouseId = productOrder.FromId,
-              Description = productOrder.Description,
-              Price = productOrder.Price,
-              BuyPrice = from.Product.RecommendedBuyPrice,
-              UserId = userId,
-              Operation = OperationDescription.Sold
-            };
-            order.Transactions.Add(prodOrder);
-          }
-
-          context.Orders.Add(order);
-          await context.SaveChangesAsync();
-
-          transaction.Commit();
+          to = new WarehouseProducts() { ProductId = productId, WarehouseId = info.ToId, Quantity = 0 };
+          context.WarehouseProducts.Add(to);
         }
+
+        to.Quantity += info.Quantity;
+        context.SaveChanges();
+
+        var date = DateTime.UtcNow;
+        context.ProductsTrqansactions.Add(new ProductAction
+        {
+          ProductId = productId,
+          Quantity = -info.Quantity,
+          WarehouseId = info.FromId,
+          UserId = userId,
+          Date = date,
+          Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Зменшення)",
+          Operation = OperationDescription.TransferRemove,
+          Price = 0,
+        });
+        context.SaveChanges();
+
+        context.ProductsTrqansactions.Add(new ProductAction()
+        {
+          ProductId = productId,
+          Quantity = info.Quantity,
+          WarehouseId = info.ToId,
+          UserId = userId,
+          Date = date,
+          Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Збільшення)",
+          Operation = OperationDescription.TransferAdd,
+          Price = 0,
+        });
+        context.SaveChanges();
+
+        // Commit transaction if all commands succeed, transaction will auto-rollback
+        // when disposed if either commands fails
+        transaction.Commit();
       }
-
-      await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
-    }
-    finally
-    {
-      _semaphoreSlim.Release();
-    }
-  }
-
-  public async Task<bool> CancelOrderAsync(string userId, int id, string reason)
-  {
-    var changesNotes = new List<ApiProdCountChange>();
-
-    await using (var context = _di.GetService<ApplicationDbContext>())
-    {
-      await using (var transaction = context.Database.BeginTransaction())
+      catch (Exception ex)
       {
+        // TODO: Handle failure
+        throw ex;
+      }
+    }
+
+    public async Task SellOrderAsync(string userId, ApiSellOrder info)
+    {
+      var changesNotes = new List<ApiProdCountChange>();
+      await _semaphoreSlim.WaitAsync();
+      try
+      {
+        await using (var context = _di.GetRequiredService<ApplicationDbContext>())
+        {
+          await using (var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
+          {
+            var date = DateTime.UtcNow;
+            var order = _mapper.Map<Order>(info);
+            order.OpenDate = date;
+            order.Status = OrderStatus.Open;
+            order.ResponsibleUserId = userId;
+            order.Transactions = new List<ProductAction>();
+
+            foreach (var productOrder in info.ProductOrders)
+            {
+              var from = getStockAndVerify(productOrder.IdProduct, productOrder, context);
+
+              changesNotes.Add(new ApiProdCountChange
+              {
+                ProductId = productOrder.IdProduct,
+                WarehouseId = productOrder.FromId,
+                NewCount = from.Quantity,
+                OldCount = from.Quantity + productOrder.Quantity
+              });
+
+              var prodOrder = new ProductAction
+              {
+                Date = date,
+                ProductId = productOrder.IdProduct,
+                Quantity = -productOrder.Quantity,
+                WarehouseId = productOrder.FromId,
+                Description = productOrder.Description,
+                Price = productOrder.Price,
+                BuyPrice = from.Product.RecommendedBuyPrice,
+                UserId = userId,
+                Operation = OperationDescription.Sold
+              };
+              order.Transactions.Add(prodOrder);
+            }
+
+            context.Orders.Add(order);
+            await context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+          }
+        }
+
+        await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
+      }
+      finally
+      {
+        _semaphoreSlim.Release();
+      }
+    }
+
+    public async Task<bool> CancelOrderAsync(string userId, int id, string reason)
+    {
+      var changesNotes = new List<ApiProdCountChange>();
+
+      await using (var context = _di.GetRequiredService<ApplicationDbContext>())
+      {
+        await using var transaction = await context.Database.BeginTransactionAsync();
         var order = await context.Orders.Include(it => it.Transactions)
           .FirstOrDefaultAsync(it => it.Id == id).ConfigureAwait(false);
 
@@ -227,14 +225,14 @@ namespace BusinessLogic.Repository
         foreach (var action in order.Transactions)
         {
           var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
-          var oldCount = from.Quantity;
-          from.Quantity += action.Quantity * -1; // quantity is negative in sale action
+          var oldCount = @from.Quantity;
+          @from.Quantity += action.Quantity * -1; // quantity is negative in sale action
 
           changesNotes.Add(new ApiProdCountChange
           {
             ProductId = action.ProductId,
-            WarehouseId = from.WarehouseId,
-            NewCount = from.Quantity,
+            WarehouseId = @from.WarehouseId,
+            NewCount = @from.Quantity,
             OldCount = oldCount
           });
 
@@ -246,7 +244,7 @@ namespace BusinessLogic.Repository
             WarehouseId = action.WarehouseId,
             Description = $"Скасовано замовлення {id}",
             Price = action.Price,
-            BuyPrice = from.Product.RecommendedBuyPrice,
+            BuyPrice = @from.Product.RecommendedBuyPrice,
             UserId = userId,
             Operation = OperationDescription.TransferAdd,
           };
@@ -255,104 +253,99 @@ namespace BusinessLogic.Repository
 
         order.Transactions.AddRange(revertActions);
 
+        await context.SaveChangesAsync();
+        await transaction.CommitAsync();
+      }
+
+      await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
+
+      return true;
+    }
+
+    public void RemoveProduct(string userId, int productId, ApiProdAction info)
+    {
+      using var context = _di.GetService<ApplicationDbContext>();
+      var from = getStockAndVerify(productId, info, context);
+
+      using var transaction = context.Database.BeginTransaction();
+      try
+      {
+
+        var date = DateTime.UtcNow;
+        var action = new ProductAction()
+        {
+          ProductId = productId,
+          Quantity = -info.Quantity,
+          WarehouseId = info.FromId,
+          Description = info.Description,
+          UserId = userId,
+          Date = date,
+          Operation = OperationDescription.Delete
+        };
+        context.ProductsTrqansactions.Add(action);
         context.SaveChanges();
+
+        // Commit transaction if all commands succeed,
+        // transaction will auto-rollback when disposed if either commands fails
         transaction.Commit();
       }
-    }
-
-    await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
-
-    return true;
-  }
-
-  public void RemoveProduct(string userId, int productId, ApiProdAction info)
-  {
-    using var context = _di.GetService<ApplicationDbContext>();
-    var from = getStockAndVerify(productId, info, context);
-
-    using var transaction = context.Database.BeginTransaction();
-    try
-    {
-
-      var date = DateTime.UtcNow;
-      var action = new ProductAction()
+      catch (Exception ex)
       {
-        ProductId = productId,
-        Quantity = -info.Quantity,
-        WarehouseId = info.FromId,
-        Description = info.Description,
-        UserId = userId,
-        Date = date,
-        Operation = OperationDescription.Delete
-      };
-      context.ProductsTrqansactions.Add(action);
-      context.SaveChanges();
-
-      // Commit transaction if all commands succeed,
-      // transaction will auto-rollback when disposed if either commands fails
-      transaction.Commit();
+        Console.WriteLine(ex.ToString());
+        // TODO: Handle failure
+        throw;
+      }
     }
-    catch (Exception ex)
-    {
-      Console.WriteLine(ex.ToString());
-      // TODO: Handle failure
-      throw;
-    }
-  }
 
-  public void AddProduct(string userId, int productId, ApiProdAction info)
-  {
-    using (var context = _di.GetService<ApplicationDbContext>())
+    public void AddProduct(string userId, int productId, ApiProdAction info)
     {
+      using var context = _di.GetService<ApplicationDbContext>();
       var from = context.WarehouseProducts.FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.FromId);
-      if (from == null)
+      if (@from == null)
       {
-        from = new WarehouseProducts() { ProductId = productId, WarehouseId = info.FromId, Quantity = 0 };
-        context.WarehouseProducts.Add(from);
+        @from = new WarehouseProducts() { ProductId = productId, WarehouseId = info.FromId, Quantity = 0 };
+        context.WarehouseProducts.Add(@from);
       }
-      from.Quantity += info.Quantity;
+      @from.Quantity += info.Quantity;
 
-      using (var transaction = context.Database.BeginTransaction())
+      using var transaction = context.Database.BeginTransaction();
+      try
       {
-        try
-        {
-          context.SaveChanges();
+        context.SaveChanges();
 
-          var date = DateTime.UtcNow;
-          context.ProductsTrqansactions.Add(new ProductAction()
-          {
-            ProductId = productId,
-            Quantity = info.Quantity,
-            WarehouseId = info.FromId,
-            UserId = userId,
-            Date = date,
-            Description = $"Товар додано адміністратором",
-            Operation = OperationDescription.StockRenew,
-            Price = 0,
-          });
-          context.SaveChanges();
-
-          // Commit transaction if all commands succeed, transaction will auto-rollback
-          // when disposed if either commands fails
-          transaction.Commit();
-        }
-        catch (Exception ex)
+        var date = DateTime.UtcNow;
+        context.ProductsTrqansactions.Add(new ProductAction()
         {
-          // TODO: Handle failure
-          throw ex;
-        }
+          ProductId = productId,
+          Quantity = info.Quantity,
+          WarehouseId = info.FromId,
+          UserId = userId,
+          Date = date,
+          Description = $"Товар додано адміністратором",
+          Operation = OperationDescription.StockRenew,
+          Price = 0,
+        });
+        context.SaveChanges();
+
+        // Commit transaction if all commands succeed, transaction will auto-rollback
+        // when disposed if either commands fails
+        transaction.Commit();
+      }
+      catch (Exception ex)
+      {
+        // TODO: Handle failure
+        throw ex;
       }
     }
-  }
 
-  private static WarehouseProducts getStockAndVerify(int productId, ApiProdAction info, ApplicationDbContext context)
-  {
-    var from = context.WarehouseProducts.Include(it => it.Product).FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.FromId);
-    if (from == null) throw new ArgumentException($"Товар з ID {productId} не знайдено на складі");
-    if (from.Quantity < info.Quantity) throw new ArgumentException($"Не достатньо товарів на складі для здійстення продажі (ProductID: {from.Product.ProductType } - {from.Product.Model})");
-    from.Quantity -= info.Quantity;
-    return from;
-  }
+    private static WarehouseProducts getStockAndVerify(int productId, ApiProdAction info, ApplicationDbContext context)
+    {
+      var from = context.WarehouseProducts.Include(it => it.Product).FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.FromId);
+      if (from == null) throw new ArgumentException($"Товар з ID {productId} не знайдено на складі");
+      if (from.Quantity < info.Quantity) throw new ArgumentException($"Не достатньо товарів на складі для здійстення продажі (ProductID: {from.Product.ProductType } - {from.Product.Model})");
+      from.Quantity -= info.Quantity;
+      return from;
+    }
 
-}
+  }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace DataAccess.Models
 {
-  public enum OrderStatus { Open, Closed, Processing, Canceled }
+  public enum OrderStatus { Open = 0, Delivered = 1, Shipping = 2, Canceled = 3, Processing = 4 }
   public enum PaymentKind { Payed, CashOnDelivery }
 
   public class Order

@@ -17,9 +17,9 @@ namespace Storage.Controllers
   [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
   public class OrderController : Controller
   {
-    private IOrdersRepository _repo;
-    private IWarehouseRepository _houseRepo;
-    private UserManager<ApplicationUser> _userManager;
+    private readonly IOrdersRepository _repo;
+    private readonly IWarehouseRepository _houseRepo;
+    private readonly UserManager<ApplicationUser> _userManager;
     Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
 

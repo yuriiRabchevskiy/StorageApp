@@ -69,7 +69,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         },
         { title: 'Накладна', field: 'orderNumber', width: 126, template: 'pageSpecial1' },
         { title: 'Телефон', field: 'clientPhone', width: 92, },
-        { title: 'Одержувач', field: 'clientName'},
+        { title: 'Одержувач', field: 'clientName' },
         { title: 'Адреса', field: 'clientAddress', maxWidth: 140 },
         { title: 'Тип Оплати', field: 'payment', width: 108, template: 'pageSpecial2' },
         { title: 'Продавець', field: 'sellerShort', width: 90 },
@@ -90,10 +90,13 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         return this.isCancelTab ? this.canceledOrders : this.filteredData;
     }
 
-    tabs: ITab[] = [{ label: 'Прийняті', value: OrderStatus.Open },
-    { label: 'Відправлені', value: OrderStatus.Processing },
-    { label: 'Отримані', value: OrderStatus.Closed }
-    ];
+    tabs: ITab[] =
+        [
+            { label: 'Прийняті', value: OrderStatus.Open },
+            { label: 'Комплектується', value: OrderStatus.Processing },
+            { label: 'Відправлені', value: OrderStatus.Shipping },
+            { label: 'Отримані', value: OrderStatus.Delivered }
+        ];
 
     private _selectedTab: ITab;
     public get selectedTab() { return this._selectedTab; }
@@ -192,9 +195,9 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
                 it.itemsName = this.getItemsName(it.products);
                 const sellerSrName = it.seller?.split(' ');
                 if (sellerSrName && sellerSrName.length > 1) {
-                  it.sellerShort = `${sellerSrName[0]} ${sellerSrName[1][0]}.`;
+                    it.sellerShort = `${sellerSrName[0]} ${sellerSrName[1][0]}.`;
                 } else {
-                  it.sellerShort = it.seller;
+                    it.sellerShort = it.seller;
                 }
             });
             res.items.sort(this.orderByDate);
@@ -210,7 +213,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         const unique = keys.filter(it => group[it].length < 2);
         const duplicates = keys.filter(it => group[it].length >= 2).map(it => `${it} x${group[it].length}`);
         return unique.concat(duplicates).sort().join(',');
-      }
+    }
 
     orderByDate(a, b) {
         const dateA = new Date(a.date).getFullYear();
@@ -249,7 +252,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             this.showConfirm = false;
             return;
         }
-        this.selectedItem.status = OrderStatus.Closed;
+        this.selectedItem.status = OrderStatus.Delivered;
         this.apiService.saveOrder(this.selectedItem).subscribe(
             res => {
                 if (res.success) {

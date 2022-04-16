@@ -42,7 +42,7 @@ export class MainComponent extends SecuredComponent implements OnInit {
       { title: 'Продажі (Архів)', url: 'orders/archive', view: user.isAdmin },
       { title: 'Звіти', url: 'reports', view: user.isAdmin },
       { title: 'Користувачі', url: 'manage', view: user.isAdmin },
-      { title: 'Налаштування', url: 'settings', view: !this.isClient }
+      { title: 'Налаштування', url: 'settings', view: true }
     ];
     this.getCurrentUrl(this.router.url);
     this.work = new WorkProgress(() => this.apiService.logout(), (res) => this.onLogoutConfirmed(res), undefined);

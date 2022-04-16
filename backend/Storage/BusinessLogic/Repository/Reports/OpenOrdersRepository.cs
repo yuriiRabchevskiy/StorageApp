@@ -34,14 +34,16 @@ namespace BusinessLogic.Repository.Reports
     public async Task<string> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
       List<Order> orders;
-      using (var context = _di.GetService<ApplicationDbContext>())
+      await using (var context = _di.GetService<ApplicationDbContext>())
       {
         orders = await context.Orders
         .Where(it => isAdmin || it.ResponsibleUserId == userId)
         .Where(it => it.Status == OrderStatus.Open)
         .Where(it => from <= it.OpenDate && it.OpenDate <= till)
         .Include(ord => ord.ResponsibleUser)
-        .Include(ord => ord.Transactions).ThenInclude(y => y.Product).OrderBy(it => it.OpenDate).ToListAsync().ConfigureAwait(false);
+        .Include(ord => ord.Transactions)
+        .ThenInclude(y => y.Product).AsNoTracking()
+        .OrderBy(it => it.OpenDate).ToListAsync().ConfigureAwait(false);
       }
 
       var sb = new StringBuilder();
@@ -70,14 +72,15 @@ namespace BusinessLogic.Repository.Reports
     public async Task<string> GetLightweightAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
       List<Order> orders;
-      using (var context = _di.GetService<ApplicationDbContext>())
+      await using (var context = _di.GetService<ApplicationDbContext>())
       {
         orders = await context.Orders
         .Where(it => isAdmin || it.ResponsibleUserId == userId)
         .Where(it => it.Status == OrderStatus.Open)
         .Where(it => from <= it.OpenDate && it.OpenDate <= till)
         .Include(ord => ord.ResponsibleUser)
-        .Include(ord => ord.Transactions).ThenInclude(y => y.Product).OrderBy(it => it.OpenDate).ToListAsync().ConfigureAwait(false);
+        .Include(ord => ord.Transactions).ThenInclude(y => y.Product).AsNoTracking()
+        .OrderBy(it => it.OpenDate).ToListAsync().ConfigureAwait(false);
       }
 
       var sb = new StringBuilder();
