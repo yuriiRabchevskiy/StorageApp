@@ -52,6 +52,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     public orderHistory: IOrderAction[] = [];
 
     public isCancelTab: boolean = false;
+    public isProcessingTab: boolean = false;
     public canceledOrders: IOrder[] = [];
     public canceledOrdersIsLoading: boolean = false;
     private _canceledLoadTimeMs: number = undefined;
@@ -68,6 +69,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             shouldHideFunc: () => this.selectedTab.value !== 3
         },
         { title: 'Накладна', field: 'orderNumber', width: 126, template: 'pageSpecial1' },
+        { title: 'Смс', field: '', width: 60, shouldHideFunc: () => !this.isProcessingTab, template: 'actions' },
         { title: 'Телефон', field: 'clientPhone', width: 92, },
         { title: 'Одержувач', field: 'clientName' },
         { title: 'Адреса', field: 'clientAddress', maxWidth: 140 },
@@ -105,6 +107,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this._selectedTab = value;
         this.typeFilter.number = value.value;
         this.isCancelTab = this.selectedTab.value === OrderStatus.Canceled;
+        this.isProcessingTab = this.selectedTab.value === OrderStatus.Processing;
 
         if (this.isCancelTab) {
             const now = new Date().getTime();
@@ -384,6 +387,19 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         }
         return metadata;
 
+    }
+
+    sentSms(order: IOrder) {
+        this.apiService.smsOrder(order.id).subscribe(
+            res => {
+                if (res.success) {
+                    this.showSuccessMessage(`Смс для клієнта ${order.clientName} відправлено успішно`);
+                    return;
+                }
+                this.showApiErrorMessage('Смс для клієнта ${order.clientName} не відправлено', res.errors);
+            },
+            err => this.showWebErrorMessage(`Смс для клієнта ${order.clientName} не відправлено`, err)
+        );
     }
 
     private onOrdersChanged = (info: ApiOrdersChanges) => {
