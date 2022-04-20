@@ -10,6 +10,7 @@ using BusinessLogic.Models.User;
 using BusinessLogic.Repository;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
+using Storage.Code.Services;
 
 namespace Storage.Controllers
 {
@@ -38,6 +39,7 @@ namespace Storage.Controllers
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
       var data = await _repo.GetAsync(user.Id, isAdmin, DateTime.UtcNow.AddDays(-60), DateTime.UtcNow.AddHours(12)).ConfigureAwait(false);
+
       return new ApiResponse<ApiOrder>(data);
     }
 
@@ -93,6 +95,19 @@ namespace Storage.Controllers
       if (model.Reason.Length < 6) return new ApiResponse<bool>(OperationError.ApiModelValidation, "Причина повинна містити принаймні 6 символів");
       await _houseRepo.CancelOrderAsync(user.Id, id, model.Reason);
       return new ApiResponse<bool>(true);
+    }
+
+    [HttpPost("{id}/sms")]
+    [Authorize(Roles = "AdminAssistant, Admin")]
+    public async Task<ApiResponse<SmsResponse>> SentOrderSms(int id, [FromServices] ISmsService smsService)
+    {
+      var order = await _repo.GetAsync(id);
+      var ttn = order.OrderNumber;
+      var phone = order.ClientPhone;
+      var message = $"Номер накладної	{ttn} - Sweetkeys.com.ua";
+      var result = await smsService.SendSmsAsync(phone, message);
+
+      return new ApiResponse<SmsResponse>(result);
     }
 
 
