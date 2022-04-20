@@ -134,6 +134,7 @@ namespace Storage
       services.AddTransient<IValidator<ApiProdSell>, ApiProdSellValidator>();
 
       services.AddTransient<IEmailSender, EmailSender>();
+      services.AddTransient<ISmsService, SmsService>();
       services.AddTransient<IStateInformer, TrackerHub>();
       services.AddTransient<TrackerHub, TrackerHub>();
 
