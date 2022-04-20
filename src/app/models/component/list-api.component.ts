@@ -13,7 +13,7 @@ export interface ITableColumn {
     width?: number;
     maxWidth?: number;
     hideFilter?: boolean;
-    template?: 'date' | 'pageSpecial1' | 'pageSpecial2' | 'pageSpecial3' | undefined;
+    template?: 'date' | 'pageSpecial1' | 'pageSpecial2' | 'pageSpecial3' | 'actions' | undefined;
     format?: string;
     dataClass?: string;
     shouldHideFunc?: () => boolean;

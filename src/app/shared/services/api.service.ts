@@ -80,6 +80,11 @@ export class ApiService extends ApiBase {
     saveOrder(data): Observable<ApiResponse<any>> {
         return this.doPost('order', data);
     }
+
+    smsOrder(id: number) {
+        return this.doPost(`order/${id}/sms/`, {});
+    }
+
     сancelOrder(id: number, data: ICancelOrder) {
         return this.doPost('order/reject/' + id, data);
     }
