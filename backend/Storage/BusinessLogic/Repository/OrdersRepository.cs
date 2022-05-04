@@ -43,7 +43,9 @@ namespace DataAccess.Repository
       await using var context = _di.GetService<ApplicationDbContext>();
       // Where(it => isAdmin || it.ResponsibleUserId == userId)
       var query = context.Orders
-        .Where(it => it.Status != OrderStatus.Canceled && it.OpenDate >= @from && it.OpenDate <= till)
+        .Where(it => it.Status != OrderStatus.Canceled) // we skip all canceled
+        // and all in progress except those that were already delivered within range
+        .Where(it => it.Status != OrderStatus.Delivered || (it.OpenDate >= @from && it.OpenDate <= till))
         .Include(ord => ord.ResponsibleUser)
         .Include(ord => ord.Transactions)
         .ThenInclude(y => y.Product).AsNoTracking();
@@ -64,8 +66,7 @@ namespace DataAccess.Repository
       await using var context = _di.GetService<ApplicationDbContext>();
       // Where(it => isAdmin || it.ResponsibleUserId == userId)f
       var query = context.Orders
-        .Where(it => (it.Status == OrderStatus.Delivered || it.Status == OrderStatus.Shipping)
-                     && it.OpenDate >= @from && it.OpenDate <= till)
+        .Where(it => (it.Status == OrderStatus.Delivered) && it.OpenDate >= @from && it.OpenDate <= till)
         .Include(ord => ord.ResponsibleUser)
         .Include(ord => ord.Transactions)
         .ThenInclude(y => y.Product);
