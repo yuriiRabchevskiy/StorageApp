@@ -1,3 +1,4 @@
+import { MessageService } from 'primeng/api';
 import { Component } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { UserService } from '@app/shared/services/user.service';
@@ -13,8 +14,9 @@ import { ApiService } from '../../shared/services/api.service';
 export class OpenOrdersLightComponent extends BaseApiComponent<string> {
   data: any = 'Немає даних';
 
-  constructor(userService: UserService, private apiService: ApiService, private sanitizer: DomSanitizer) {
-    super(userService);
+  constructor(userService: UserService, notify: MessageService, private apiService: ApiService, private sanitizer: DomSanitizer,
+  ) {
+    super(userService, notify);
   }
 
   doGetData() {

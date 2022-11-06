@@ -64,7 +64,7 @@ export class NumberFilter<T> extends Filter<T> {
     name = 'number filter';
     public number: number;
 
-    getNumber: (item: T) => number;
+    getNumber: (item: T) => number | undefined;
 
     constructor() {
         super();

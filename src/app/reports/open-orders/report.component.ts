@@ -4,6 +4,7 @@ import { ApiService } from '../../shared/services/api.service';
 import { ApiResponse } from '../../models/api';
 import { BaseApiComponent } from '../../models/component';
 import { DomSanitizer } from '@angular/platform-browser';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-open-orders',
@@ -13,8 +14,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class OpenOrdersComponent extends BaseApiComponent<string> {
   data: any = 'Немає даних';
 
-  constructor(userService: UserService, private apiService: ApiService, private sanitizer: DomSanitizer) {
-    super(userService);
+  constructor(userService: UserService, notify: MessageService, private apiService: ApiService, private sanitizer: DomSanitizer) {
+    super(userService, notify);
   }
 
   doGetData() {

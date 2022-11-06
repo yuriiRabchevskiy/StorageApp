@@ -5,6 +5,7 @@ import { SecuredComponent } from '../models/component/base-api.component';
 import { WorkProgress } from '../models/component/work-progress';
 import { ApiService } from '../shared/services/api.service';
 import { TrackerService } from './../shared/services/tracker.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-main',
@@ -31,8 +32,9 @@ export class MainComponent extends SecuredComponent implements OnInit {
     return this.work.showSpinner;
   }
 
-  constructor(userService: UserService, private router: Router, private apiService: ApiService, trackerService: TrackerService) {
-    super(userService);
+  constructor(userService: UserService, notify: MessageService,
+    private router: Router, private apiService: ApiService, trackerService: TrackerService) {
+    super(userService, notify);
     const user = this.userService.getLocal();
     if (!user) return;
     this.canView = user.isAdmin;

@@ -4,12 +4,12 @@ import { IApiResponseBase } from '../api';
 
 export class WorkProgress {
     requestInProgress: boolean = false;
-    startDate: Date;
+    startDate: Date | null;
     showSpinner: boolean = false;
 
     constructor(private doRequest: () => Observable<any>,
         private onDataReceived: (res: any) => any,
-        private onDataReceiveError: (res: any, parsed: IApiResponseBase) => any) {
+        private onDataReceiveError?: (res: any, parsed?: IApiResponseBase) => any) {
     }
 
     public doStopProgress() {
@@ -31,7 +31,7 @@ export class WorkProgress {
                 this.stopGetProgress();
                 if (this.onDataReceiveError) {
                     let msg = err;
-                    let apiErr: IApiResponseBase;
+                    let apiErr: IApiResponseBase | undefined;
                     if (err.status && err._body) {
                         apiErr = JSON.parse(err._body) as IApiResponseBase;
                     }
