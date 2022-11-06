@@ -104,7 +104,7 @@ namespace Storage.Controllers
       var order = await _repo.GetAsync(id);
       var ttn = order.OrderNumber;
       var phone = order.ClientPhone;
-      var message = $"Номер накладної	{ttn} Sweetkeys.com.ua";
+      var message = $"Номер накладної	{ttn} Sweetkeys.com.ua \n\r Все буде Україна!";
       var result = await smsService.SendSmsAsync(phone, message);
 
       return new ApiResponse<SmsResponse>(result);

@@ -101,10 +101,16 @@
                                 {{rowData[column.field] | date: column.format}}
                             </ng-container>
                             <ng-container *ngIf="column.template === 'pageSpecial1'">
-                                <a href="https://novaposhta.ua/tracking/?cargo_number={{rowData.orderNumber}}"
-                                    target="_blank">
-                                    <span>{{rowData.orderNumber}}</span>
-                                </a>
+                                <ng-container *ngIf="rowData.orderNumber && rowData.orderNumber.toString().startsWith('50')">                  
+                                    <a href="https://track.ukrposhta.ua/tracking_UA.html?barcode=0{{rowData.orderNumber}}" target="_blank">
+                                      <span>0{{rowData.orderNumber}}</span>
+                                    </a>
+                                  </ng-container>
+                                  <ng-container *ngIf="!rowData.orderNumber || !rowData.orderNumber.toString().startsWith('50')">
+                                    <a href="https://novaposhta.ua/tracking/?cargo_number={{rowData.orderNumber}}" target="_blank">
+                                      <span>{{rowData.orderNumber}}</span>
+                                    </a>
+                                  </ng-container>
                             </ng-container>
                             <ng-container *ngIf="column.template === 'pageSpecial2'">
                                 {{rowData.payment === 0 ? 'Оплачено' : 'Наложний'}}
