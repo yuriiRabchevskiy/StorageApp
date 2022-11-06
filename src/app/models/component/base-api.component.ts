@@ -10,15 +10,17 @@ export abstract class SecuredComponent {
   public view: ViewState = new ViewState();
   public canView: boolean;
   public canEdit: boolean = false;
+  public isAdmin: boolean = false;
   public isAdminAssistant: boolean = false;
   public isClient: boolean = false;
 
-  constructor(public userService: UserService, protected notify?: MessageService) {
+  constructor(public userService: UserService, protected notify: MessageService) {
 
     const user = this.userService.getLocal();
     if (!user) return;
     this.isAdminAssistant = user.role === 'AdminAssistant';
     this.isClient = user.role === 'Client';
+    this.isAdmin = user.isAdmin;
     this.canView = user.isAdmin;
     this.canEdit = user.isAdmin;
   }
@@ -77,8 +79,8 @@ export abstract class BaseApiComponent<T> extends SecuredComponent {
     return this.work.showSpinner;
   }
 
-  constructor(userService: UserService) {
-    super(userService);
+  constructor(userService: UserService, notify: MessageService) {
+    super(userService, notify);
     this.work = new WorkProgress(() => this.doGetData(), (res) => this.onDataReceived(res), undefined);
   }
 

@@ -1,3 +1,4 @@
+import { MessageService } from 'primeng/api';
 import { UserService } from './../../../shared/services/user.service';
 import { ICategory } from './../../../models/storage/categories';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
@@ -58,8 +59,8 @@ export class ProductComponent extends SecuredComponent {
 
   @Output() saveProduct: EventEmitter<ISaveResult> = new EventEmitter<ISaveResult>();
 
-  constructor(userService: UserService) {
-    super(userService);
+  constructor(userService: UserService, notify: MessageService) {
+    super(userService, notify);
   }
   createHeader(val) {
     if (!val.id && !val.categoryId) {

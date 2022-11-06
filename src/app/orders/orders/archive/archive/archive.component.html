@@ -16,7 +16,7 @@
                 <app-i-button [disabled]="viewData.length < 1 || selectedItems.length > 1" icon="edit-icon"
                     title="Редагувати продажу" (iClick)="showToEdit()">
                 </app-i-button>
-                <app-i-button *ngIf="canView" icon="i-history" title="Історія замовлення" (iClick)="showHistory()"
+                <app-i-button icon="i-history" title="Історія замовлення" (iClick)="showHistory()"
                     [disabled]="viewData.length < 1 || selectedItems.length > 1">
                 </app-i-button>
                 <app-i-button icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"

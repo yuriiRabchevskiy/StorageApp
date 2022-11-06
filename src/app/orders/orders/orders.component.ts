@@ -402,7 +402,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         );
     }
 
-    private onOrdersChanged = (info: ApiOrdersChanges) => {
+    private onOrdersChanged = (info?: ApiOrdersChanges) => {
         console.log('products count changed', info);
         info.changes.forEach(orderChange => {
             const current = this.data.find(it => it.id === orderChange.orderId);
