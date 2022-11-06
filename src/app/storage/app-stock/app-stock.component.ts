@@ -33,6 +33,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     { title: 'Нотатки', field: 'freeNote', width: 300 },
     { title: 'Ціна покупки', field: 'recommendedBuyPrice', width: 110, hideFilter: true, shouldHideFunc: () => !this.canView },
     { title: 'Ціна продажу', field: 'recommendedSalePrice', width: 110, hideFilter: true },
+    { title: 'Id', field: 'id', width: 46, hideFilter: true, shouldHideFunc: () => !this.canView },
   ];
 
   selectedItem: IProduct;
@@ -54,7 +55,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
 
   typeFilter: NumberFilter<IProduct> = new NumberFilter<IProduct>();
 
-  globalSearchFields = ['productType', 'producer', 'model', 'size', 'color', 'freeNote', 'recommendedBuyPrice', 'recommendedSalePrice'];
+  globalSearchFields = ['productType', 'producer', 'model', 'size', 'color', 'freeNote', 'recommendedBuyPrice', 'recommendedSalePrice', 'id'];
 
   tabs: ICategory[] = [];
   _selectedTab: ICategory;
