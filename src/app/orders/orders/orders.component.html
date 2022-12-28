@@ -114,7 +114,7 @@
               <ng-container *ngIf="column.template === 'pageSpecial1'">
                 <ng-container *ngIf="rowData.orderNumber && rowData.orderNumber.toString().startsWith('050')">                  
                   <a href="https://track.ukrposhta.ua/tracking_UA.html?barcode={{rowData.orderNumber}}" target="_blank">
-                    <span>0{{rowData.orderNumber}}</span>
+                    <span>{{rowData.orderNumber}}</span>
                   </a>
                 </ng-container>
                 <ng-container *ngIf="!rowData.orderNumber || !rowData.orderNumber.toString().startsWith('050')">
