@@ -10,7 +10,7 @@ export interface IOrder {
     clientPhone?: string;
     clientName?: string;
     clientAddress?: string;
-    orderNumber?: number;
+    orderNumber?: string;
     other?: string;
     status?: OrderStatus;
     payment?: PaymentKind;
@@ -58,7 +58,7 @@ export class Order implements IOrder {
     clientPhone?: string;
     clientName?: string;
     clientAddress?: string;
-    orderNumber?: number;
+    orderNumber?: string;
     other?: string;
     status?: OrderStatus = OrderStatus.Open;
     payment?: PaymentKind = PaymentKind.cashOnDelivery;

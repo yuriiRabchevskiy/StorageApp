@@ -44,7 +44,7 @@ namespace DataAccess.Repository
       // Where(it => isAdmin || it.ResponsibleUserId == userId)
       var query = context.Orders
         .Where(it => it.Status != OrderStatus.Canceled) // we skip all canceled
-        // and all in progress except those that were already delivered within range
+                                                        // and all in progress except those that were already delivered within range
         .Where(it => it.Status != OrderStatus.Delivered || (it.OpenDate >= @from && it.OpenDate <= till))
         .Include(ord => ord.ResponsibleUser)
         .Include(ord => ord.Transactions)
@@ -116,7 +116,7 @@ namespace DataAccess.Repository
         order.ClientName = it.ClientName;
         order.ClientAddress = it.ClientAddress;
         order.ClientPhone = it.ClientPhone;
-        order.OrderNumber = it.OrderNumber;
+        order.TrackingNumber = it.OrderNumber;
         order.Other = it.Other;
         order.Status = it.Status ?? OrderStatus.Open;
         order.Payment = it.Payment;
