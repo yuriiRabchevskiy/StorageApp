@@ -54,7 +54,7 @@ namespace BusinessLogic.Repository.Reports
       {
         sb.AppendLine($"<b>{order.OpenDate.ToString(DateFormat, ukUA)}</b>");
         sb.AppendLine($"Замовлення <b>{order.Id} - {order.ClientName}</b>");
-        sb.AppendLine($"Накладна: <b>{order.OrderNumber}</b>");
+        sb.AppendLine($"Накладна: <b>{order.TrackingNumber}</b>");
         sb.AppendLine($"Товари:");
         foreach (var product in order.Transactions)
         {
@@ -91,7 +91,7 @@ namespace BusinessLogic.Repository.Reports
         sb.Append($"<div class=\"order\">");
         sb.AppendLine($"<b>{order.OpenDate.ToString(DateFormat, ukUA)}</b>");
         sb.AppendLine($"Замовлення <b>{order.Id} - {order.ClientName}</b>");
-        sb.Append($"Накладна: <b>{order.OrderNumber}</b>");
+        sb.Append($"Накладна: <b>{order.TrackingNumber}</b>");
         sb.AppendLine($"</div>");
       }
       sb.AppendLine("Кінець звіту.");

@@ -10,7 +10,7 @@ namespace BusinessLogic.Models.Api
     public string ClientPhone { get; set; }
     public string ClientName { get; set; }
     public string ClientAddress { get; set; }
-    public long? OrderNumber { get; set; }
+    public string OrderNumber { get; set; }
     public string Other { get; set; }
     public OrderStatus? Status { get; set; }
     public PaymentKind Payment { get; set; }

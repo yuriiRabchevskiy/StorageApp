@@ -1,6 +1,7 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using BusinessLogic.Abstractions;
 using DataAccess;
@@ -98,9 +99,9 @@ namespace Storage
 
       services.AddCors();
       services.AddControllers(cfg =>
-        {
-        }).AddFluentValidation().AddJsonOptions(opt => opt.JsonSerializerOptions.IgnoreNullValues = true)
-        .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+      {
+      }).AddFluentValidation()
+        .AddJsonOptions(opt => opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
 
       services.AddAuthorization(options =>
       {
@@ -117,8 +118,7 @@ namespace Storage
     private void setupDependencyInjectionServices(IServiceCollection services)
     {
       var connectionString = Configuration.GetConnectionString("appConnectionString");
-      services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString),
-        ServiceLifetime.Transient);
+      services.AddSqlServer<ApplicationDbContext>(connectionString);
       services.AddTransient<IProductsRepository, ProductsRepository>();
       services.AddTransient<ICategoriesRepository, CategoriesRepository>();
       services.AddTransient<IWarehouseRepository, WarehousesRepository>();
