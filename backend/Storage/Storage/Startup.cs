@@ -183,6 +183,7 @@ namespace Storage
 
       // ===== Create tables ======
       // dbContext.Database.EnsureCreated();
+      dbContext.Database.SetCommandTimeout(300);
       dbContext.Database.Migrate();
 
 
