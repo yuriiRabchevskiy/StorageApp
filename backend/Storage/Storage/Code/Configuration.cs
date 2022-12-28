@@ -14,9 +14,12 @@ namespace Storage.Code
       var config = new MapperConfiguration(cfg =>
       {
         cfg.CreateMap<ApiProdAction, ApiProdSell>();
-        cfg.CreateMap<Order, ApiOrder>();
-        cfg.CreateMap<ApiSellOrder, Order>();
-        cfg.CreateMap<ApiOrder, Order>();
+        cfg.CreateMap<Order, ApiOrder>()
+          .ForMember(it => it.OrderNumber, opt => opt.MapFrom(src => src.TrackingNumber));
+        cfg.CreateMap<ApiSellOrder, Order>()
+          .ForMember(it => it.TrackingNumber, opt => opt.MapFrom(src => src.OrderNumber));
+        cfg.CreateMap<ApiOrder, Order>()
+          .ForMember(it => it.TrackingNumber, opt => opt.MapFrom(src => src.OrderNumber));
         cfg.CreateMap<OrderAction, ApiOrderAction>().ReverseMap();
         cfg.CreateMap<ApplicationUser, ApiUser>().ForMember(it => it.Login, opt => opt.MapFrom(src => src.UserName));
         cfg.CreateMap<ApiUser, ApplicationUser>().ForMember(it => it.UserName, opt => opt.MapFrom(src => src.Login));
