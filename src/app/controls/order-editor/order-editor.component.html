@@ -1,9 +1,9 @@
 <form class="order-editor wh-100 flex-col" [formGroup]="orderEditForm">
     <div class="flex-row flex-wrap">
         <mat-form-field class="s-input-wrapper">
-            <input matInput type="number" placeholder="Номер накладної"
-                formControlName="orderNumber" required>
-            <mat-error *ngIf="orderNumber.errors && (orderNumber.dirty || orderNumber.touched)">{{getNumberError()}}</mat-error>
+            <input matInput placeholder="Номер накладної" formControlName="orderNumber" required>
+            <mat-error
+                *ngIf="orderNumber.errors && (orderNumber.dirty || orderNumber.touched)">{{getNumberError()}}</mat-error>
         </mat-form-field>
         <mat-form-field class="s-input-wrapper">
             <mat-select placeholder="Статус" formControlName="status" [disabled]="!canEdit">
@@ -15,21 +15,21 @@
     </div>
     <div class="flex-row flex-wrap">
         <mat-form-field class="s-input-wrapper">
-            <input matInput type="text" placeholder="Кому"
-                formControlName="clientName" required>
-            <mat-error *ngIf="clientName.errors && (clientName.dirty || clientName.touched)">Ви не вказали дані клієнта</mat-error>
+            <input matInput type="text" placeholder="Кому" formControlName="clientName" required>
+            <mat-error *ngIf="clientName.errors && (clientName.dirty || clientName.touched)">Ви не вказали дані
+                клієнта</mat-error>
         </mat-form-field>
         <mat-form-field class="s-input-wrapper">
-            <input matInput type="text" placeholder="Адреса"
-                formControlName="clientAddress" required>
-            <mat-error *ngIf="clientAddress.errors && (clientAddress.dirty || clientAddress.touched)">Ви не ввели адресу</mat-error>
+            <input matInput type="text" placeholder="Адреса" formControlName="clientAddress" required>
+            <mat-error *ngIf="clientAddress.errors && (clientAddress.dirty || clientAddress.touched)">Ви не ввели
+                адресу</mat-error>
         </mat-form-field>
     </div>
     <div class="flex-row flex-wrap">
         <mat-form-field class="s-input-wrapper">
-            <input matInput type="tel" placeholder="Телефон"
-                formControlName="clientPhone" required>
-            <mat-error *ngIf="clientPhone.errors && (clientPhone.dirty || clientPhone.touched)">{{getTelError()}}</mat-error>
+            <input matInput type="tel" placeholder="Телефон" formControlName="clientPhone" required>
+            <mat-error
+                *ngIf="clientPhone.errors && (clientPhone.dirty || clientPhone.touched)">{{getTelError()}}</mat-error>
         </mat-form-field>
         <mat-form-field class="s-input-wrapper">
             <mat-select placeholder="Ти оплати" formControlName="payment">
