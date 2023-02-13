@@ -11,6 +11,7 @@ using BusinessLogic.Repository;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Storage.Code.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace Storage.Controllers
 {
@@ -99,12 +100,15 @@ namespace Storage.Controllers
 
     [HttpPost("{id}/sms")]
     [Authorize(Roles = "AdminAssistant, Admin")]
-    public async Task<ApiResponse<SmsResponse>> SentOrderSms(int id, [FromServices] ISmsService smsService)
+    public async Task<ApiResponse<SmsResponse>> SentOrderSms(int id, [FromServices] ISmsService smsService, [FromServices] IConfiguration config)
     {
       var order = await _repo.GetAsync(id);
       var ttn = order.OrderNumber;
       var phone = order.ClientPhone;
-      var message = $"Номер накладної	{ttn} Sweetkeys.com.ua Все буде Україна!";
+      var sms = config.GetSection("Sms");
+      var messageTemplate = sms.GetValue<string>("TtnMessage");
+      var message = string.Format(messageTemplate, ttn);
+      
       var result = await smsService.SendSmsAsync(phone, message);
 
       return new ApiResponse<SmsResponse>(result);
