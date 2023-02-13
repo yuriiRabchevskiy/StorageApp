@@ -53,7 +53,7 @@ export class OrderEditorComponent implements OnInit {
     this.clientName = new FormControl(this.item.clientName, Validators.required);
     this.clientAddress = new FormControl(this.item.clientAddress, Validators.required);
     this.clientPhone = new FormControl(this.item.clientPhone,
-      [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]+$')
+      [Validators.required, Validators.minLength(10), Validators.pattern('^[0-9]+$')
       ]);
     this.status = new FormControl({
       value: this.item.status !== undefined ? this.item.status : this.statuses[0].value,
