@@ -27,7 +27,7 @@
     </div>
     <div class="flex-row flex-wrap">
         <mat-form-field class="s-input-wrapper">
-            <input matInput type="tel" placeholder="Телефон" formControlName="clientPhone" required>
+            <input matInput type="tel" placeholder="Телефон" formControlName="clientPhone" required appAllowNumbersOnly >
             <mat-error
                 *ngIf="clientPhone.errors && (clientPhone.dirty || clientPhone.touched)">{{getTelError()}}</mat-error>
         </mat-form-field>
