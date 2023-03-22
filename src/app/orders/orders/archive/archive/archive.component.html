@@ -131,8 +131,8 @@
                         <div class="products-list flex-col">
                             <table class="check-order">
                                 <colgroup>
-                                    <col width="100px">
                                     <col>
+                                    <col width="100px">
                                     <col width="110px">
                                     <col width="110px">
                                     <col width="100px">
@@ -140,8 +140,8 @@
                                 </colgroup>
                                 <thead class="check-head">
                                     <tr class="check-tr">
-                                        <th class="check-cell">Кількість</th>
                                         <th class="check-cell">Назва</th>
+                                        <th class="check-cell">Кількість</th>
                                         <th class="check-cell" *ngIf="canView">Ціна покупки</th>
                                         <th class="check-cell">Ціна продажу</th>
                                         <th class="check-cell" *ngIf="canView">Різниця</th>
@@ -151,7 +151,7 @@
 
                                 <tbody class="check-body">
                                     <tr class="check-tr" *ngFor="let prod of item.products">
-                                        <td class="check-td">{{prod.quantity}} *</td>
+                                        <td class="check-td"><b>{{prod.quantity}} шт</b></td>
                                         <td class="check-td check-item-name-td">
                                             {{prod.product.size}} {{prod.product.color}} {{prod.product.productType}} -
                                             {{prod.product.model}}
