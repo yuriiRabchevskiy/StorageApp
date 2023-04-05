@@ -78,6 +78,22 @@ export class OrderEditorComponent implements OnInit {
     });
   }
 
+  onPhoneChange(event: FocusEvent) {
+    const target = event.target as HTMLInputElement;
+    let value = target.value;
+    // trim spaces
+    value = value.trim();
+    // cut +38 from start
+    if (value.startsWith("+38")) {
+      value = value.substring(3);
+      value = value.trim();
+    }
+    // replace all non numbers with empty
+    value = value.replace(/[^0-9]*/g, '')
+    if (value === target.value) return;
+    this.clientPhone.setValue(value);
+  }
+
   getNumberError() {
     return this.orderNumber.hasError('required') ? 'Номер накладної не введено' :
       this.orderNumber.hasError('pattern') ? 'Тільки числовий номер' : '';
@@ -88,5 +104,5 @@ export class OrderEditorComponent implements OnInit {
       this.clientPhone.hasError('minlength') ? 'Не менше 9 символів' :
         this.clientPhone.hasError('pattern') ? 'Тільки числа' : '';
   }
-  
+
 }
