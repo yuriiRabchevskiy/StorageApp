@@ -13,7 +13,20 @@ export class OrderComponent {
 
     private _order: IOrder;
     get order() { return this._order; }
-    @Input() set order(val: IOrder) { this._order = val; }
+    @Input() set order(val: IOrder) {
+        this._order = val;
+        const editedId = this.orderEditor.editedOrderId;
+        const currentId = this.order.id;
+        if (editedId && currentId && currentId !== editedId) {
+            this.notify.add(
+                {
+                    severity: 'error',
+                    summary: 'Помилка',
+                    detail: 'Товар який вибрано не відповідає товару що редагується. Оновіть сторінку'
+                }
+            );
+        }
+    }
     @Input() canEdit: boolean;
 
     @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
