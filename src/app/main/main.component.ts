@@ -1,11 +1,11 @@
-import { UserService } from './../shared/services/user.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { SecuredComponent } from '../models/component/base-api.component';
 import { WorkProgress } from '../models/component/work-progress';
 import { ApiService } from '../shared/services/api.service';
 import { TrackerService } from './../shared/services/tracker.service';
-import { MessageService } from 'primeng/api';
+import { UserService } from './../shared/services/user.service';
 
 @Component({
   selector: 'app-main',
@@ -13,6 +13,19 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent extends SecuredComponent implements OnInit {
+
+  @HostListener('document:visibilitychange', ['$event'])
+  handleVisibilityChange(event) {
+    if (document.hidden) {
+      console.log('doc: hidden');
+      // The tab has become inactive.
+    } else {
+      this.trackerService.connectUser();
+      console.log('doc: active');
+      // The tab has become active.
+      // Perform your extra checks here.
+    }
+  }
 
   pages = [];
   page: string = '';

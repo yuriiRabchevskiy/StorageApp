@@ -1,7 +1,7 @@
 import { ApiOrdersChanges } from './../../models/api/state/state';
-import { Injectable } from '@angular/core';
+import { HostListener, Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
-import {MessageService} from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { ApiEndpointsConfig } from '../../api.config';
 import { UserService } from './user.service';
 import { ApiProdCountChanges } from '../../models/api/state/state';
@@ -24,11 +24,21 @@ export class TrackerService {
         this.connectUser();
     }
 
+    public verifyConnected() {
+        if (this.isConnected) return;
+        console.log('reconnecting...');
+        this.connectUser();
+    }
+
     public connectUser() {
         const user = this.userService.getLocal();
         if (!user) return;
         this._userToken = user.token;
-        if (this._connection) this._connection.stop();
+        if (this._connection) {
+            this._connection.stop();
+            this._connection.off('orderChanged');
+            this._connection.off('productsCountChanged');
+        }
         const apiUrl = ApiEndpointsConfig.getAppEndpoint();
         const hubUrl = `${apiUrl}tracker`;
         const builder = new HubConnectionBuilder();
@@ -51,7 +61,7 @@ export class TrackerService {
 
 
         connection.start().catch(err => {
-            return console.error(err.toString());
+            return console.error(err?.toString() ?? 'unknown signalR error');
         });
         console.log(`signal R Hub started for user ${user.userName}`);
 
