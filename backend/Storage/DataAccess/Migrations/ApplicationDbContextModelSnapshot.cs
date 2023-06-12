@@ -150,6 +150,9 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("CloseDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Delivery")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("OpenDate")
                         .HasColumnType("datetime2");
 

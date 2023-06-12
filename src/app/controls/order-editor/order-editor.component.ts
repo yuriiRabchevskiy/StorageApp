@@ -1,27 +1,34 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IOrder, OrderStatus } from './../../models/storage';
-import { PaymentKind } from './../../models/storage/order';
+import { PaymentKind, DeliveryKind } from './../../models/storage/order';
+
+export const deliveryTypes = [
+  { label: 'Нова Пошта', value: DeliveryKind.NewPost },
+  { label: 'Укрпошта', value: DeliveryKind.UkrPost },
+  { label: 'Самовивіз', value: DeliveryKind.SelfDelivery },
+  { label: 'По Львову', value: DeliveryKind.LvivTransfer },
+  { label: 'Інше', value: DeliveryKind.Other },
+]
+
 
 @Component({
   selector: 'app-order-editor',
   templateUrl: './order-editor.component.html',
   styleUrls: ['./order-editor.component.scss']
 })
-
 export class OrderEditorComponent implements OnInit {
-  orderEditForm: FormGroup;
-  orderNumber: FormControl;
-  clientName: FormControl;
-  clientAddress: FormControl;
-  clientPhone: FormControl;
-  status: FormControl;
-  payment: FormControl;
-  orderOther: FormControl;
+  public orderEditForm: FormGroup;
+  public orderNumber: FormControl;
+  public clientName: FormControl;
+  public clientAddress: FormControl;
+  public clientPhone: FormControl;
+  public status: FormControl;
+  public payment: FormControl;
+  public delivery: FormControl;
+  public orderOther: FormControl;
 
-  get invalid() {
-    return this.orderEditForm.invalid;
-  }
+  public get invalid() { return this.orderEditForm.invalid; }
 
   @Input() item: IOrder = { id: 0 };
   @Input() canEdit: boolean;
@@ -31,12 +38,13 @@ export class OrderEditorComponent implements OnInit {
     { label: 'Наложений платіж', value: PaymentKind.cashOnDelivery }
   ];
 
+  deliveryTypes = deliveryTypes;
+
   statuses = [
     { label: 'Прийнятий', value: OrderStatus.Open },
     { label: 'Комплектується', value: OrderStatus.Processing },
     { label: 'Відправлений', value: OrderStatus.Shipping },
     { label: 'Отриманий', value: OrderStatus.Delivered },
-    // { label: 'Відмінений', value: OrderStatus.Canceled }
   ];
 
   constructor() { }
@@ -53,14 +61,18 @@ export class OrderEditorComponent implements OnInit {
     this.clientName = new FormControl(this.item.clientName, Validators.required);
     this.clientAddress = new FormControl(this.item.clientAddress, Validators.required);
     this.clientPhone = new FormControl(this.item.clientPhone,
-      [Validators.required, Validators.minLength(9), Validators.pattern('^[0-9]+$')
-      ]);
+      [Validators.required, Validators.minLength(9), Validators.pattern('^[0-9]+$')]
+    );
     this.status = new FormControl({
-      value: this.item.status !== undefined ? this.item.status : this.statuses[0].value,
+      value: this.item.status ?? this.statuses[0].value,
       disabled: !this.item.id
     });
     this.payment = new FormControl({
-      value: this.item.payment !== undefined ? this.item.payment : this.payments[1].value,
+      value: this.item.payment ?? this.payments[1].value,
+      disabled: false
+    });
+    this.delivery = new FormControl({
+      value: this.item.delivery ?? this.deliveryTypes[0].value,
       disabled: false
     });
     this.orderOther = new FormControl(this.item.other);
@@ -74,6 +86,7 @@ export class OrderEditorComponent implements OnInit {
       clientPhone: this.clientPhone,
       status: this.status,
       payment: this.payment,
+      delivery: this.delivery,
       orderOther: this.orderOther
     });
   }

@@ -14,6 +14,8 @@ namespace BusinessLogic.Models.Api
     public string Other { get; set; }
     public OrderStatus? Status { get; set; }
     public PaymentKind Payment { get; set; }
+
+    public DeliveryKind Delivery { get; set; }
     public DateTime? OpenDate { get; set; }
     public DateTime? CloseDate { get; set; }
     public double? TotalPrice { get; set; }
