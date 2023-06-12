@@ -1,4 +1,5 @@
 @import '../../assets/css/globals';
+
 .nav-bar {
     position: fixed;
     top: 0;
@@ -8,6 +9,7 @@
     background: $pageHeaderColor;
     justify-content: space-between;
     z-index: 10;
+
     @include customMaxWidth(1023px) {
         height: 40px;
     }
@@ -20,6 +22,7 @@
     text-decoration: none;
     cursor: pointer;
     flex-shrink: 0;
+
     @include customMaxWidth(1023px) {
         width: 40px;
     }
@@ -39,9 +42,11 @@
     padding: 8px;
     margin: 0px;
     opacity: 0.8;
+
     &:hover {
         opacity: 1;
     }
+
     @include customMaxWidth(1023px) {
         padding: 0px;
     }
@@ -68,11 +73,13 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+
     @include customMaxWidth(1023px) {
         line-height: 40px;
         font-size: 14px;
     }
 }
+
 .nav-wrap {
     display: flex;
     height: 100%;
@@ -94,14 +101,17 @@
     border-bottom: 2px solid;
     border-color: transparent;
     text-decoration: none;
+
     &:hover {
         color: #fff;
         border-color: $appRedHoverColor;
     }
+
     @include customMaxWidth(1023px) {
         line-height: 40px;
         font-size: 16px;
     }
+
     @include customMaxWidth(599px) {
         font-size: 14px;
     }
@@ -122,10 +132,12 @@
     padding: 0px 8px;
     cursor: pointer;
 }
+
 .menu-button {
     margin: 0px;
     margin-left: 8px;
 }
+
 .mob-menu {
     @include wH(80%, calc(100vh - 40px));
     max-width: 280px;
@@ -138,16 +150,32 @@
     padding: 12px;
     transition: linear 0.3s;
     z-index: 10;
+
     .link-wrap {
         margin-bottom: 8px;
+
         &:hover {
             border-bottom-color: transparent;
         }
     }
+
     .link-active {
         border-bottom-color: transparent;
     }
 }
+
 .menu-open {
     left: 0px;
+}
+
+.connection-status {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    margin: auto 2px;
+    background: red;
+}
+
+.ok {
+    background: green;
 }

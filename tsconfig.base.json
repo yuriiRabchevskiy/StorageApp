@@ -21,5 +21,11 @@
       "dom"
     ],
     "module": "es2020"
+  },
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true,
+    "strictTemplates": true,
+    "strictDomEventTypes": false
   }
 }

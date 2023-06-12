@@ -20,9 +20,7 @@ export class MainComponent extends SecuredComponent implements OnInit {
   open: boolean = false;
 
   private _selectedPage: any;
-  get selectedPage() {
-    return this._selectedPage;
-  }
+  get selectedPage() { return this._selectedPage; }
   set selectedPage(page: any) {
     this.selectPage(page);
   }
@@ -33,7 +31,7 @@ export class MainComponent extends SecuredComponent implements OnInit {
   }
 
   constructor(userService: UserService, notify: MessageService,
-    private router: Router, private apiService: ApiService, trackerService: TrackerService) {
+    private router: Router, private apiService: ApiService, public trackerService: TrackerService) {
     super(userService, notify);
     const user = this.userService.getLocal();
     if (!user) return;
