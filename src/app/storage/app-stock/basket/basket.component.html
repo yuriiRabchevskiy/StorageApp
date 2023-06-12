@@ -2,10 +2,11 @@
     [closable]="false">
     <p-header class="sell-header">
         <app-i-button class="nav-button nav-back" *ngIf="items.length > 0 && view.isMobile" icon="i-close"
-            (iClick)="back()" [disabled]="sellCount === 0 || page === 1"></app-i-button>
+            (iClick)="back()" [disabled]="page === 1">
+        </app-i-button>
         <div class="d-header-title">{{pageNames[page - 1]}}</div>
         <app-i-button class="nav-button nav-next" *ngIf="items.length > 0 && view.isMobile" icon="i-open"
-            (iClick)="next()" [disabled]="sellCount === 0 || page === lastPage"></app-i-button>
+            (iClick)="next()" [disabled]="page === lastPage"></app-i-button>
     </p-header>
     <div class="dialog-body">
         <div class="d-page-wrap" [class.s-hidden]="page !== productPage">
@@ -68,9 +69,9 @@
     <p-footer class="s-dialog-foot">
         <div class="foot-group step-grop-footer" *ngIf="!view.isMobile || items.length > 0">
             <button *ngIf="items.length > 0 && page !== 1" class="d-s-button" pButton type="button" (click)="back()"
-                [disabled]="sellCount === 0 || page === 1" label="Назад"></button>
+                [disabled]="page === 1" label="Назад"></button>
             <button *ngIf="items.length > 0 && page !== lastPage" class="d-s-button" pButton type="button"
-                (click)="next()" [disabled]="sellCount === 0 || page === lastPage" label="Далі"></button>
+                (click)="next()" [disabled]="page === lastPage" label="Далі"></button>
         </div>
         <div class="foot-group">
             <button class="d-s-button" type="button" pButton icon="pi pi-check" (click)="save()" label="Зберегти"

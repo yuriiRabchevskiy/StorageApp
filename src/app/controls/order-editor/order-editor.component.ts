@@ -30,6 +30,7 @@ export class OrderEditorComponent implements OnInit {
 
   public get invalid() { return this.orderEditForm.invalid; }
 
+  public editedOrderId: number;
   @Input() item: IOrder = { id: 0 };
   @Input() canEdit: boolean;
 
@@ -55,6 +56,7 @@ export class OrderEditorComponent implements OnInit {
   }
 
   createOrderControl(val: IOrder) {
+    this.editedOrderId = val.id;
     this.orderNumber = new FormControl(this.item.orderNumber,
       [Validators.required, Validators.pattern('^[0-9]+$')
       ]);
