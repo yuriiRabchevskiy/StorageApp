@@ -3,10 +3,12 @@
     <a class="logo-wrap" routerLink="/storage">
       <li class="s-logo" (click)="selectPage('storage')"></li>
     </a>
-    <app-i-button class="menu-button" *ngIf="view.isMobile" [icon]="open ? 'i-closed' : 'i-menu'" (iClick)="openMenu()"></app-i-button>
+    <app-i-button class="menu-button" *ngIf="view.isMobile" [icon]="open ? 'i-closed' : 'i-menu'" (iClick)="openMenu()">
+    </app-i-button>
     <div class="flex-row" [ngClass]="{'mob-menu': view.isMobile, 'menu-open': open && view.isMobile}">
       <div *ngFor="let page of pages">
-        <a class="link-wrap" [class.link-active]="page.url === selectedPage" *ngIf="page.view" routerLink="/{{page.url}}" (click)="selectPage(page.url)">
+        <a class="link-wrap" [class.link-active]="page.url === selectedPage" *ngIf="page.view"
+          routerLink="/{{page.url}}" (click)="selectPage(page.url)">
           <li class="u-link">{{page.title}}</li>
         </a>
       </div>
@@ -14,6 +16,9 @@
   </ul>
   <ul class="nav-wrap">
     <li class="login-wrap">{{userLogin}}</li>
+    <li class="connection-status" [ngClass]="{'ok': !!trackerService.isConnected}"
+    [title]=" !!trackerService.isConnected ? 'Синхронізація працює' : 'Синхронізація відсутня'">
+    </li>
     <li class="logout-wrap" (click)=logout()>
       <div class="s-logout"></div>
     </li>

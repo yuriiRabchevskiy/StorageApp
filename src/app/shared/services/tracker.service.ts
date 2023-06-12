@@ -13,6 +13,10 @@ export class TrackerService {
     public productsCountChanged: LiteEvent<ApiProdCountChanges> = new LiteEvent<ApiProdCountChanges>();
     public orderChanged: LiteEvent<ApiOrdersChanges> = new LiteEvent<ApiOrdersChanges>();
 
+    public get isConnected() {
+        return this._connection?.state;
+    }
+
     private _userToken: string;
     private _connection: HubConnection;
 
