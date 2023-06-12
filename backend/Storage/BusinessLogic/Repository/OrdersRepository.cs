@@ -119,6 +119,7 @@ namespace DataAccess.Repository
         order.TrackingNumber = it.OrderNumber;
         order.Other = it.Other;
         order.Status = it.Status ?? OrderStatus.Open;
+        order.Delivery = it.Delivery;
         order.Payment = it.Payment;
         if (it.Status == OrderStatus.Delivered && order.CloseDate == null) order.CloseDate = DateTime.UtcNow;
         if (it.Status == OrderStatus.Canceled && order.CanceledDate == null)

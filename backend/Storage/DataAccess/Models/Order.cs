@@ -7,6 +7,8 @@ namespace DataAccess.Models
   public enum OrderStatus { Open = 0, Delivered = 1, Shipping = 2, Canceled = 3, Processing = 4 }
   public enum PaymentKind { Payed, CashOnDelivery }
 
+  public enum DeliveryKind { Other, NewPost, UkrPost, SelfDelivery, LvivTransfer,  }
+
   public class Order
   {
     public int Id { get; set; }
@@ -19,6 +21,7 @@ namespace DataAccess.Models
     public string Other { get; set; }
     public OrderStatus Status { get; set; }
     public PaymentKind Payment { get; set; }
+    public DeliveryKind Delivery { get; set; }
     public DateTime OpenDate { get; set; }
     public DateTime? CloseDate { get; set; }
     public DateTime? CanceledDate { get; set; }

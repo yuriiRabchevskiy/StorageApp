@@ -35,9 +35,18 @@
                 {{getTelError()}}
             </mat-error>
         </mat-form-field>
-        <mat-form-field class="s-input-wrapper">
+        <!--Payment is not needed anymore-->
+        <!-- <mat-form-field class="s-input-wrapper">
             <mat-select placeholder="Тип оплати" formControlName="payment">
                 <mat-option *ngFor="let item of payments" [value]="item.value">
+                    {{item.label}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field> -->
+
+        <mat-form-field class="s-input-wrapper">
+            <mat-select placeholder="Доставка" formControlName="delivery">
+                <mat-option *ngFor="let item of deliveryTypes" [value]="item.value">
                     {{item.label}}
                 </mat-option>
             </mat-select>

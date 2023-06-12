@@ -3,6 +3,7 @@ import { IProduct } from './products';
 
 export enum OrderStatus { Open = 0, Delivered = 1, Shipping = 2, Canceled = 3, Processing = 4 }
 export enum PaymentKind { payed = 0, cashOnDelivery = 1 }
+export enum DeliveryKind { Other, NewPost, UkrPost, SelfDelivery, LvivTransfer,  }
 
 export interface IOrder {
     id: number;
@@ -14,6 +15,7 @@ export interface IOrder {
     other?: string;
     status?: OrderStatus;
     payment?: PaymentKind;
+    delivery?: DeliveryKind;
     openDate?: Date;
     closeDate?: Date;
     seller?: string;

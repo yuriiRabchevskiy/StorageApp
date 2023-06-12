@@ -13,5 +13,11 @@
     {
       "path": "./src/tsconfig.spec.json"
     }
-  ]
+  ],
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true,
+    "strictTemplates": true,
+    "strictDomEventTypes": false
+  }
 }

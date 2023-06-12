@@ -1,3 +1,4 @@
+import { deliveryTypes } from './../../controls/order-editor/order-editor.component';
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { PreferenceService } from '@app/shared/services/preference.service';
@@ -10,7 +11,7 @@ import { ApiResponse } from '../../models/api';
 import { ApiOrdersChanges } from '../../models/api/state/state';
 import { ApiListComponent, ITableColumn } from '../../models/component/list-api.component';
 import { NumberFilter, StringFilter } from '../../models/filtering/filters';
-import { IOrder, ITransaction, OrderStatus, IOrderAction } from '../../models/storage';
+import { IOrder, ITransaction, OrderStatus, IOrderAction, DeliveryKind } from '../../models/storage';
 import { ApiService } from '../../shared/services/api.service';
 import { TrackerService } from '../../shared/services/tracker.service';
 import { Dictionary, IDictionary } from './../../models/dictionary';
@@ -73,7 +74,8 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         { title: 'Телефон', field: 'clientPhone', width: 92, },
         { title: 'Одержувач', field: 'clientName' },
         { title: 'Адреса', field: 'clientAddress', maxWidth: 140 },
-        { title: 'Тип Оплати', field: 'payment', width: 108, template: 'pageSpecial2' },
+        // { title: 'Тип Оплати', field: 'payment', width: 108, template: 'pageSpecial2' },
+        { title: 'Доставка', field: 'delivery', width: 108, template: 'pageSpecial2' },
         { title: 'Продавець', field: 'sellerShort', width: 90 },
         { title: 'Скасував', field: 'canceledBy', shouldHideFunc: () => !this.isCancelTab },
         { title: 'Товари', field: 'itemsName', width: 180 },
@@ -143,6 +145,12 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this.filters.push(this.typeFilter);
 
         this.initHiddenColumns('ordersColumns');
+    }
+
+    getDeliveryDescriptor(order: IOrder) {
+        const type = order.delivery ?? DeliveryKind.Other;
+        const result = deliveryTypes.find(dt => dt.value === type);
+        return result?.label || 'Невідомо'
     }
 
     onFiltered() {
