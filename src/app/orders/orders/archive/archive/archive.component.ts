@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { ApiListComponent } from 'app/models/component';
 import { Dictionary, IDictionary } from 'app/models/dictionary';
 import { StringFilter } from 'app/models/filtering/filters';
-import { IOrder, IOrderAction, ITransaction } from 'app/models/storage';
+import { DeliveryKind, IOrder, IOrderAction, ITransaction } from 'app/models/storage';
 import { ApiService } from 'app/shared/services/api.service';
 import * as moment from 'moment-mini';
 import { MessageService } from 'primeng/api';
@@ -12,6 +12,7 @@ import { PreferenceService } from '@app/shared/services/preference.service';
 import { ITableColumn } from '@app/models/component/list-api.component';
 import { groupBy } from 'lodash';
 import { UserService } from '@app/shared/services/user.service';
+import { deliveryTypes } from '@app/controls';
 
 interface IDoubleClick {
   date?: number;
@@ -65,7 +66,8 @@ export class ArchiveComponent extends ApiListComponent<IOrder> {
     { title: 'Телефон', field: 'clientPhone', width: 95, },
     { title: 'Одержувач', field: 'clientName', },
     { title: 'Адреса', field: 'clientAddress', maxWidth: 140 },
-    { title: 'Тип Оплати', field: 'payment', width: 108, template: 'pageSpecial2' },
+    // { title: 'Тип Оплати', field: 'payment', width: 108, template: 'pageSpecial2' },
+    { title: 'Доставка', field: 'delivery', width: 108, template: 'pageSpecial2' },
     { title: 'Продавець', field: 'sellerShort', width: 90 },
     { title: 'Товари', field: 'itemsName', width: 180 },
     { title: 'Нотатки', field: 'other', template: 'pageSpecial3' },
@@ -80,6 +82,12 @@ export class ArchiveComponent extends ApiListComponent<IOrder> {
     this.archiveTo = new Date(date.getFullYear(), date.getMonth() - 2, 1);
 
     this.initHiddenColumns('ordersArchiveColumns');
+  }
+
+  getDeliveryDescriptor(order: IOrder) {
+    const type = order.delivery ?? DeliveryKind.Other;
+    const result = deliveryTypes.find(dt => dt.value === type);
+    return result?.label || 'Невідомо'
   }
 
   doGetData() {

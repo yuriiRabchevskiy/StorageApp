@@ -18,11 +18,11 @@
                 </div>
                 <div class="login-form-input-wrapper flex-col">
                     <mat-form-field class="s-input-wrapper mat-input-with-error" [hideRequiredMarker]="true">
-                        <input matInput placeholder="Логін" type="text" [formControl]="loginForm.controls['login']" required>
+                        <input matInput placeholder="Логін" type="text" [formControl]="loginControl" required>
                         <mat-error *ngIf="loginForm.controls['login'].invalid">Ви не ввели логін</mat-error>
                     </mat-form-field>
                     <mat-form-field class="s-input-wrapper mat-input-with-error" [hideRequiredMarker]="true">
-                        <input matInput placeholder="Пароль" [formControl]="loginForm.controls['password']" type="password" required autocomplete="new-password">
+                        <input matInput placeholder="Пароль" [formControl]="passwordControl" type="password" required autocomplete="new-password">
                         <mat-error *ngIf="loginForm.controls['password'].invalid">Ви не ввели пароль</mat-error>
                     </mat-form-field>
                 </div>
@@ -49,7 +49,7 @@
         </div>
         <form [formGroup]="forgotForm" class="forgot-body flex-col">
             <mat-form-field class="forgot-field">
-                <input matInput placeholder="Введіть емейл" [formControl]="forgotForm.controls['email']" required>
+                <input matInput placeholder="Введіть емейл" [formControl]="emailControl" required>
                 <mat-error *ngIf="forgotForm.controls['email'].hasError('email')">Невалідний емейл</mat-error>
                 <mat-error *ngIf="forgotForm.controls['email'].hasError('required')">Ви не ввели дані</mat-error>
             </mat-form-field>

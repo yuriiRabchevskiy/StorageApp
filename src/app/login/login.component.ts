@@ -23,12 +23,17 @@ interface IUrlParamsPair {
 })
 
 export class LoginComponent implements OnInit {
+
+  loginControl = new FormControl('', Validators.required);
+  passwordControl = new FormControl('', [Validators.required]);
+  emailControl = new FormControl('', [Validators.required, Validators.email]);
+
   loginForm = new FormGroup({
-    login: new FormControl('', Validators.required),
-    password: new FormControl('', [Validators.required])
+    login: this.loginControl,
+    password: this.passwordControl
   });
   forgotForm = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email])
+    email: this.emailControl
   });
   token: string;
   returnUrl: string;
