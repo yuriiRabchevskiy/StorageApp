@@ -8,6 +8,10 @@ import { Component, Output, EventEmitter, Input } from '@angular/core';
 
 export class ConfirmComponent {
   @Output() confirm: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @Input() yesHeader = "Підтвердити";
+  @Input() cancelHeader = "Відмінити";
+
   constructor() { }
 
   confirmation(val: boolean) {

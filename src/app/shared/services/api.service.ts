@@ -77,7 +77,7 @@ export class ApiService extends ApiBase {
         return this.doGet('order/canceled');
     }
 
-    saveOrder(data): Observable<ApiResponse<any>> {
+    saveOrder(data: IOrder): Observable<ApiResponse<any>> {
         return this.doPost('order', data);
     }
 

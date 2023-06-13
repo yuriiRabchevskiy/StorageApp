@@ -3,8 +3,9 @@
         <ng-content select="[header]"></ng-content>
     </div>
     <div class="confirm-bottom flex-row">
-        <button class="d-s-button" type="button" pButton (click)="confirmation(true)" label="Підтвердити"></button>
-        <button class="d-s-button-cancel" type="button" pButton (click)="confirmation(false)" label="Відмінити"></button>
+        <button class="d-s-button" type="button" pButton (click)="confirmation(true)" label="{{yesHeader}}"></button>
+        <button class="d-s-button-cancel" type="button" pButton (click)="confirmation(false)" label="{{cancelHeader}}">            
+        </button>
     </div>
 </div>
 <div class="overlay" (click)="confirmation(false)"></div>

@@ -28,21 +28,16 @@ namespace BusinessLogic.Repository.Reports
 
     public async Task<IEnumerable<ApiSale>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
-      List<ProductAction> soldProducts;
-      Dictionary<int, Product> products;
-      using (var context = _di.GetService<ApplicationDbContext>())
-      {
-        soldProducts = await context.ProductsTrqansactions
-          .Where(it => isAdmin || it.UserId == userId)
-          .Where(it => it.Operation == OperationDescription.Sold)
-          .Where(it => from <= it.Date && it.Date <= till)
-          .ToListAsync().ConfigureAwait(false);
-      }
+      await using var context = _di.GetRequiredService<ApplicationDbContext>();
 
-      using (var context = _di.GetService<ApplicationDbContext>())
-      {
-        products = await context.Products.ToDictionaryAsync(it => it.Id, it => it).ConfigureAwait(false);
-      }
+      var soldProducts = await context.ProductsTrqansactions
+        .Where(it => isAdmin || it.UserId == userId)
+        .Where(it => it.Operation == OperationDescription.Sold)
+        .Where(it => from <= it.Date && it.Date <= till)
+        .ToListAsync();
+
+      var products = await context.Products.ToDictionaryAsync(it => it.Id, it => it);
+
 
       var result = soldProducts.GroupBy(it => it.ProductId).Select(it =>
       {

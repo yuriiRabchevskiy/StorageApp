@@ -15,6 +15,7 @@ import { IOrder, ITransaction, OrderStatus, IOrderAction, DeliveryKind } from '.
 import { ApiService } from '../../shared/services/api.service';
 import { TrackerService } from '../../shared/services/tracker.service';
 import { Dictionary, IDictionary } from './../../models/dictionary';
+import { catchError, forkJoin, lastValueFrom, map, of } from 'rxjs';
 
 interface ITab {
     label: string;
@@ -43,6 +44,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     public selectedItem: IOrder;
     public orderDialog: boolean = false;
     public showConfirm: boolean = false;
+    public showConfirmMoveToSent: boolean = false;
     public showConfirmCancel: boolean = false;
     public showOrderHistory: boolean = false;
     public typeFilter: NumberFilter<IOrder> = new NumberFilter<IOrder>();
@@ -276,6 +278,47 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             err => this.showWebErrorMessage('Продажу не закрито', err)
         );
         this.showConfirm = false;
+    }
+
+    async confirmMoveToSent(val: boolean) {
+        if (!val) {
+            this.showConfirmMoveToSent = false;
+            return;
+        }
+
+        const data = (this.viewData || []).slice();
+        let successCount = 0;;
+        const totalCount = data.length;
+        const requests = data.map(it => {
+            const originalStatus = it.status;
+            it.status = OrderStatus.Shipping;
+            return this.apiService.saveOrder(it).pipe(
+                map(response => {
+                    // increment success counter
+                    if (response.success) {
+                        successCount++;
+                        return response;
+                    }
+                    it.status = originalStatus;
+                    return response;
+                }),
+                catchError(error => {
+                    it.status = originalStatus;
+                    return of(null);
+                })
+            );
+        })
+
+        await lastValueFrom(forkJoin(requests));
+
+        if (totalCount == successCount) {
+            this.showSuccessMessage('Статус продаж змінено на відправлені');
+        } else {
+            this.showWebErrorMessage(`Для деяких продаж не вдалося змінити статус (${totalCount - successCount}/${totalCount})`, '');
+        }
+
+        this.filter();
+        this.showConfirmMoveToSent = false;
     }
 
     closeCancelOrder(val) {

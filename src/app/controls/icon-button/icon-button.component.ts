@@ -12,6 +12,7 @@ export class IconButtonComponent {
   @Input() disabled: boolean = false;
   @Input() icon: string;
   @Input() sprite: string = 'app-sprite';
+  @Input() useSprite: boolean = true;
   @Output() iClick: EventEmitter<any> = new EventEmitter<any>();
 
   constructor() { }
