@@ -1,12 +1,21 @@
 @import '../../../assets/css/globals';
+
+:host {
+    display: flex;
+    flex-grow: 1;
+}
+
 .group-wrap {
     display: flex;
+    flex-grow: 1;
     width: auto;
     overflow: hidden;
 }
+
 .withOverflow {
     overflow: unset;
 }
+
 .open {
     align-items: flex-start;
     @include wH(auto, auto);
@@ -19,7 +28,7 @@
     background: silver;
     box-sizing: border-box;
     padding: 0px 0px 0px 44px;
-    box-shadow: -8px 8px 12px -6px rgba(255,255,255,1);
+    box-shadow: -8px 8px 12px -6px rgba(255, 255, 255, 1);
 }
 
 .closed {
@@ -30,6 +39,7 @@
 .open-bottom {
     padding: 44px 2px 2px 2px;
     max-width: 272px;
+
     .closed {
         top: 0px;
     }
@@ -38,16 +48,30 @@
 .but-wrap {
     display: flex;
     flex-wrap: nowrap;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+.but-left {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.but-right {
+    display: flex;
+    flex-wrap: nowrap;
 }
 
 .hidden-content {
     display: none;
 }
+
 .show-content {
     display: flex;
     flex-wrap: wrap;
     align-content: space-between;
 }
-:host ::ng-deep .show-content >* {
+
+:host ::ng-deep .show-content>* {
     margin-bottom: 4px;
 }

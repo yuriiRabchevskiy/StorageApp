@@ -6,9 +6,9 @@
             <app-i-button icon="add-user-icon" title="Додати користувача" (iClick)="addNewUser()">
             </app-i-button>
             <app-i-button icon="del-icon" title="Видалити користувача" (iClick)="confirmation()"></app-i-button>
-            <app-i-button icon="edit-icon" title="Редагувати користувача" (iClick)="showToEdit()">
+            <app-i-button [useSprite]="false" icon="pencil" title="Редагувати користувача" (iClick)="showToEdit()">
             </app-i-button>
-            <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
+            <app-i-button right icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
         </app-button-group>
 
         <div class="button-wrap">

@@ -1,4 +1,5 @@
 @import '../../../assets/css/globals';
+
 .i-button {
     display: inline-block;
     position: relative;
@@ -9,26 +10,31 @@
     outline: 0px;
     padding: 0px;
     cursor: pointer;
+
     &:focus,
     &:hover {
         outline: none;
         background-color: $appRedHoverColor;
     }
+
     &:disabled,
     &:disabled:hover {
         cursor: default;
         background-color: $appRedDisabledColor;
     }
 }
-.rotate-icon .i-wrap{
+
+.rotate-icon .i-wrap {
     transform: rotate(90deg);
 }
+
 .i-button-xs {
     @include wH(24px, 24px);
 }
 
 .i-disabled {
     background-color: $appRedDisabledColor;
+
     &:hover {
         background-color: $appRedDisabledColor;
     }
@@ -192,7 +198,6 @@
 .i-history,
 .i-button.i-disabled:hover .i-history {
     background-position: -1327px -49px;
-    
 }
 
 .i-button:hover .i-history,

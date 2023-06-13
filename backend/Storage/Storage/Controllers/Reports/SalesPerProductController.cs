@@ -17,23 +17,21 @@ namespace Storage.Controllers
   [Authorize(Roles = UserRole.Admin)]
   public class SalesPerProductController : ReportsControllerBase
   {
-    private readonly ISalesPerProductRepository _repo;
 
-    public SalesPerProductController(ISalesPerProductRepository repo,
-      UserManager<ApplicationUser> userManager, IConfiguration configuration) : base(userManager, configuration)
+
+    public SalesPerProductController(UserManager<ApplicationUser> userManager, IConfiguration configuration) : base(userManager, configuration)
     {
-      _repo = repo;
     }
 
     // GET api/values
     [HttpGet("{from}/{to}")]
-    public async Task<ApiResponse<ApiSale>> Get(long from, long to)
+    public async Task<ApiResponse<ApiSale>> Get(long from, long to, [FromServices] ISalesPerProductRepository repo)
     {
       var dFrom = from.ToDateTime();
       var dTo = to.ToDateTime();
-      var user = await GetCurrentUserAsync().ConfigureAwait(false);
+      var user = await GetCurrentUserAsync();
       var isAdmin = await GetIsAdminAsync(user);
-      var data = await _repo.GetAsync(user.Id, isAdmin, dFrom, dTo).ConfigureAwait(false);
+      var data = await repo.GetAsync(user.Id, isAdmin, dFrom, dTo);
       return new ApiResponse<ApiSale>(data);
     }
 
