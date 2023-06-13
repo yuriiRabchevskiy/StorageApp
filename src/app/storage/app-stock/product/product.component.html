@@ -47,8 +47,8 @@
             </div>
         </div>
         <div class="d-cb-wrap flex-row" *ngIf="product.isNew">
-            <p-checkbox class="s-cb" *ngIf="product.isNew" name="next" label="Додати ще" [(ngModel)]="addNext" binary="true" (onChange)="addMore($event)"></p-checkbox>
-            <p-checkbox class="s-cb" *ngIf="addNext" name="next" label="Додати копію" [(ngModel)]="addCopy" binary="true" (onChange)="addMoreCopy($event)"></p-checkbox>
+            <p-checkbox class="s-cb" *ngIf="product.isNew" name="next" label="Додати ще" [(ngModel)]="addNext" [binary]="true" (onChange)="addMore($event)"></p-checkbox>
+            <p-checkbox class="s-cb" *ngIf="addNext" name="next" label="Додати копію" [(ngModel)]="addCopy" [binary]="true" (onChange)="addMoreCopy($event)"></p-checkbox>
         </div>
     </div>
 

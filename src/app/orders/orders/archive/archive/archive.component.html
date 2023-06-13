@@ -42,7 +42,7 @@
         <p-table class="prime-table" [value]="viewData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
             selectionMode="single" [pageLinks]="4" [rows]="100" [responsive]="true" [scrollable]="false" scrollWidth="100%"
             scrollHeight="100%" dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
-          'clientPhone', 'clientName', 'clientAddress', 'payment', 'seller', 'canceledBy',
+          'clientPhone', 'clientName', 'clientAddress', 'delivery', 'seller', 'canceledBy',
           'itemsName', 'other', 'totalPrice']" (onSort)="onSort()">
 
             <ng-template pTemplate="colgroup">
@@ -113,8 +113,8 @@
                                   </ng-container>
                             </ng-container>
                             <ng-container *ngIf="column.template === 'pageSpecial2'">
-                                {{rowData.payment === 0 ? 'Оплачено' : 'Наложний'}}
-                            </ng-container>
+                                {{getDeliveryDescriptor(rowData)}}
+                              </ng-container>
                             <ng-container *ngIf="column.template === 'pageSpecial3'">
                                 <span class="notes" [title]="rowData[column.field]">  {{rowData[column.field]}}</span>
                               </ng-container>

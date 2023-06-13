@@ -80,7 +80,7 @@
                     <ng-container *ngFor="let column of columns">
                         <th *ngIf="visibleColumn(column)">
                             <input *ngIf="!column.hideFilter" pInputText type="text" [style.width]="'100%'"
-                                (input)="dt.filter($event.target.value, column.field)" />
+                                (input)="dt.filter($event.target.value, column.field, null)" />
                         </th>
                     </ng-container>
                     <th *ngFor="let col of wereHouses"></th>

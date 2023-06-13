@@ -36,7 +36,7 @@
             </div>
         </div>
         <div class="d-cb-wrap flex-row">
-            <p-checkbox class="s-cb" name="next" label="Додати ще" [(ngModel)]="addNext" binary="true" (onChange)="addMore($event)"></p-checkbox>
+            <p-checkbox class="s-cb" name="next" label="Додати ще" [(ngModel)]="addNext" [binary]="true" (onChange)="addMore($event)"></p-checkbox>
         </div>
     </div>
     <p-footer class="s-dialog-foot">
