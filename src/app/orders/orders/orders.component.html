@@ -10,7 +10,7 @@
       <div *ngIf="view.isMobile">
       </div>
       <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
-        <app-i-button [useSprite]="false"  icon="pencil" *ngIf="selectedTab.value !== 1 && !isCancelTab"
+        <app-i-button [useSprite]="false" icon="pencil" *ngIf="selectedTab.value !== 1 && !isCancelTab"
           [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Редагувати продажу"
           (iClick)="showToEdit()">
         </app-i-button>
@@ -19,14 +19,20 @@
           [disabled]="viewData.length < 1 || selectedItems.length > 1">
         </app-i-button>
         <app-i-button [useSprite]="false" icon="rocket" *ngIf="isProcessingTab && canView"
-          [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Перемістити з комплектується у відправлені"
-          (iClick)="showConfirmMoveToSent = true">
+          [disabled]="viewData.length < 1 || selectedItems.length > 1"
+          title="Перемістити з комплектується у відправлені" (iClick)="showConfirmMoveToSent = true">
         </app-i-button>
         <app-i-button [useSprite]="false" icon="lock" *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
           [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Закрити продажу"
           (iClick)="confirmation()">
         </app-i-button>
         <app-i-button [useSprite]="false" icon="hourglass" title="Історія замовлення" (iClick)="showHistory()"
+          [disabled]="viewData.length < 1 || selectedItems.length > 1">
+        </app-i-button>
+        <app-i-button icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
+          [disabled]="viewData.length < 1 || selectedItems.length > 1">
+        </app-i-button>
+        <app-i-button icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
           [disabled]="viewData.length < 1 || selectedItems.length > 1">
         </app-i-button>
 
@@ -37,13 +43,6 @@
         <!-- <app-i-button *ngIf="canView" icon="i-export-all" title="Зберегти всі дані" (iClick)="saveToExcel(viewData)"
           [disabled]="viewData.length < 1"></app-i-button> -->
         <ng-container right>
-
-          <app-i-button icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
-            [disabled]="viewData.length < 1 || selectedItems.length > 1">
-          </app-i-button>
-          <app-i-button icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
-            [disabled]="viewData.length < 1 || selectedItems.length > 1">
-          </app-i-button>
           <button class="i-menu-button" title="Колонки" (click)="showColumnsPicker = true"
             [ngClass]="{'i-menu-button-active': hiddenColumns.size}">
             <i class="dripicons dripicons-toggles"> </i>
@@ -65,7 +64,7 @@
     <p-table class="prime-table" [value]="viewData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
       responsiveLayout="scroll" [resizableColumns]="true" [pageLinks]="4" [rows]="100" [responsive]="true"
       [scrollable]="false" scrollWidth="100%" scrollHeight="100%" dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
-        'clientPhone', 'clientName', 'clientAddress', 'delivery', 'seller', 'canceledBy',
+        'clientPhone', 'clientName', 'clientAddress', 'deliveryString', 'seller', 'canceledBy',
         'itemsName', 'other', 'totalPrice']" (onSort)="onSort()" selectionMode="single">
 
       <ng-template pTemplate="colgroup">
@@ -133,9 +132,6 @@
                     <span>{{rowData.orderNumber}}</span>
                   </a>
                 </ng-container>
-              </ng-container>
-              <ng-container *ngIf="column.template === 'pageSpecial2'">
-                {{getDeliveryDescriptor(rowData)}}
               </ng-container>
               <ng-container *ngIf="column.template === 'pageSpecial3'">
                 <span class="notes" [title]="rowData[column.field]"> {{rowData[column.field]}}</span>
@@ -225,15 +221,16 @@
   [canEdit]="(canEdit || isAdminAssistant)">
 </app-order>
 
-<app-confirm (confirm)="confirmCloseOrder($event)" *ngIf="showConfirm"  [yesHeader]="'Закрити продажу'">
+<app-confirm (confirm)="confirmCloseOrder($event)" *ngIf="showConfirm" [yesHeader]="'Закрити продажу'">
   <span header class="confirm-title">Ви впевнені, що бажаєте закрити продажу №:
     <b>{{selectedItem.orderNumber}} для {{selectedItem.clientName}}</b> ?
   </span>
 </app-confirm>
 
-<app-confirm (confirm)="confirmMoveToSent($event)" *ngIf="showConfirmMoveToSent" yesHeader="Перемістити {{viewData.length}}">
+<app-confirm (confirm)="confirmMoveToSent($event)" *ngIf="showConfirmMoveToSent"
+  yesHeader="Перемістити {{dt.filteredValue?.length}}">
   <span header class="confirm-title">Перемістити усі
-    (<b>{{viewData.length}}</b>) замовленя з комплектується у відправлені?
+    (<b>{{dt.filteredValue?.length}}</b>) замовленя з комплектується у відправлені?
   </span>
 </app-confirm>
 

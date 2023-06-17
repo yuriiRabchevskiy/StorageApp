@@ -23,6 +23,8 @@ namespace DataAccess.Repository
 
     Task<IReadOnlyCollection<ApiOrderAction>> GetOrderHistoryAsync(string userId, bool isAdmin, int orderId);
     Task UpdateAsync(string userId, bool isAdmin, ApiOrder product);
+
+    Task MoveAsync(string userId, bool isAdmin, ApiOrderMoveCommand product);
   }
 
   public class OrdersRepository : IOrdersRepository
@@ -159,6 +161,37 @@ namespace DataAccess.Repository
           } }).ConfigureAwait(false);
       }
       await context.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    public async Task MoveAsync(string userId, bool isAdmin, ApiOrderMoveCommand it)
+    {
+      await using var context = _di.GetRequiredService<ApplicationDbContext>();
+      var order = await context.Orders.FindAsync(it.Id);
+
+      if (order == null) throw new ArgumentException("Замовлення не знайдено");
+      if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
+
+      order.Status = OrderStatus.Shipping;
+      context.OrderAction.Add(new OrderAction
+      {
+        Date = DateTime.UtcNow,
+        OrderId = order.Id,
+        UserId = userId,
+        Note = "Перенесено у відправлені",
+        Operation = OrderOperation.Updated,
+        OrderJson = JsonConvert.SerializeObject(it)
+      });
+
+      await context.SaveChangesAsync().ConfigureAwait(false);
+
+      var apiOrder = _mapper.Map<ApiOrder>(order);
+      await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
+          {
+            OrderId = order.Id,
+            Order = apiOrder,
+            ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+          } }).ConfigureAwait(false);
+
     }
   }
 }

@@ -3,7 +3,16 @@ import { IProduct } from './products';
 
 export enum OrderStatus { Open = 0, Delivered = 1, Shipping = 2, Canceled = 3, Processing = 4 }
 export enum PaymentKind { payed = 0, cashOnDelivery = 1 }
-export enum DeliveryKind { Other, NewPost, UkrPost, SelfDelivery, LvivTransfer,  }
+export enum DeliveryKind { Other, NewPost, UkrPost, SelfDelivery, LvivTransfer, Drop }
+
+export const deliveryTypes = [
+    { label: 'Нова Пошта', value: DeliveryKind.NewPost },
+    { label: 'Укрпошта', value: DeliveryKind.UkrPost },
+    { label: 'Самовивіз', value: DeliveryKind.SelfDelivery },
+    { label: 'По Львову', value: DeliveryKind.LvivTransfer },
+    { label: 'Дроп', value: DeliveryKind.Drop },
+    { label: 'Інше', value: DeliveryKind.Other },
+  ]
 
 export interface IOrder {
     id: number;
@@ -16,6 +25,7 @@ export interface IOrder {
     status?: OrderStatus;
     payment?: PaymentKind;
     delivery?: DeliveryKind;
+    deliveryString?: string;
     openDate?: Date;
     closeDate?: Date;
     seller?: string;
@@ -64,6 +74,7 @@ export class Order implements IOrder {
     other?: string;
     status?: OrderStatus = OrderStatus.Open;
     payment?: PaymentKind = PaymentKind.cashOnDelivery;
+    delivery?: DeliveryKind;
     openDate?: Date;
     closeDate?: Date;
     seller?: string;

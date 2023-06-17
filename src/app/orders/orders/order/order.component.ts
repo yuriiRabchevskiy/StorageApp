@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core
 import { OrderEditorComponent } from '@app/controls/order-editor/order-editor.component';
 import { MessageService } from 'primeng/api';
 import { IOrder } from './../../../models/storage';
+import { getDeliveryDescriptor } from '@app/shared/services/api.service';
 
 @Component({
     selector: 'app-order',
@@ -55,6 +56,7 @@ export class OrderComponent {
         this.order.status = this.orderEditor.status.value;
         this.order.payment = this.orderEditor.payment.value;
         this.order.delivery = this.orderEditor.delivery.value;
+        this.order.deliveryString = getDeliveryDescriptor(this.orderEditor.delivery.value);
         this.order.other = this.orderEditor.orderEditForm.value.orderOther;
         return true;
     }

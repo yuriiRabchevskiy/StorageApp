@@ -155,6 +155,7 @@ namespace BusinessLogic.Repository
             var order = _mapper.Map<Order>(info);
             order.OpenDate = date;
             order.Status = OrderStatus.Open;
+            order.Delivery = info.Delivery;
             order.ResponsibleUserId = userId;
             order.Transactions = new List<ProductAction>();
 

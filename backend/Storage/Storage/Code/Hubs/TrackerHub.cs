@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BusinessLogic.Abstractions;
 using BusinessLogic.Models.Api.State;
@@ -25,7 +26,13 @@ namespace Storage.Code.Hubs
 
     public Task OrderChangedAsync(IEnumerable<ApiOrderDetailsChange> changes)
     {
-      return _context.Clients.All.SendAsync("orderChanged", new ApiOrderDetailsChanges { Changes = changes });
+      var changesL = changes.ToList();
+      foreach (var change in changesL.Where(it => it.Order.Products != null))
+      {
+        change.Order.Products = null; // we do not want to sent products
+      }
+
+      return _context.Clients.All.SendAsync("orderChanged", new ApiOrderDetailsChanges { Changes = changesL });
     }
   }
 
