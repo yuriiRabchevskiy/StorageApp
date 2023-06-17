@@ -9,13 +9,18 @@ import { IUser, ISUser, IUserToEdit, IChangePassword } from '../../models/manage
 import { IProduct } from './../../models/storage/products';
 import { IWarehouse } from '../../models/storage/werehouse';
 import { ICategory } from './../../models/storage/categories';
-import { IOrder, ISaleOrder, IOrderAction, OrderOperation } from './../../models/storage/order';
+import { IOrder, ISaleOrder, IOrderAction, OrderOperation, DeliveryKind, deliveryTypes } from './../../models/storage/order';
 import { ICancelOrder } from '../../models/storage/index';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 
-@Injectable()
+export function getDeliveryDescriptor(delivery: DeliveryKind) {
+    const type = delivery ?? DeliveryKind.Other;
+    const result = deliveryTypes.find(dt => dt.value === type);
+    return result?.label || 'Невідомо'
+}
 
+@Injectable()
 export class ApiService extends ApiBase {
     constructor(http: HttpClient, userService: UserService) {
         super(http, userService);
@@ -31,7 +36,11 @@ export class ApiService extends ApiBase {
 
     // orders method
     getOrders(): Observable<ApiResponse<IOrder>> {
-        return this.doGet('order');
+        return this.doGet('order').pipe(tap((res: ApiResponse<IOrder>) => {
+            res.items?.map(order => {
+                order.deliveryString = getDeliveryDescriptor(order.delivery);
+            })
+        }));
     }
 
     // orders method

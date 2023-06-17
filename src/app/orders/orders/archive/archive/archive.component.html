@@ -17,19 +17,18 @@
                     [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Редагувати продажу"
                     (iClick)="showToEdit()">
                 </app-i-button>
-                <app-i-button  [useSprite]="false" icon="hourglass" title="Історія замовлення" (iClick)="showHistory()"
+                <app-i-button [useSprite]="false" icon="hourglass" title="Історія замовлення" (iClick)="showHistory()"
+                    [disabled]="viewData.length < 1 || selectedItems.length > 1">
+                </app-i-button>
+                <app-i-button icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
+                    [disabled]="viewData.length < 1 || selectedItems.length > 1">
+                </app-i-button>
+                <app-i-button icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
                     [disabled]="viewData.length < 1 || selectedItems.length > 1">
                 </app-i-button>
 
-
-
                 <ng-container right>
-                    <app-i-button icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
-                        [disabled]="viewData.length < 1 || selectedItems.length > 1">
-                    </app-i-button>
-                    <app-i-button icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
-                        [disabled]="viewData.length < 1 || selectedItems.length > 1">
-                    </app-i-button>
+
                     <button class="i-menu-button" title="Колонки" (click)="showColumnsPicker = true"
                         [ngClass]="{'i-menu-button-active': hiddenColumns.size}">
                         <i class="dripicons dripicons-toggles"> </i>
@@ -48,7 +47,7 @@
         <p-table class="prime-table" [value]="viewData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
             selectionMode="single" [pageLinks]="4" [rows]="100" [responsive]="true" [scrollable]="false"
             scrollWidth="100%" scrollHeight="100%" dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
-          'clientPhone', 'clientName', 'clientAddress', 'delivery', 'seller', 'canceledBy',
+          'clientPhone', 'clientName', 'clientAddress', 'deliveryString', 'seller', 'canceledBy',
           'itemsName', 'other', 'totalPrice']" (onSort)="onSort()">
 
             <ng-template pTemplate="colgroup">
@@ -121,9 +120,6 @@
                                         <span>{{rowData.orderNumber}}</span>
                                     </a>
                                 </ng-container>
-                            </ng-container>
-                            <ng-container *ngIf="column.template === 'pageSpecial2'">
-                                {{getDeliveryDescriptor(rowData)}}
                             </ng-container>
                             <ng-container *ngIf="column.template === 'pageSpecial3'">
                                 <span class="notes" [title]="rowData[column.field]"> {{rowData[column.field]}}</span>

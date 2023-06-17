@@ -1,4 +1,3 @@
-import { deliveryTypes } from './../../controls/order-editor/order-editor.component';
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { PreferenceService } from '@app/shared/services/preference.service';
@@ -11,8 +10,8 @@ import { ApiResponse } from '../../models/api';
 import { ApiOrdersChanges } from '../../models/api/state/state';
 import { ApiListComponent, ITableColumn } from '../../models/component/list-api.component';
 import { NumberFilter, StringFilter } from '../../models/filtering/filters';
-import { IOrder, ITransaction, OrderStatus, IOrderAction, DeliveryKind } from '../../models/storage';
-import { ApiService } from '../../shared/services/api.service';
+import { IOrder, ITransaction, OrderStatus, IOrderAction } from '../../models/storage';
+import { ApiService, getDeliveryDescriptor } from '../../shared/services/api.service';
 import { TrackerService } from '../../shared/services/tracker.service';
 import { Dictionary, IDictionary } from './../../models/dictionary';
 import { catchError, forkJoin, lastValueFrom, map, of } from 'rxjs';
@@ -77,7 +76,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         { title: 'Одержувач', field: 'clientName' },
         { title: 'Адреса', field: 'clientAddress', maxWidth: 140 },
         // { title: 'Тип Оплати', field: 'payment', width: 108, template: 'pageSpecial2' },
-        { title: 'Доставка', field: 'delivery', width: 108, template: 'pageSpecial2' },
+        { title: 'Доставка', field: 'deliveryString', width: 108 },
         { title: 'Продавець', field: 'sellerShort', width: 90 },
         { title: 'Скасував', field: 'canceledBy', shouldHideFunc: () => !this.isCancelTab },
         { title: 'Товари', field: 'itemsName', width: 180 },
@@ -149,11 +148,6 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this.initHiddenColumns('ordersColumns');
     }
 
-    getDeliveryDescriptor(order: IOrder) {
-        const type = order.delivery ?? DeliveryKind.Other;
-        const result = deliveryTypes.find(dt => dt.value === type);
-        return result?.label || 'Невідомо'
-    }
 
     onFiltered() {
         super.onFiltered();
@@ -286,7 +280,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             return;
         }
 
-        const data = (this.viewData || []).slice();
+        const data = (this.dataTable.filteredValue || []).slice();
         let successCount = 0;;
         const totalCount = data.length;
         const requests = data.map(it => {
@@ -455,13 +449,22 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
     private onOrdersChanged = (info?: ApiOrdersChanges) => {
         console.log('products count changed', info);
+        let shouldFilter = false;
         info.changes.forEach(orderChange => {
+            const newOrder = orderChange.order;
             const current = this.data.find(it => it.id === orderChange.orderId);
+            if (!current) return;
+            const statusChanged = current.status != newOrder.status;
             const originalProducts = current.products;
+            shouldFilter = shouldFilter || statusChanged;
             Object.assign(current, orderChange.order);
+            current.deliveryString = getDeliveryDescriptor(newOrder.delivery);
             current.products = originalProducts; // restore as unmodifiable
             current.openDate = new Date(current.openDate); // open date
         });
+        if (shouldFilter) {
+            this.filter();
+        }
     }
 
     public showHistory() {

@@ -1,15 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IOrder, OrderStatus } from './../../models/storage';
-import { PaymentKind, DeliveryKind } from './../../models/storage/order';
-
-export const deliveryTypes = [
-  { label: 'Нова Пошта', value: DeliveryKind.NewPost },
-  { label: 'Укрпошта', value: DeliveryKind.UkrPost },
-  { label: 'Самовивіз', value: DeliveryKind.SelfDelivery },
-  { label: 'По Львову', value: DeliveryKind.LvivTransfer },
-  { label: 'Інше', value: DeliveryKind.Other },
-]
+import { PaymentKind, deliveryTypes } from './../../models/storage/order';
 
 
 @Component({

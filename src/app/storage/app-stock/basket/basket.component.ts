@@ -1,6 +1,6 @@
 import { SaleOrder } from './../../../models/storage/order';
 import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { ApiService } from '../../../shared/services/api.service';
+import { ApiService, getDeliveryDescriptor } from '../../../shared/services/api.service';
 import { ISaleOrder, IProdOrder, IWarehouse } from '../../../models/storage';
 import { ViewState } from '../../../shared/helpers/index';
 import { MessageService } from 'primeng/api';
@@ -70,7 +70,8 @@ export class BasketComponent extends SecuredComponent {
     this.order.clientPhone = this.orderEditor.orderEditForm.value.clientPhone;
     this.order.status = this.orderEditor.status.value;
     this.order.other = this.orderEditor.orderEditForm.value.orderOther;
-    this.order.payment = this.orderEditor.payment.value;
+    this.order.delivery = this.orderEditor.delivery.value;
+    this.order.deliveryString = getDeliveryDescriptor(this.orderEditor.delivery.value);
     this.order.productOrders = this.items.map(it => it.prodOrder);
   }
 
@@ -81,7 +82,7 @@ export class BasketComponent extends SecuredComponent {
 
   save() {
     this.createOrder();
-    this.finisSale(this.order);
+    this.finishSale(this.order);
   }
 
   closeDialog() {
@@ -100,7 +101,7 @@ export class BasketComponent extends SecuredComponent {
     }
   }
 
-  finisSale(item: ISaleOrder) {
+  finishSale(item: ISaleOrder) {
     this.isSaving = true;
     this.apiService.sale(item).subscribe(
       res => {

@@ -22,9 +22,11 @@
                 <app-i-button *ngIf="canView" icon="addition-icon" title="Поповнити склад"
                     (iClick)="showAdditionDialog(true)"></app-i-button>
                 <app-i-button *ngIf="canView" icon="withdrawal-icon" title="Забрати зі складу"
-                    (iClick)="showRemovalDialog(true)"></app-i-button>
+                    (iClick)="showRemovalDialog(true)">
+                </app-i-button>
                 <app-i-button *ngIf="canView && wereHouses.length > 2" icon="transfer-icon" title="Перемістити продукт"
-                    (iClick)="showTransferDialog()" [disabled]="!selectedItem || !isBalance"></app-i-button>
+                    (iClick)="showTransferDialog()" [disabled]="!selectedItem || !isBalance">
+                </app-i-button>
                 <app-i-button icon="sell-icon" title="Додати до кошика" (iClick)="showSellDialog()" *ngIf="!isClient"
                     [disabled]="!selectedItem || !isBalance">
                 </app-i-button>
@@ -37,12 +39,11 @@
                         [ngClass]="{'i-menu-button-active': hiddenColumns.size}">
                         <i class="dripicons dripicons-toggles"> </i>
                     </button>
-                    <app-i-button right icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
+                    <app-i-button right icon="i-refresh" title="Оновити дані" (iClick)="refresh()">
+                    </app-i-button>
                 </ng-container>
             </app-button-group>
             <div class="button-wrap">
-
-
                 <input class="s-serche" type="text" pInputText size="50" placeholder="Пошук"
                     (input)="dt.filterGlobal($event.target.value, 'contains')">
             </div>
