@@ -7,6 +7,14 @@ namespace DataAccess
 {
   public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
   {
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<ProductAction> ProductsTrqansactions { get; set; }
+    public DbSet<Warehouse> Warehouses { get; set; }
+    public DbSet<WarehouseProducts> WarehouseProducts { get; set; }
+    public DbSet<Preference> UserPreferences { get; set; }
+    public DbSet<OrderAction> OrderAction { get; set; }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
@@ -39,14 +47,7 @@ namespace DataAccess
         .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
     }
 
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<Product> Products { get; set; }
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<ProductAction> ProductsTrqansactions { get; set; }
-    public DbSet<Warehouse> Warehouses { get; set; }
-    public DbSet<WarehouseProducts> WarehouseProducts { get; set; }
-    public DbSet<Preference> UserPreferences { get; set; }
-    public DbSet<OrderAction> OrderAction { get; set; }
+
     
   }
 }
