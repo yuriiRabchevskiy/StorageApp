@@ -11,6 +11,8 @@ using BusinessLogic.Models.Api.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using MediatR.NotificationPublishers;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace DataAccess.Repository
 {
@@ -25,14 +27,25 @@ namespace DataAccess.Repository
     Task UpdateAsync(string userId, bool isAdmin, ApiOrder product);
 
     Task MoveAsync(string userId, bool isAdmin, ApiOrderMoveCommand product);
-  }
 
+    Task MoveOrderAsync(string userId, bool isAdmin, ApiOrderMoveCommand product);
+  }
   public class OrdersRepository : IOrdersRepository
   {
     private readonly IServiceProvider _di;
     private readonly IMapper _mapper;
     IStateInformer Informer => _di.GetService<IStateInformer>();
 
+    private static string GetNoteByOrderStatus(OrderStatus orderStatus)
+    {
+      switch (orderStatus)
+      {
+        case OrderStatus.Delivered: return "Отриманий";
+        case OrderStatus.Shipping: return "Відправлений";
+        case OrderStatus.Processing: return "Комплектується";
+        default: throw new ArgumentException("Неможливо перенести");
+      }
+    }
 
     public OrdersRepository(IServiceProvider serviceProvider, IMapper mapper)
     {
@@ -166,7 +179,7 @@ namespace DataAccess.Repository
     public async Task MoveAsync(string userId, bool isAdmin, ApiOrderMoveCommand it)
     {
       await using var context = _di.GetRequiredService<ApplicationDbContext>();
-      var order = await context.Orders.FindAsync(it.Id);
+      var order = await context.Orders.FindAsync(it.Ids[0]);
 
       if (order == null) throw new ArgumentException("Замовлення не знайдено");
       if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
@@ -192,6 +205,45 @@ namespace DataAccess.Repository
             ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
           } }).ConfigureAwait(false);
 
+    }
+    public async Task MoveOrderAsync(string userId, bool isAdmin, ApiOrderMoveCommand command)
+    {
+      if (command.OrderStatus == OrderStatus.Open || command.OrderStatus == OrderStatus.Canceled)
+      {
+        throw new ArgumentException("Замовлення не може бути відкритим чи скасованим");
+      }
+      await using var context = _di.GetRequiredService<ApplicationDbContext>();
+      var orders = await context.Orders.Where(it => command.Ids.Contains(it.Id)).ToListAsync();
+      var canceledOrders = await context.Orders.Where(order => order.Status == OrderStatus.Canceled).ToListAsync();
+      if (canceledOrders != null) throw new ArgumentException($"Замовлення {canceledOrders.FirstOrDefault()} скасоване і не може редагуватися");
+
+      foreach (var order in orders)
+      {
+        
+        order.Status = command.OrderStatus;
+        context.OrderAction.Add(new OrderAction
+        {
+          Date = DateTime.UtcNow,
+          OrderId = order.Id,
+          UserId = userId,
+          Note = $"Статус замовлення змінено на {GetNoteByOrderStatus(command.OrderStatus)}",
+          Operation = OrderOperation.Updated,
+          OrderJson = JsonConvert.SerializeObject(command)
+        });
+      }
+
+      await context.SaveChangesAsync().ConfigureAwait(false);
+
+      foreach (var order in orders)
+      {
+        var apiOrder = _mapper.Map<ApiOrder>(order);
+        await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
+          {
+            OrderId = order.Id,
+            Order = apiOrder,
+            ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+          } }).ConfigureAwait(false);
+      }
     }
   }
 }

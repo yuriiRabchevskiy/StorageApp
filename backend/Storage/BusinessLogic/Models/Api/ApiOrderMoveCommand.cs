@@ -6,6 +6,8 @@ namespace BusinessLogic.Models.Api
 {
   public class ApiOrderMoveCommand
   {
-    public int Id { get; set; }
+    public List<int> Ids { get; set; }
+
+    public OrderStatus OrderStatus { get; set; }
   }
 }

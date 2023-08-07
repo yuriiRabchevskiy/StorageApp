@@ -98,6 +98,17 @@ namespace Storage.Controllers
       return new ApiResponseBase();
     }
 
+    [HttpPost("move")]
+    [Authorize(Roles = "AdminAssistant, Admin")]
+    public async Task<ApiResponseBase> MoveAllOrderStatus(int orderCommand, ApiOrderMoveCommand it)
+    {
+      var user = await GetCurrentUserAsync().ConfigureAwait(false);
+      var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
+      isAdmin = isAdmin || await _userManager.IsInRoleAsync(user, UserRole.AdminAssistant).ConfigureAwait(false);
+      await _repo.MoveOrderAsync(user.Id, isAdmin, it);
+      return new ApiResponseBase();
+    }
+
     [HttpPost("reject/{id}")]
     [Authorize(Roles = "AdminAssistant, Admin")]
     public async Task<ApiResponse<bool>> CancelOrder(int id, [FromBody] ApiOrderCancel model)
