@@ -12,6 +12,10 @@ using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Storage.Code.Services;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Linq;
+using DataAccess.Migrations;
+using System.Numerics;
 
 namespace Storage.Controllers
 {
@@ -100,7 +104,7 @@ namespace Storage.Controllers
 
     [HttpPost("move")]
     [Authorize(Roles = "AdminAssistant, Admin")]
-    public async Task<ApiResponseBase> MoveAllOrderStatus(int orderCommand, ApiOrderMoveCommand it)
+    public async Task<ApiResponseBase> MoveAllOrderStatus(ApiOrderMoveCommand it)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
@@ -126,18 +130,47 @@ namespace Storage.Controllers
     [Authorize(Roles = "AdminAssistant, Admin")]
     public async Task<ApiResponse<SmsResponse>> SentOrderSms(int id, [FromServices] ISmsService smsService, [FromServices] IConfiguration config)
     {
-      var order = await _repo.GetAsync(id);
-      var ttn = order.OrderNumber;
-      var phone = order.ClientPhone;
       var sms = config.GetSection("Sms");
       var messageTemplate = sms.GetValue<string>("TtnMessage");
-      var message = string.Format(messageTemplate, ttn);
-      
-      var result = await smsService.SendSmsAsync(phone, message);
+      var order = await _repo.GetAsync(id);
 
-      return new ApiResponse<SmsResponse>(result);
+      return new ApiResponse<SmsResponse>(await sendOrderSmsAsync(smsService, order, messageTemplate));
     }
 
+    [HttpPost("sms")]
+    [Authorize(Roles = "AdminAssistant, Admin")]
+    public async Task<ApiResponse<SmsResponse>> SentArrayOrdersSms([FromServices] ISmsService smsService, [FromServices] IConfiguration config, ApiSmsSendCommand command)
+    {
+      List<SmsResponse> results = new List<SmsResponse>();
 
+      var sms = config.GetSection("Sms");
+      var messageTemplate = sms.GetValue<string>("TtnMessage");
+
+      foreach ( var id in command.Ids)
+      {
+        var order = await _repo.GetAsync(id);
+        var result = await sendOrderSmsAsync(smsService, order, messageTemplate);
+        results.Add(result);
+      }
+
+      return new ApiResponse<SmsResponse>(results);
+    }
+    private async Task<SmsResponse> sendOrderSmsAsync(ISmsService smsService,ApiOrder order, string messageTemplate)
+    {
+      try
+      {
+        var ttn = order.OrderNumber;
+        var phone = order.ClientPhone;
+        var message = string.Format(messageTemplate, ttn);
+        var result = await smsService.SendSmsAsync(phone, message);
+        return result;
+      }
+      catch 
+      {
+        return new SmsResponse() { success=0, data=new ResponseData() {
+          messageID=$"Не вдалося відправити sms на замовлення {order.Id}"
+        } };
+      }
+    }
   }
 }
