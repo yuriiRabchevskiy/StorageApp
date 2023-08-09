@@ -20,7 +20,8 @@ using System.Numerics;
 namespace Storage.Controllers
 {
   [Route("api/[controller]")]
-  [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
+  // todo allow newRole warehouse manna
+  [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}, {UserRole.WarhouseManager}")]
   public class OrderController : Controller
   {
     private readonly IOrdersRepository _repo;
@@ -82,6 +83,7 @@ namespace Storage.Controllers
 
     // POST api/values
     [HttpPost]
+    [Authorize(Roles = "AdminAssistant, Admin, User")]  
     public async Task<ApiResponseBase> Post([FromBody] ApiOrder product)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
@@ -91,6 +93,7 @@ namespace Storage.Controllers
       return new ApiResponseBase();
     }
 
+    [Obsolete]
     [HttpPost("move/{id}")]
     [Authorize(Roles = "AdminAssistant, Admin")]
     public async Task<ApiResponseBase> MoveOrder(int id, ApiOrder product)
@@ -102,19 +105,35 @@ namespace Storage.Controllers
       return new ApiResponseBase();
     }
 
-    [HttpPost("move")]
-    [Authorize(Roles = "AdminAssistant, Admin")]
-    public async Task<ApiResponseBase> MoveAllOrderStatus(ApiOrderMoveCommand it)
+    [HttpPost("move/processing")]
+    [Authorize(Roles = "AdminAssistant, Admin, WarhouseManager")] 
+    public async Task<ApiResponseBase> MoveOrderToProcessing(ApiOrderMoveToProcessingCommand it)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
-      var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
-      isAdmin = isAdmin || await _userManager.IsInRoleAsync(user, UserRole.AdminAssistant).ConfigureAwait(false);
-      await _repo.MoveOrderAsync(user.Id, isAdmin, it);
+      await _repo.MoveOrderToAsync(user.Id, it);
+      return new ApiResponseBase();
+    }
+
+    [HttpPost("move/shipping")]
+    [Authorize(Roles = "AdminAssistant, Admin")]
+    public async Task<ApiResponseBase> MoveOrderToShipping(ApiOrderMoveToShippingCommand it)
+    {
+      var user = await GetCurrentUserAsync().ConfigureAwait(false);
+      await _repo.MoveOrderToAsync(user.Id, it);
+      return new ApiResponseBase();
+    }
+
+    [HttpPost("move/delivered")]
+    [Authorize(Roles = "AdminAssistant, Admin")]
+    public async Task<ApiResponseBase> MoveOrderToDelivered(ApiOrderMoveToDeliveredCommand it)
+    {
+      var user = await GetCurrentUserAsync().ConfigureAwait(false);
+      await _repo.MoveOrderToAsync(user.Id, it);
       return new ApiResponseBase();
     }
 
     [HttpPost("reject/{id}")]
-    [Authorize(Roles = "AdminAssistant, Admin")]
+    [Authorize(Roles = "AdminAssistant, Admin")] 
     public async Task<ApiResponse<bool>> CancelOrder(int id, [FromBody] ApiOrderCancel model)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
@@ -127,7 +146,7 @@ namespace Storage.Controllers
 
 
     [HttpPost("{id}/sms")]
-    [Authorize(Roles = "AdminAssistant, Admin")]
+    [Authorize(Roles = "AdminAssistant, Admin")] 
     public async Task<ApiResponse<SmsResponse>> SentOrderSms(int id, [FromServices] ISmsService smsService, [FromServices] IConfiguration config)
     {
       var sms = config.GetSection("Sms");
@@ -137,8 +156,8 @@ namespace Storage.Controllers
       return new ApiResponse<SmsResponse>(await sendOrderSmsAsync(smsService, order, messageTemplate));
     }
 
-    [HttpPost("sms")]
-    [Authorize(Roles = "AdminAssistant, Admin")]
+    [HttpPost("sms")] 
+    [Authorize(Roles = "AdminAssistant, Admin")] 
     public async Task<ApiResponse<SmsResponse>> SentArrayOrdersSms([FromServices] ISmsService smsService, [FromServices] IConfiguration config, ApiSmsSendCommand command)
     {
       List<SmsResponse> results = new List<SmsResponse>();

@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using MediatR.NotificationPublishers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DataAccess.Repository
 {
@@ -25,27 +26,13 @@ namespace DataAccess.Repository
 
     Task<IReadOnlyCollection<ApiOrderAction>> GetOrderHistoryAsync(string userId, bool isAdmin, int orderId);
     Task UpdateAsync(string userId, bool isAdmin, ApiOrder product);
-
-    Task MoveAsync(string userId, bool isAdmin, ApiOrderMoveCommand product);
-
-    Task MoveOrderAsync(string userId, bool isAdmin, ApiOrderMoveCommand product);
+    Task MoveOrderToAsync(string userId, ApiOrderMoveCommand command);
   }
   public class OrdersRepository : IOrdersRepository
   {
     private readonly IServiceProvider _di;
     private readonly IMapper _mapper;
     IStateInformer Informer => _di.GetService<IStateInformer>();
-
-    private static string GetNoteByOrderStatus(OrderStatus orderStatus)
-    {
-      switch (orderStatus)
-      {
-        case OrderStatus.Delivered: return "Отриманий";
-        case OrderStatus.Shipping: return "Відправлений";
-        case OrderStatus.Processing: return "Комплектується";
-        default: throw new ArgumentException("Неможливо перенести");
-      }
-    }
 
     public OrdersRepository(IServiceProvider serviceProvider, IMapper mapper)
     {
@@ -176,58 +163,24 @@ namespace DataAccess.Repository
       await context.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    public async Task MoveAsync(string userId, bool isAdmin, ApiOrderMoveCommand it)
+    public async Task MoveOrderToAsync(string userId, ApiOrderMoveCommand command)
     {
-      await using var context = _di.GetRequiredService<ApplicationDbContext>();
-      var order = await context.Orders.FindAsync(it.Ids[0]);
-
-      if (order == null) throw new ArgumentException("Замовлення не знайдено");
-      if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
-
-      order.Status = OrderStatus.Shipping;
-      context.OrderAction.Add(new OrderAction
-      {
-        Date = DateTime.UtcNow,
-        OrderId = order.Id,
-        UserId = userId,
-        Note = "Перенесено у відправлені",
-        Operation = OrderOperation.Updated,
-        OrderJson = JsonConvert.SerializeObject(it)
-      });
-
-      await context.SaveChangesAsync().ConfigureAwait(false);
-
-      var apiOrder = _mapper.Map<ApiOrder>(order);
-      await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
-          {
-            OrderId = order.Id,
-            Order = apiOrder,
-            ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-          } }).ConfigureAwait(false);
-
-    }
-    public async Task MoveOrderAsync(string userId, bool isAdmin, ApiOrderMoveCommand command)
-    {
-      if (command.OrderStatus == OrderStatus.Open || command.OrderStatus == OrderStatus.Canceled)
-      {
-        throw new ArgumentException("Замовлення не може бути відкритим чи скасованим");
-      }
       await using var context = _di.GetRequiredService<ApplicationDbContext>();
       var orders = await context.Orders.Where(it => command.Ids.Contains(it.Id)).ToListAsync();
-      var canceledOrders = await context.Orders.Where(order => order.Status == OrderStatus.Canceled).ToListAsync();
-      if (canceledOrders != null) throw new ArgumentException($"Замовлення {canceledOrders.FirstOrDefault()} скасоване і не може редагуватися");
+
+      var canceledOrders = orders.Where(order => order.Status == OrderStatus.Canceled).FirstOrDefault();
+      if (canceledOrders != null) throw new ArgumentException($"Замовлення {canceledOrders.Id} скасоване і не може редагуватися");
 
       foreach (var order in orders)
       {
-        
         order.Status = command.OrderStatus;
         context.OrderAction.Add(new OrderAction
         {
           Date = DateTime.UtcNow,
           OrderId = order.Id,
           UserId = userId,
-          Note = $"Статус замовлення змінено на {GetNoteByOrderStatus(command.OrderStatus)}",
-          Operation = OrderOperation.Updated,
+          Note = $"Статус замовлення змінено на {command.OrderStatus}",
+          Operation = OrderOperation.Moved,
           OrderJson = JsonConvert.SerializeObject(command)
         });
       }

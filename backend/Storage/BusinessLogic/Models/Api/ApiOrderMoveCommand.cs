@@ -8,6 +8,6 @@ namespace BusinessLogic.Models.Api
   {
     public List<int> Ids { get; set; }
 
-    public OrderStatus OrderStatus { get; set; }
+    public OrderStatus OrderStatus { get; protected set; }
   }
 }

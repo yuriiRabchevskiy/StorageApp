@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Storage.Controllers
 {
   [Route("api/[controller]")]
+  [Authorize]
   public class WarehouseController
     {
     private readonly IWarehouseRepository _repo;
@@ -18,7 +19,6 @@ namespace Storage.Controllers
 
     // GET api/values
     [HttpGet]
-    [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}, {UserRole.Client}")]
     public ApiResponse<ApiWarehouse> Get()
     {
       return new ApiResponse<ApiWarehouse>(_repo.Get());
@@ -27,7 +27,7 @@ namespace Storage.Controllers
 
     // POST api/values
     [HttpPost]
-    [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public ApiResponseBase Post([FromBody] ApiWarehouse product)
     {
       _repo.Update(product);
@@ -36,7 +36,7 @@ namespace Storage.Controllers
 
     // PUT api/values/5
     [HttpPut]
-    [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public ApiResponseBase Put([FromBody] ApiWarehouse product)
     {
       _repo.Add(product);
@@ -45,7 +45,7 @@ namespace Storage.Controllers
 
     // DELETE api/values/5
     [HttpDelete("{id}")]
-    [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public ApiResponseBase Delete(int id)
     {
       _repo.Delete(id);
