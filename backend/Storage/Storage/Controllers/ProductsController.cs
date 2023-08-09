@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 using AutoMapper;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using BusinessLogic.Models.User;
 
 namespace Storage.Controllers
 {
@@ -44,7 +45,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("export/generate")]
-    [AllowAnonymous]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public async Task<ApiResponse<string>> GenerateExportAsync([FromServices] IConfiguration configuration, [FromServices] IMapper mapper)
     {
       try
@@ -66,6 +67,7 @@ namespace Storage.Controllers
 
     // POST api/values
     [HttpPost]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public ApiResponseBase Post([FromBody] ApiProduct product)
     {
       if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
@@ -75,6 +77,7 @@ namespace Storage.Controllers
 
     // PUT api/values/5
     [HttpPut]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public ApiResponse<int> Put([FromBody] ApiProduct product)
     {
       if (!ModelState.IsValid) return ModelState.ToApiResponse<int>();
@@ -85,6 +88,7 @@ namespace Storage.Controllers
 
     // DELETE api/values/5
     [HttpDelete("{id}")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public ApiResponseBase Delete(int id)
     {
       _repo.Delete(id);
@@ -92,6 +96,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("{id}/transfer")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public async Task<ApiResponseBase> Transfer(int id, [FromBody] ApiProdTransfer prodTransfer)
     {
       if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
@@ -102,6 +107,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("{id}/add")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public async Task<ApiResponseBase> Add(int id, [FromBody] ApiProdAction model)
     {
       if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
@@ -112,6 +118,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("sell")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public async Task<ApiResponseBase> Sell([FromBody] ApiSellOrder model, [FromServices]  TrackerHub hub)
     {
       if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
@@ -122,6 +129,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("{id}/remove")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public async Task<ApiResponseBase> Remove(int id, [FromBody] ApiProdAction model)
     {
       if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();

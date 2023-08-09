@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BusinessLogic.Helpers.Http;
+using BusinessLogic.Models.Api;
 using Microsoft.Extensions.Configuration;
 
 namespace Storage.Code.Services
@@ -11,8 +12,6 @@ namespace Storage.Code.Services
   public interface ISmsService
   {
     Task<SmsResponse> SendSmsAsync(string phoneNumber, string message);
-
-    Task<List<SmsResponse>> SendArraySmsAsync(Dictionary<string, string> phoneNumbersAndMessages);
   }
 
   public class SmsService : ISmsService
@@ -49,12 +48,6 @@ namespace Storage.Code.Services
       });
       return data;
     }
-
-    public async Task<List<SmsResponse>> SendArraySmsAsync(Dictionary<string, string> phoneNumbersAndMessages)
-    {
-
-    }
-
 
     public class SmsClient : RestApiClient
     {

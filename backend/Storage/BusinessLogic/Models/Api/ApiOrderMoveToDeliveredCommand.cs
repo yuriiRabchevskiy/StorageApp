@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace BusinessLogic.Models.Api
 {
-  public class ApiSmsSendCommand
+  public class ApiOrderMoveToDeliveredCommand : ApiOrderMoveCommand
   {
-    public List<int> Ids { get; set; }
+    public ApiOrderMoveToDeliveredCommand()
+    {
+      OrderStatus = OrderStatus.Delivered;
+    }
   }
 }
