@@ -1,4 +1,5 @@
 using DataAccess.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -45,9 +46,38 @@ namespace DataAccess
       builder.Entity<Order>()
         .Property(x => x.CloseDate)
         .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+      builder.Entity<IdentityRole>().HasData(new IdentityRole[] {
+                new IdentityRole{
+                  Id = "1dff4f55-bb77-45b3-855b-cbf07956e542" ,
+                  ConcurrencyStamp = "dab90e8f-f5b3-4636-8fc1-a235144e3108",
+                  Name="Admin",
+                  NormalizedName="ADMIN"},
+                new IdentityRole{
+                  Id = "674f258a-3bdc-481a-b542-88918aa0cc70" ,
+                  ConcurrencyStamp = "46cb7bbf-9a18-4471-b145-f761452d6b2d",
+                  Name="Client",
+                  NormalizedName="CLIENT"},
+                new IdentityRole{
+                  Id = "6c31ac53-8b84-468c-84bc-62d5b7650ab9" ,
+                  ConcurrencyStamp = "8899bd73-3c61-4fe0-bd56-4d0f24ff1478",
+                  Name="User",
+                  NormalizedName="USER"},
+                new IdentityRole{
+                  Id = "c5783af5-1b7b-4fb7-afcc-3dceca0d0bf6" ,
+                  ConcurrencyStamp = "3f2ad95e-e15e-4f06-ad86-f861031d19b3",
+                  Name="AdminAssistant",
+                  NormalizedName="ADMINASSISTANT"},
+                new IdentityRole{
+                  Id = "d106ab57-e203-43cd-a72f-405308541a19" ,
+                  ConcurrencyStamp = "4013c147-877b-48d5-ab0d-469012e9fd1f",
+                  Name="WarehouseManager",
+                  NormalizedName="WAREHOUSEMANAGER"},
+            });
     }
 
-
     
+
+
   }
 }

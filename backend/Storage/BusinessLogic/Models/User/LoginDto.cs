@@ -12,12 +12,11 @@ namespace BusinessLogic.Models.User
     public const string AdminAssistant = nameof(AdminAssistant);
     public const string User = nameof(User);
     public const string Client = nameof(Client);
-    public const string WarhouseManager = nameof(WarhouseManager);
-    public const string AllSales = "AdminAssistant, Admin, User";
+    public const string WarehouseManager = nameof(WarehouseManager);
 
     public static List<string> SupportedRoles = new List<string>(new[]
     {
-      Admin, Client, AdminAssistant, User
+      Admin, Client, AdminAssistant, User, WarehouseManager
     });
 
     public static bool IsSupportedRole(string role)

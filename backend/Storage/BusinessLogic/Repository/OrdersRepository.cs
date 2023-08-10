@@ -115,6 +115,7 @@ namespace DataAccess.Repository
       if (order != null)
       {
         if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
+        if (!isAdmin && order.ResponsibleUserId != userId) throw new ArgumentException("Замовлення створене іншим користувачем і не може редагуватися");
         order.ClientName = it.ClientName;
         order.ClientAddress = it.ClientAddress;
         order.ClientPhone = it.ClientPhone;
