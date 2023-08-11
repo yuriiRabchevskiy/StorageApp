@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 
 namespace BusinessLogic.Models.User
 {
@@ -10,10 +12,11 @@ namespace BusinessLogic.Models.User
     public const string AdminAssistant = nameof(AdminAssistant);
     public const string User = nameof(User);
     public const string Client = nameof(Client);
+    public const string WarehouseManager = nameof(WarehouseManager);
 
     public static List<string> SupportedRoles = new List<string>(new[]
     {
-      Admin, Client, AdminAssistant, User
+      Admin, Client, AdminAssistant, User, WarehouseManager
     });
 
     public static bool IsSupportedRole(string role)

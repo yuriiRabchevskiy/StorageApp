@@ -6,6 +6,7 @@ namespace DataAccess.Models
   public class Product
   {
     public int Id { get; set; }
+    public string ProductCode { get; set; }
     public int? CategoryId { get; set; }
     public string ProductType { get; set; } // e.g. backpack, stairs
     public string Model { get; set; } // e.g. backpack, stairs

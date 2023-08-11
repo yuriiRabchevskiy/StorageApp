@@ -11,6 +11,9 @@ using BusinessLogic.Models.Api.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using MediatR.NotificationPublishers;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DataAccess.Repository
 {
@@ -23,16 +26,13 @@ namespace DataAccess.Repository
 
     Task<IReadOnlyCollection<ApiOrderAction>> GetOrderHistoryAsync(string userId, bool isAdmin, int orderId);
     Task UpdateAsync(string userId, bool isAdmin, ApiOrder product);
-
-    Task MoveAsync(string userId, bool isAdmin, ApiOrderMoveCommand product);
+    Task MoveOrderToAsync(string userId, ApiOrderMoveCommand command);
   }
-
   public class OrdersRepository : IOrdersRepository
   {
     private readonly IServiceProvider _di;
     private readonly IMapper _mapper;
     IStateInformer Informer => _di.GetService<IStateInformer>();
-
 
     public OrdersRepository(IServiceProvider serviceProvider, IMapper mapper)
     {
@@ -115,6 +115,7 @@ namespace DataAccess.Repository
       if (order != null)
       {
         if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
+        if (!isAdmin && order.ResponsibleUserId != userId) throw new ArgumentException("Замовлення створене іншим користувачем і не може редагуватися");
         order.ClientName = it.ClientName;
         order.ClientAddress = it.ClientAddress;
         order.ClientPhone = it.ClientPhone;
@@ -163,35 +164,40 @@ namespace DataAccess.Repository
       await context.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    public async Task MoveAsync(string userId, bool isAdmin, ApiOrderMoveCommand it)
+    public async Task MoveOrderToAsync(string userId, ApiOrderMoveCommand command)
     {
       await using var context = _di.GetRequiredService<ApplicationDbContext>();
-      var order = await context.Orders.FindAsync(it.Id);
+      var orders = await context.Orders.Where(it => command.Ids.Contains(it.Id)).ToListAsync();
 
-      if (order == null) throw new ArgumentException("Замовлення не знайдено");
-      if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
+      var canceledOrders = orders.Where(order => order.Status == OrderStatus.Canceled).FirstOrDefault();
+      if (canceledOrders != null) throw new ArgumentException($"Замовлення {canceledOrders.Id} скасоване і не може редагуватися");
 
-      order.Status = OrderStatus.Shipping;
-      context.OrderAction.Add(new OrderAction
+      foreach (var order in orders)
       {
-        Date = DateTime.UtcNow,
-        OrderId = order.Id,
-        UserId = userId,
-        Note = "Перенесено у відправлені",
-        Operation = OrderOperation.Updated,
-        OrderJson = JsonConvert.SerializeObject(it)
-      });
+        order.Status = command.OrderStatus;
+        context.OrderAction.Add(new OrderAction
+        {
+          Date = DateTime.UtcNow,
+          OrderId = order.Id,
+          UserId = userId,
+          Note = $"Статус замовлення змінено на {command.OrderStatus}",
+          Operation = OrderOperation.Moved,
+          OrderJson = JsonConvert.SerializeObject(command)
+        });
+      }
 
       await context.SaveChangesAsync().ConfigureAwait(false);
 
-      var apiOrder = _mapper.Map<ApiOrder>(order);
-      await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
+      foreach (var order in orders)
+      {
+        var apiOrder = _mapper.Map<ApiOrder>(order);
+        await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
           {
             OrderId = order.Id,
             Order = apiOrder,
             ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
           } }).ConfigureAwait(false);
-
+      }
     }
   }
 }

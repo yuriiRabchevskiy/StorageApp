@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BusinessLogic.Helpers.Http;
+using BusinessLogic.Models.Api;
 using Microsoft.Extensions.Configuration;
 
 namespace Storage.Code.Services
@@ -47,9 +48,6 @@ namespace Storage.Code.Services
       });
       return data;
     }
-
-
-
 
     public class SmsClient : RestApiClient
     {
