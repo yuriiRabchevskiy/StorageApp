@@ -1,13 +1,14 @@
 using DataAccess.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BusinessLogic.Models.Api
 {
-  public class ApiOrderMoveCommand
+  public class ApiSmsSendCommand
   {
     public List<int> Ids { get; set; }
-
-    public OrderStatus OrderStatus { get; protected set; }
   }
 }
