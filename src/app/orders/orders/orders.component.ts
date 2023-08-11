@@ -95,11 +95,6 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     get moveToInfo(): IMoveToInfo | undefined {
 
         switch (this.selectedTab.value) {
-            case OrderStatus.Open: return {
-                title: 'з прийняті у комплектується',
-                desiredStatus: OrderStatus.Processing,
-                apiActionExecutor: (apiService, ids) => apiService.moveOrderToProcessing({ ids })
-            };
             case OrderStatus.Processing: return {
                 title: 'з комплектується у відправлені',
                 desiredStatus: OrderStatus.Shipping,
