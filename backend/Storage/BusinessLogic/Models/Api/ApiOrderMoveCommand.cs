@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace BusinessLogic.Models.Api
 {
-  public class ApiOrderMoveCommand
+  public abstract class ApiOrderMoveCommand
   {
     public List<int> Ids { get; set; }
 

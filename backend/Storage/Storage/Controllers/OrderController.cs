@@ -20,7 +20,6 @@ using System.Numerics;
 namespace Storage.Controllers
 {
   [Route("api/[controller]")]
-  // todo allow newRole warehouse manna
   [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}, {UserRole.WarehouseManager}")]
   public class OrderController : Controller
   {
