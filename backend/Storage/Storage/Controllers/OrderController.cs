@@ -106,7 +106,7 @@ namespace Storage.Controllers
 
     [HttpPost("move/processing")]
     [Authorize(Roles = $"{UserRole.Admin}, {UserRole.AdminAssistant}, {UserRole.WarehouseManager}")]
-    public async Task<ApiResponseBase> MoveOrderToProcessing(ApiOrderMoveToProcessingCommand it)
+    public async Task<ApiResponseBase> MoveOrderToProcessing([FromBody] ApiOrderMoveToProcessingCommand it)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       await _repo.MoveOrderToAsync(user.Id, it);
@@ -115,7 +115,7 @@ namespace Storage.Controllers
 
     [HttpPost("move/shipping")]
     [Authorize(Roles = $"{UserRole.Admin}, {UserRole.AdminAssistant}")]
-    public async Task<ApiResponseBase> MoveOrderToShipping(ApiOrderMoveToShippingCommand it)
+    public async Task<ApiResponseBase> MoveOrderToShipping([FromBody] ApiOrderMoveToShippingCommand it)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       await _repo.MoveOrderToAsync(user.Id, it);
@@ -124,7 +124,7 @@ namespace Storage.Controllers
 
     [HttpPost("move/delivered")]
     [Authorize(Roles = $"{UserRole.Admin}, {UserRole.AdminAssistant}")]
-    public async Task<ApiResponseBase> MoveOrderToDelivered(ApiOrderMoveToDeliveredCommand it)
+    public async Task<ApiResponseBase> MoveOrderToDelivered([FromBody] ApiOrderMoveToDeliveredCommand it)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       await _repo.MoveOrderToAsync(user.Id, it);

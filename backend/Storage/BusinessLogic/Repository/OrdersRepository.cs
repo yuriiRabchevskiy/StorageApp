@@ -169,19 +169,26 @@ namespace DataAccess.Repository
       await using var context = _di.GetRequiredService<ApplicationDbContext>();
       var orders = await context.Orders.Where(it => command.Ids.Contains(it.Id)).ToListAsync();
 
-      var canceledOrders = orders.Where(order => order.Status == OrderStatus.Canceled).FirstOrDefault();
+      var canceledOrders = orders.FirstOrDefault(order => order.Status == OrderStatus.Canceled);
       if (canceledOrders != null) throw new ArgumentException($"Замовлення {canceledOrders.Id} скасоване і не може редагуватися");
+
+      var operation = command.OrderStatus == OrderStatus.Delivered ? OrderOperation.Closed : OrderOperation.Moved;
 
       foreach (var order in orders)
       {
         order.Status = command.OrderStatus;
+
+        if (command.OrderStatus == OrderStatus.Delivered && order.CloseDate == null)
+        {
+          order.CloseDate = DateTime.UtcNow;
+        }
         context.OrderAction.Add(new OrderAction
         {
           Date = DateTime.UtcNow,
           OrderId = order.Id,
           UserId = userId,
           Note = $"Статус замовлення змінено на {command.OrderStatus}",
-          Operation = OrderOperation.Moved,
+          Operation = operation,
           OrderJson = JsonConvert.SerializeObject(command)
         });
       }
