@@ -12,7 +12,11 @@ export const deliveryTypes = [
     { label: 'По Львову', value: DeliveryKind.LvivTransfer },
     { label: 'Дроп', value: DeliveryKind.Drop },
     { label: 'Інше', value: DeliveryKind.Other },
-  ]
+];
+
+export interface IApiOrderMoveCommand {
+    ids: number[];
+}
 
 export interface IOrder {
     id: number;

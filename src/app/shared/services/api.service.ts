@@ -9,7 +9,7 @@ import { IUser, ISUser, IUserToEdit, IChangePassword } from '../../models/manage
 import { IProduct } from './../../models/storage/products';
 import { IWarehouse } from '../../models/storage/werehouse';
 import { ICategory } from './../../models/storage/categories';
-import { IOrder, ISaleOrder, IOrderAction, OrderOperation, DeliveryKind, deliveryTypes } from './../../models/storage/order';
+import { IOrder, ISaleOrder, IOrderAction, OrderOperation, DeliveryKind, deliveryTypes, IApiOrderMoveCommand } from './../../models/storage/order';
 import { ICancelOrder } from '../../models/storage/index';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
@@ -84,6 +84,18 @@ export class ApiService extends ApiBase {
 
     getCanceledOrders(): Observable<ApiResponse<IOrder>> {
         return this.doGet('order/canceled');
+    }
+
+    moveOrderToDelivered(data: IApiOrderMoveCommand): Observable<ApiResponse<any>> {
+        return this.doPost('order/move/delivered', data);
+    }
+
+    moveOrderToShipping(data: IApiOrderMoveCommand): Observable<ApiResponse<any>> {
+        return this.doPost('order/move/shipping', data);
+    }
+    
+    moveOrderToProcessing(data: IApiOrderMoveCommand): Observable<ApiResponse<any>> {
+        return this.doPost('order/move/processing', data);
     }
 
     saveOrder(data: IOrder): Observable<ApiResponse<any>> {

@@ -18,9 +18,9 @@
           title="Повернути замовлення" (iClick)="confCancel()"
           [disabled]="viewData.length < 1 || selectedItems.length > 1">
         </app-i-button>
-        <app-i-button [useSprite]="false" icon="rocket" *ngIf="isProcessingTab && canView"
-          [disabled]="viewData.length < 1 || selectedItems.length > 1"
-          title="Перемістити з комплектується у відправлені" (iClick)="showConfirmMoveToSent = true">
+        <app-i-button [useSprite]="false" icon="rocket" *ngIf="moveToInfo && canView"
+          [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Перемістити {{moveToInfo.title}}"
+          (iClick)="showConfirmMoveTo = true">
         </app-i-button>
         <app-i-button [useSprite]="false" icon="lock" *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
           [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Закрити продажу"
@@ -227,15 +227,12 @@
   </span>
 </app-confirm>
 
-<app-confirm (confirm)="confirmMoveToSent($event)" *ngIf="showConfirmMoveToSent"
-  yesHeader="Перемістити {{dt.filteredValue?.length}}">
+<app-confirm (confirm)="confirmMoveTo($event)" *ngIf="showConfirmMoveTo"
+  yesHeader="Перемістити {{visibleOrders?.length}}">
   <span header class="confirm-title">Перемістити усі
-    (<b>{{dt.filteredValue?.length}}</b>) замовленя з комплектується у відправлені?
+    (<b>{{visibleOrders?.length}}</b>) замовленя {{moveToInfo.title}}?
   </span>
 </app-confirm>
-
-
-
 
 <app-return (confirm)="closeCancelOrder($event)" [order]="selectedItem" *ngIf="showConfirmCancel">
 </app-return>

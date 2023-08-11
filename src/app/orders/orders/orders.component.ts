@@ -14,23 +14,24 @@ import { IOrder, ITransaction, OrderStatus, IOrderAction } from '../../models/st
 import { ApiService, getDeliveryDescriptor } from '../../shared/services/api.service';
 import { TrackerService } from '../../shared/services/tracker.service';
 import { Dictionary, IDictionary } from './../../models/dictionary';
-import { catchError, forkJoin, lastValueFrom, map, of } from 'rxjs';
+import { Observable } from 'rxjs';
+
+type MoveToAction = (apiService: ApiService, ids: number[]) => Observable<ApiResponse<any>>;
 
 interface ITab {
     label: string;
     value: OrderStatus;
 }
-interface IExportData {
-    id: number;
-    date: string;
-    itemsName: any;
-    orderNumber: number;
-    seller: string;
-}
 
 interface IDoubleClick {
     date?: number;
     element?: IOrder;
+}
+
+interface IMoveToInfo {
+    title: string;
+    desiredStatus: OrderStatus;
+    apiActionExecutor: MoveToAction;
 }
 
 @Component({
@@ -43,7 +44,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     public selectedItem: IOrder;
     public orderDialog: boolean = false;
     public showConfirm: boolean = false;
-    public showConfirmMoveToSent: boolean = false;
+    public showConfirmMoveTo: boolean = false;
     public showConfirmCancel: boolean = false;
     public showOrderHistory: boolean = false;
     public typeFilter: NumberFilter<IOrder> = new NumberFilter<IOrder>();
@@ -59,6 +60,10 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     public canceledOrdersIsLoading: boolean = false;
     private _canceledLoadTimeMs: number = undefined;
     public clickInfo: IDoubleClick = {};
+
+    public get visibleOrders(): IOrder[] {
+        return (this.dataTable.filteredValue ?? this.dataTable.value ?? []);
+    }
 
     public columns: ITableColumn[] = [
         { title: 'Дата продажу', field: 'openDate', width: 114, template: 'date', format: 'dd/MM/yy HH:mm', },
@@ -86,6 +91,29 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             shouldHideFunc: () => this.isCancelTab
         },
     ];
+
+    get moveToInfo(): IMoveToInfo | undefined {
+
+        switch (this.selectedTab.value) {
+            case OrderStatus.Open: return {
+                title: 'з прийняті у комплектується',
+                desiredStatus: OrderStatus.Processing,
+                apiActionExecutor: (apiService, ids) => apiService.moveOrderToProcessing({ ids })
+            };
+            case OrderStatus.Processing: return {
+                title: 'з комплектується у відправлені',
+                desiredStatus: OrderStatus.Shipping,
+                apiActionExecutor: (apiService, ids) => apiService.moveOrderToShipping({ ids })
+            };
+            case OrderStatus.Shipping: return {
+                title: 'з відправлені у отримані',
+                desiredStatus: OrderStatus.Delivered,
+                apiActionExecutor: (apiService, ids) => apiService.moveOrderToDelivered({ ids })
+            };
+        }
+
+        return null;
+    }
 
     get rowMetadata() {
         return this.isCancelTab ? this.canceledRowGroupMetadata : this.rowGroupMetadata;
@@ -274,45 +302,31 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this.showConfirm = false;
     }
 
-    async confirmMoveToSent(val: boolean) {
+    async confirmMoveTo(val: boolean) {
         if (!val) {
-            this.showConfirmMoveToSent = false;
+            this.showConfirmMoveTo = false;
             return;
         }
 
-        const data = (this.dataTable.filteredValue || []).slice();
-        let successCount = 0;;
-        const totalCount = data.length;
-        const requests = data.map(it => {
-            const originalStatus = it.status;
-            it.status = OrderStatus.Shipping;
-            return this.apiService.saveOrder(it).pipe(
-                map(response => {
-                    // increment success counter
-                    if (response.success) {
-                        successCount++;
-                        return response;
-                    }
-                    it.status = originalStatus;
-                    return response;
-                }),
-                catchError(error => {
-                    it.status = originalStatus;
-                    return of(null);
-                })
-            );
-        })
+        const moveToInfo = this.moveToInfo;
 
-        await lastValueFrom(forkJoin(requests));
-
-        if (totalCount == successCount) {
-            this.showSuccessMessage('Статус продаж змінено на відправлені');
-        } else {
-            this.showWebErrorMessage(`Для деяких продаж не вдалося змінити статус (${totalCount - successCount}/${totalCount})`, '');
-        }
+        const data = this.visibleOrders.slice();
+        const ids = data.map(it => it.id);
+        moveToInfo.apiActionExecutor(this.apiService, ids).subscribe({
+            next: (res: ApiResponse<any>) => {
+                if (res.success) {
+                    this.data.forEach(d => d.status = moveToInfo.desiredStatus);
+                    return;
+                }
+                this.showApiErrorMessage('не вдалося змінити статус продаж, оновіть сторінку', res.errors)
+            },
+            error: (err) => {
+                this.showWebErrorMessage(`не вдалося змінити статус продаж, оновіть сторінку`, err);
+            }
+        });
 
         this.filter();
-        this.showConfirmMoveToSent = false;
+        this.showConfirmMoveTo = false;
     }
 
     closeCancelOrder(val) {
