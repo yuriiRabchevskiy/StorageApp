@@ -137,5 +137,16 @@ namespace Storage.Controllers
       _houseRepo.RemoveProduct(user?.Id, id, model);
       return new ApiResponseBase();
     }
+
+    [HttpPost("{id}/modify")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
+    public async Task<ApiResponseBase> Modify([FromBody] ApiSellOrder model, [FromServices] TrackerHub hub)
+    {
+      if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
+
+      var user = await GetCurrentUserAsync();
+      await _houseRepo.ModifyOrderAsync(user?.Id, model).ConfigureAwait(false);
+      return new ApiResponseBase();
+    }
   }
 }

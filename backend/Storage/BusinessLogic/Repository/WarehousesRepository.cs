@@ -14,6 +14,7 @@ using BusinessLogic.Models.Api.State;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace BusinessLogic.Repository
 {
@@ -28,6 +29,7 @@ namespace BusinessLogic.Repository
     void AddProduct(string userId, int productId, ApiProdAction info);
     Task SellOrderAsync(string userId, ApiSellOrder info);
     Task<bool> CancelOrderAsync(string userId, int id, string reason);
+    Task ModifyOrderAsync(string userId, ApiSellOrder info);
   }
 
   public class WarehousesRepository : IWarehouseRepository
@@ -163,14 +165,6 @@ namespace BusinessLogic.Repository
             {
               var from = getStockAndVerify(productOrder.IdProduct, productOrder, context);
 
-              changesNotes.Add(new ApiProdCountChange
-              {
-                ProductId = productOrder.IdProduct,
-                WarehouseId = productOrder.FromId,
-                NewCount = from.Quantity,
-                OldCount = from.Quantity + productOrder.Quantity
-              });
-
               var prodOrder = new ProductAction
               {
                 Date = date,
@@ -184,6 +178,66 @@ namespace BusinessLogic.Repository
                 Operation = OperationDescription.Sold
               };
               order.Transactions.Add(prodOrder);
+
+              changesNotes.Add(new ApiProdCountChange
+              {
+                ProductId = productOrder.IdProduct,
+                WarehouseId = productOrder.FromId,
+                NewCount = from.Quantity,
+                OldCount = from.Quantity + productOrder.Quantity
+              });
+            }
+
+            context.Orders.Add(order);
+            await context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+          }
+        }
+
+        await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
+      }
+      finally
+      {
+        _semaphoreSlim.Release();
+      }
+    }
+
+    public async Task ModifyOrderAsync(string userId, ApiSellOrder info)
+    {
+      var changesNotes = new List<ApiProdCountChange>();
+      await _semaphoreSlim.WaitAsync();
+      try
+      {
+        await using (var context = _di.GetRequiredService<ApplicationDbContext>())
+        {
+          await using (var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
+          {
+            var date = DateTime.UtcNow;
+            var order = await context.Orders.Include(it => it.Transactions).FirstOrDefaultAsync(it => it.Id == info.Id);
+
+            var existingIds = order.Transactions.Select(it => it.ProductId).ToList();
+            var newIds = info.ProductOrders.Select(it => it.IdProduct).ToList();
+            var editedProducts = info.ProductOrders.Where(it => existingIds.Contains(it.IdProduct));
+            var addedProducts = info.ProductOrders.Where(it => !existingIds.Contains(it.IdProduct));
+            var deletedProducts = order.Transactions.Where(it => !newIds.Contains(it.ProductId));
+            // TODO order has to be OPen in open state 
+            foreach (var productOrder in info.ProductOrders)
+            {               
+              bool IsAdding = false;
+              var prodAction = order.Transactions.FirstOrDefault(it => it.ProductId == productOrder.IdProduct);
+              // TODO chek for null /added 
+              
+              if (prodAction.Quantity < productOrder.Quantity) IsAdding = true; 
+
+              var from = getStockforModify(productOrder.IdProduct, productOrder, context, IsAdding);
+
+              prodAction.Quantity = IsAdding ? +from.Quantity : -from.Quantity;
+              prodAction.Operation = OperationDescription.BasketEdited; // order is modified
+
+              var prodCountChange = changesNotes.FirstOrDefault(it => it.ProductId == productOrder.IdProduct);
+              prodCountChange.NewCount = from.Quantity;
+              prodCountChange.OldCount = IsAdding ? from.Quantity + productOrder.Quantity : from.Quantity - productOrder.Quantity;
             }
 
             context.Orders.Add(order);
@@ -347,6 +401,24 @@ namespace BusinessLogic.Repository
       from.Quantity -= info.Quantity;
       return from;
     }
-
+    private static WarehouseProducts getStockforModify(int productId, ApiProdAction info, ApplicationDbContext context, bool IsAdding)
+    {
+      var from = context.WarehouseProducts.Include(it => it.Product).FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.FromId);
+      if (from == null) throw new ArgumentException($"Товар з ID {productId} не знайдено на складі");
+      if (IsAdding)
+      {
+        if (from.Quantity < info.Quantity)
+          throw new ArgumentException($"Можливо додати до замовлення тільки {from.Quantity} (ProductID: {from.Product.ProductType} - {from.Product.Model})");
+        from.Quantity -= info.Quantity;
+        return from;
+      }
+      from.Quantity += info.Quantity;
+      return from;
+    }
+    private static void getVerify(int productId, ApiProdAction info, ApplicationDbContext context)
+    {
+      var from = context.WarehouseProducts.Include(it => it.Product).FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.FromId);
+      if (from == null) throw new ArgumentException($"Товар з ID {productId} не знайдено на складі");
+    }
   }
 }

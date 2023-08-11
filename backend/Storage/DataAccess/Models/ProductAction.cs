@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace DataAccess.Models
 {
 
-  public enum OperationDescription { TransferAdd, TransferRemove, Sold, StockRenew, Delete }
+  public enum OperationDescription { TransferAdd, TransferRemove, Sold, StockRenew, Delete, BasketEdited }
 
   public class ProductAction
   {
