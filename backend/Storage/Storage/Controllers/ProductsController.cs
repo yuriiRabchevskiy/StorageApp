@@ -119,7 +119,7 @@ namespace Storage.Controllers
 
     [HttpPost("sell")]
     [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
-    public async Task<ApiResponseBase> Sell([FromBody] ApiSellOrder model, [FromServices]  TrackerHub hub)
+    public async Task<ApiResponseBase> Sell([FromBody] ApiSellOrder model)
     {
       if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
 
