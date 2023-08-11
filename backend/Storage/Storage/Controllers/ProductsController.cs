@@ -23,9 +23,9 @@ namespace Storage.Controllers
   [Authorize]
   public class ProductController : Controller
   {
-    private IProductsRepository _repo;
-    private IWarehouseRepository _houseRepo;
-    private UserManager<ApplicationUser> _userManager;
+    private readonly IProductsRepository _repo;
+    private readonly IWarehouseRepository _houseRepo;
+    private readonly UserManager<ApplicationUser> _userManager;
     Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
 
@@ -45,7 +45,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("export/generate")]
-    [Authorize(Roles = $"{UserRole.Admin}")]
+    [AllowAnonymous]
     public async Task<ApiResponse<string>> GenerateExportAsync([FromServices] IConfiguration configuration, [FromServices] IMapper mapper)
     {
       try
@@ -118,7 +118,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("sell")]
-    [Authorize(Roles = $"{UserRole.Admin}")]
+    [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
     public async Task<ApiResponseBase> Sell([FromBody] ApiSellOrder model, [FromServices]  TrackerHub hub)
     {
       if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();

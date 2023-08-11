@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BusinessLogic.Abstractions;
-using BusinessLogic.Helpers;
 using BusinessLogic.Models.Api.State;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,7 +22,7 @@ namespace BusinessLogic.Repository
     int Add(ApiWarehouse warehouse);
     void Update(ApiWarehouse warehouse);
     void Delete(int id);
-    void TransferProduct(string userId, int prouductId, ApiProdTransfer info);
+    void TransferProduct(string userId, int productId, ApiProdTransfer info);
     void RemoveProduct(string userId, int productId, ApiProdAction info);
     void AddProduct(string userId, int productId, ApiProdAction info);
     Task SellOrderAsync(string userId, ApiSellOrder info);
@@ -47,7 +46,7 @@ namespace BusinessLogic.Repository
 
     public List<ApiWarehouse> Get()
     {
-      using var context = _di.GetService<ApplicationDbContext>();
+      using var context = _di.GetRequiredService<ApplicationDbContext>();
       return context.Warehouses.Where(it => it.IsActive).ToList().Select(_mapper.Map<ApiWarehouse>).ToList();
     }
 
@@ -65,7 +64,7 @@ namespace BusinessLogic.Repository
 
     public void Update(ApiWarehouse it)
     {
-      using var context = _di.GetService<ApplicationDbContext>();
+      using var context = _di.GetRequiredService<ApplicationDbContext>();
       var real = context.Warehouses.Find(it.Id);
       if (real != null)
       {
@@ -87,7 +86,7 @@ namespace BusinessLogic.Repository
 
     public void TransferProduct(string userId, int productId, ApiProdTransfer info)
     {
-      using var context = _di.GetService<ApplicationDbContext>();
+      using var context = _di.GetRequiredService<ApplicationDbContext>();
       var from = getStockAndVerify(productId, info, context);
 
       using var transaction = context.Database.BeginTransaction();
@@ -205,58 +204,56 @@ namespace BusinessLogic.Repository
     {
       var changesNotes = new List<ApiProdCountChange>();
 
-      await using (var context = _di.GetRequiredService<ApplicationDbContext>())
+      await using var context = _di.GetRequiredService<ApplicationDbContext>();
+      await using var transaction = await context.Database.BeginTransactionAsync();
+      var order = await context.Orders.Include(it => it.Transactions)
+        .FirstOrDefaultAsync(it => it.Id == id).ConfigureAwait(false);
+
+      if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Поточне замовлення уже скасовано");
+      order.Status = OrderStatus.Canceled;
+      order.CloseDate = DateTime.UtcNow;
+      order.CanceledDate = DateTime.UtcNow;
+      order.CanceledByUserId = userId;
+      order.CancelReason = reason;
+
+
+      var warehouses = context.WarehouseProducts.Include(it => it.Product);
+      var revertActions = new List<ProductAction>();
+
+      var date = DateTime.UtcNow;
+      foreach (var action in order.Transactions)
       {
-        await using var transaction = await context.Database.BeginTransactionAsync();
-        var order = await context.Orders.Include(it => it.Transactions)
-          .FirstOrDefaultAsync(it => it.Id == id).ConfigureAwait(false);
+        var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
+        var oldCount = @from.Quantity;
+        @from.Quantity += action.Quantity * -1; // quantity is negative in sale action
 
-        if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Поточне замовлення уже скасовано");
-        order.Status = OrderStatus.Canceled;
-        order.CloseDate = DateTime.UtcNow;
-        order.CanceledDate = DateTime.UtcNow;
-        order.CanceledByUserId = userId;
-        order.CancelReason = reason;
-
-
-        var warehouses = context.WarehouseProducts.Include(it => it.Product);
-        var revertActions = new List<ProductAction>();
-
-        var date = DateTime.UtcNow;
-        foreach (var action in order.Transactions)
+        changesNotes.Add(new ApiProdCountChange
         {
-          var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
-          var oldCount = @from.Quantity;
-          @from.Quantity += action.Quantity * -1; // quantity is negative in sale action
+          ProductId = action.ProductId,
+          WarehouseId = @from.WarehouseId,
+          NewCount = @from.Quantity,
+          OldCount = oldCount
+        });
 
-          changesNotes.Add(new ApiProdCountChange
-          {
-            ProductId = action.ProductId,
-            WarehouseId = @from.WarehouseId,
-            NewCount = @from.Quantity,
-            OldCount = oldCount
-          });
-
-          var restoreAction = new ProductAction
-          {
-            Date = date,
-            ProductId = action.ProductId,
-            Quantity = -action.Quantity, // quantity is negative in sale action
-            WarehouseId = action.WarehouseId,
-            Description = $"Скасовано замовлення {id}",
-            Price = action.Price,
-            BuyPrice = @from.Product.RecommendedBuyPrice,
-            UserId = userId,
-            Operation = OperationDescription.TransferAdd,
-          };
-          revertActions.Add(restoreAction);
-        }
-
-        order.Transactions.AddRange(revertActions);
-
-        await context.SaveChangesAsync();
-        await transaction.CommitAsync();
+        var restoreAction = new ProductAction
+        {
+          Date = date,
+          ProductId = action.ProductId,
+          Quantity = -action.Quantity, // quantity is negative in sale action
+          WarehouseId = action.WarehouseId,
+          Description = $"Скасовано замовлення {id}",
+          Price = action.Price,
+          BuyPrice = @from.Product.RecommendedBuyPrice,
+          UserId = userId,
+          Operation = OperationDescription.TransferAdd,
+        };
+        revertActions.Add(restoreAction);
       }
+
+      order.Transactions.AddRange(revertActions);
+
+      await context.SaveChangesAsync();
+      await transaction.CommitAsync();
 
       await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
 
@@ -343,7 +340,7 @@ namespace BusinessLogic.Repository
     {
       var from = context.WarehouseProducts.Include(it => it.Product).FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.FromId);
       if (from == null) throw new ArgumentException($"Товар з ID {productId} не знайдено на складі");
-      if (from.Quantity < info.Quantity) throw new ArgumentException($"Не достатньо товарів на складі для здійстення продажі (ProductID: {from.Product.ProductType } - {from.Product.Model})");
+      if (from.Quantity < info.Quantity) throw new ArgumentException($"Не достатньо товарів на складі для здійстення продажі (ProductID: {from.Product.ProductType} - {from.Product.Model})");
       from.Quantity -= info.Quantity;
       return from;
     }

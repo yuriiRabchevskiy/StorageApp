@@ -192,7 +192,18 @@ namespace DataAccess.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
-        }
+
+            migrationBuilder.InsertData(
+              table: "AspNetRoles",
+              columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+              values: new object[,]
+              {
+                { "1dff4f55-bb77-45b3-855b-cbf07956e542", "dab90e8f-f5b3-4636-8fc1-a235144e3108", "Admin", "ADMIN" },
+                { "674f258a-3bdc-481a-b542-88918aa0cc70", "46cb7bbf-9a18-4471-b145-f761452d6b2d", "Client", "CLIENT" },
+                { "6c31ac53-8b84-468c-84bc-62d5b7650ab9", "8899bd73-3c61-4fe0-bd56-4d0f24ff1478", "User", "USER" },
+                { "c5783af5-1b7b-4fb7-afcc-3dceca0d0bf6", "3f2ad95e-e15e-4f06-ad86-f861031d19b3", "AdminAssistant", "ADMINASSISTANT" },
+              });
+    }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
