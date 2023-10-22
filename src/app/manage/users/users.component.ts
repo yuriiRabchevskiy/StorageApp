@@ -31,6 +31,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
     switch (user.role) {
       case UserRoleName.adminAssistant: return 'Помічник Адміністратора';
       case UserRoleName.user: return 'Продавець';
+      case UserRoleName.warehouseManager: return 'Завскладу';
       default: return 'Клієнт';
     }
   }
