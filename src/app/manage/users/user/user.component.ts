@@ -38,7 +38,8 @@ export class UserComponent implements OnInit {
     { label: 'Адміністратор', value: UserRoleName.admin },
     { label: 'Помічник Адміністратора', value: UserRoleName.adminAssistant },
     { label: 'Продавець', value: UserRoleName.user },
-    { label: 'Клієнт', value: UserRoleName.client }
+    { label: 'Клієнт', value: UserRoleName.client },
+    { label: 'Завскладу', value: UserRoleName.warehouseManager }    
   ];
 
   user: ISUser;

@@ -1,10 +1,11 @@
-declare type UserRole = 'Admin' | 'AdminAssistant' | 'User' | 'Client';
+declare type UserRole = 'Admin' | 'AdminAssistant' | 'User' | 'Client' | 'WarehouseManager';
 
 export class UserRoleName {
     static admin: UserRole = 'Admin';
     static adminAssistant: UserRole = 'AdminAssistant';
     static user: UserRole = 'User';
     static client: UserRole = 'Client';
+    static warehouseManager: UserRole = 'WarehouseManager';
 }
 
 export interface IUserToEdit {
