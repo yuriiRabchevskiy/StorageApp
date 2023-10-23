@@ -45,6 +45,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     public orderDialog: boolean = false;
     public showConfirm: boolean = false;
     public showConfirmMoveTo: boolean = false;
+    public showConfirmMassSms: boolean = false;
     public showConfirmCancel: boolean = false;
     public showOrderHistory: boolean = false;
     public typeFilter: NumberFilter<IOrder> = new NumberFilter<IOrder>();
@@ -290,6 +291,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     }
 
     showToEdit() {
+        if(this.isWarehouseManager) return;
         this.orderDialog = true;
     }
 
@@ -360,6 +362,17 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
         this.filter();
         this.showConfirmMoveTo = false;
+    }
+
+    confirmMassSms(val: boolean) {
+        if (!val) {
+            this.showConfirmMassSms = false;
+            return;
+        }
+
+        const data = this.chosenVisibleOrders;
+        data.forEach(itm => this.sentSms(itm));
+        this.showConfirmMassSms = false;
     }
 
     closeCancelOrder(val) {
