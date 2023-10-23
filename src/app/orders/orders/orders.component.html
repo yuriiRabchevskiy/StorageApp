@@ -10,7 +10,8 @@
       <div *ngIf="view.isMobile">
       </div>
       <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
-        <app-i-button [useSprite]="false" icon="pencil" *ngIf="selectedTab.value !== 1 && !isCancelTab"
+        <app-i-button [useSprite]="false" icon="pencil" *ngIf="
+        (selectedTab.value !== 1 && !isCancelTab && !isWarehouseManager)"
           [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Редагувати продажу"
           (iClick)="showToEdit()">
         </app-i-button>
@@ -18,8 +19,8 @@
           title="Повернути замовлення" (iClick)="confCancel()"
           [disabled]="viewData.length < 1 || selectedItems.length > 1">
         </app-i-button>
-        <app-i-button [useSprite]="false" icon="rocket" *ngIf="moveToInfo && canView"
-          [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Перемістити {{moveToInfo.title}}"
+        <app-i-button [useSprite]="false" icon="rocket" *ngIf="canViewMoveTo"
+          [disabled]="!chosenVisibleOrders.length" title="Перемістити {{moveToInfo.title}}"
           (iClick)="showConfirmMoveTo = true">
         </app-i-button>
         <app-i-button [useSprite]="false" icon="lock" *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
@@ -74,7 +75,9 @@
         </colgroup>
 
         <colgroup *ngIf="!view.isMobile">
+          <col [width]="50" />
           <col />
+          
           <!--coll for expand-->
           <col [width]="50" />
 
@@ -87,7 +90,12 @@
       <ng-template pTemplate="header">
         <tr>
           <!--cols for expand and id-->
+          <th>
+            <input [checked]="isMoveToAllCbChecked" type="checkbox" [indeterminate]="isMoveToAllIndeterminate" 
+            (change)="onMoveToAllChange($event)"/>
+          </th>
           <th></th>
+          
           <th>#</th>
           <ng-container *ngFor="let column of columns">
             <th [pSortableColumn]="column?.field" *ngIf="visibleColumn(column)" pResizableColumn>
@@ -108,9 +116,13 @@
 
         <tr (click)="onItemClick(rowData)" [pSelectableRow]="rowData"
           [ngClass]="{'s-selected-row': rowData.id === selectedItem?.id}">
+          
+          <td><input type="checkbox" [checked]="rowData.isChecked" (change)="onCheckedChange(rowData, $event)"/></td>
+          
           <td class="expanded-cell">
             <i href="#" [pRowToggler]="rowData" [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
           </td>
+          
           <td>{{rowData.id}}</td>
 
           <ng-container *ngFor="let column of columns">
@@ -228,9 +240,9 @@
 </app-confirm>
 
 <app-confirm (confirm)="confirmMoveTo($event)" *ngIf="showConfirmMoveTo"
-  yesHeader="Перемістити {{visibleOrders?.length}}">
+  yesHeader="Перемістити {{chosenVisibleOrders?.length}}">
   <span header class="confirm-title">Перемістити усі
-    (<b>{{visibleOrders?.length}}</b>) замовленя {{moveToInfo.title}}?
+    (<b>{{chosenVisibleOrders?.length}}</b>) замовленя {{moveToInfo.title}}?
   </span>
 </app-confirm>
 

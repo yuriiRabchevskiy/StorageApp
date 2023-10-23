@@ -34,13 +34,7 @@ export class UserComponent implements OnInit {
   password: FormControl;
   confirmPassword: FormControl;
   role: FormControl;
-  userRoles = [
-    { label: 'Адміністратор', value: UserRoleName.admin },
-    { label: 'Помічник Адміністратора', value: UserRoleName.adminAssistant },
-    { label: 'Продавець', value: UserRoleName.user },
-    { label: 'Клієнт', value: UserRoleName.client },
-    { label: 'Завскладу', value: UserRoleName.warehouseManager }    
-  ];
+  userRoles = UserRoleName.selectionList;
 
   user: ISUser;
 

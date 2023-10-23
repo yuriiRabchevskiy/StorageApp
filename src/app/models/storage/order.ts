@@ -39,6 +39,7 @@ export interface IOrder {
     date?: string;
     sellerShort?: string;
     itemsName?: string;
+    isChecked?: boolean;
 }
 
 export enum OrderOperation { Created, Updated, Closed, Canceled }

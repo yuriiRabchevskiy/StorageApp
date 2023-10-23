@@ -19,13 +19,7 @@ export class UserEditorComponent implements OnInit {
   notes: FormControl;
   role: FormControl;
 
-  userRoles = [
-    { label: 'Адміністратор', value: UserRoleName.admin },
-    { label: 'Помічник Адміністратора', value: UserRoleName.adminAssistant },
-    { label: 'Продавець', value: UserRoleName.user },
-    { label: 'Клієнт', value: UserRoleName.client },
-    { label: 'Завскладу', value: UserRoleName.warehouseManager }    
-  ];
+  userRoles = UserRoleName.selectionList;
 
   _user: ISUser;
   userToEdit: IUserToEdit;
