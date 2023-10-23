@@ -61,8 +61,18 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     private _canceledLoadTimeMs: number = undefined;
     public clickInfo: IDoubleClick = {};
 
+    public get canViewMoveTo() {
+        if (!this.moveToInfo) return false;
+        if (this.canView) return true;
+        return (this.isWarehouseManager && this.selectedTab.value == OrderStatus.Open);
+    }
+
     public get visibleOrders(): IOrder[] {
         return (this.dataTable.filteredValue ?? this.dataTable.value ?? []);
+    }
+
+    public get chosenVisibleOrders(): IOrder[]  {
+        return this.visibleOrders.filter(it => it.isChecked);
     }
 
     public columns: ITableColumn[] = [
@@ -92,9 +102,24 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         },
     ];
 
+    get isMoveToAllCbChecked() {
+        return this.visibleOrders.length && this.visibleOrders.some(it => it.isChecked);
+    }
+
+    get isMoveToAllIndeterminate() {
+        if (!this.visibleOrders.length) return false;
+        const first = this.visibleOrders[0].isChecked;
+        return this.visibleOrders.some(it => it.isChecked !== first);
+    }
+
     get moveToInfo(): IMoveToInfo | undefined {
 
         switch (this.selectedTab.value) {
+            case OrderStatus.Open: return {
+                title: 'з прийняті у комплектується',
+                desiredStatus: OrderStatus.Shipping,
+                apiActionExecutor: (apiService, ids) => apiService.moveOrderToProcessing({ ids })
+            };
             case OrderStatus.Processing: return {
                 title: 'з комплектується у відправлені',
                 desiredStatus: OrderStatus.Shipping,
@@ -177,6 +202,18 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         this.updateMetadata();
     }
 
+    onMoveToAllChange(_: InputEvent) {
+        const val = (_.target as any).checked;
+        this.visibleOrders.map(it => it.isChecked = val);
+    }
+
+    onCheckedChange(order: IOrder, _: InputEvent) {
+        const val = (_.target as any).checked;
+        order.isChecked = val;
+        const realData = this.data.find(it => it.id === order.id);
+        realData.isChecked = val;
+    }
+
     onItemClick(event: IOrder) {
         this.onRowClick(event);
 
@@ -221,6 +258,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         if (res.success) {
             res.items.map(it => {
                 it.openDate = new Date(it.openDate);
+                it.isChecked = true;
                 it.date = moment(it.openDate).format('DD/MM/YYYY');
                 it.itemsName = this.getItemsName(it.products);
                 const sellerSrName = it.seller?.split(' ');
@@ -305,7 +343,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
         const moveToInfo = this.moveToInfo;
 
-        const data = this.visibleOrders.slice();
+        const data = this.chosenVisibleOrders.slice().filter(it => it.isChecked);
         const ids = data.map(it => it.id);
         moveToInfo.apiActionExecutor(this.apiService, ids).subscribe({
             next: (res: ApiResponse<any>) => {
@@ -331,7 +369,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         }
 
         const order = this.selectedItem;
-        this.apiService.сancelOrder(order.id, val.item).subscribe(
+        this.apiService.cancelOrder(order.id, val.item).subscribe(
             res => {
                 if (res.success) {
                     this.showSuccessMessage('Продажу повернено');
@@ -356,7 +394,10 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             res => {
                 this._canceledLoadTimeMs = new Date().getTime();
                 this.canceledOrdersIsLoading = false;
-                res.items.forEach(it => it.openDate = new Date(it.openDate));
+                res.items.forEach(it => {
+                    it.openDate = new Date(it.openDate);
+                    it.isChecked = true;
+                });
                 this.canceledOrders = res.items;
                 this.canceledRowGroupMetadata = this.updateRowGroupMetaData(this.canceledOrders);
             },

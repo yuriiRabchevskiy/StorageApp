@@ -6,7 +6,25 @@ export class UserRoleName {
     static user: UserRole = 'User';
     static client: UserRole = 'Client';
     static warehouseManager: UserRole = 'WarehouseManager';
-}
+
+    static selectionList = [
+        { label: 'Адміністратор', value: UserRoleName.admin },
+        { label: 'Помічник Адміністратора', value: UserRoleName.adminAssistant },
+        { label: 'Продавець', value: UserRoleName.user },
+        { label: 'Клієнт', value: UserRoleName.client },
+        { label: 'Завскладу', value: UserRoleName.warehouseManager }    
+      ];
+      
+    static getRoleName(isAdmin: boolean, role: string ) {
+        if (isAdmin) return 'Адміністратор';
+        switch (role) {
+          case UserRoleName.adminAssistant: return 'Помічник Адміністратора';
+          case UserRoleName.user: return 'Продавець';
+          case UserRoleName.warehouseManager: return 'Завскладу';
+          default: return 'Клієнт';
+        }
+    }  
+} 
 
 export interface IUserToEdit {
     id: string;

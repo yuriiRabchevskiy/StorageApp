@@ -5,6 +5,7 @@ import { ViewState } from '../../shared/helpers';
 import { ApiResponse, IApiErrorInfo } from '../api';
 import { UserService } from './../../shared/services/user.service';
 import { WorkProgress } from './work-progress';
+import { UserRoleName } from '../manage/user';
 
 export abstract class SecuredComponent {
   public view: ViewState = new ViewState();
@@ -13,13 +14,15 @@ export abstract class SecuredComponent {
   public isAdmin: boolean = false;
   public isAdminAssistant: boolean = false;
   public isClient: boolean = false;
+  public isWarehouseManager: boolean = false;
 
   constructor(public userService: UserService, protected notify: MessageService) {
 
     const user = this.userService.getLocal();
     if (!user) return;
-    this.isAdminAssistant = user.role === 'AdminAssistant';
-    this.isClient = user.role === 'Client';
+    this.isAdminAssistant = user.role === UserRoleName.adminAssistant;
+    this.isClient = user.role === UserRoleName.client;
+    this.isWarehouseManager = user.role === UserRoleName.warehouseManager;
     this.isAdmin = user.isAdmin;
     this.canView = user.isAdmin;
     this.canEdit = user.isAdmin;

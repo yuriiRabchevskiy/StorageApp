@@ -27,13 +27,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
   }
 
   getUserRole(user: IUser) {
-    if (user.isAdmin) return 'Адміністратор';
-    switch (user.role) {
-      case UserRoleName.adminAssistant: return 'Помічник Адміністратора';
-      case UserRoleName.user: return 'Продавець';
-      case UserRoleName.warehouseManager: return 'Завскладу';
-      default: return 'Клієнт';
-    }
+   return UserRoleName.getRoleName(user.isAdmin, user.role);
   }
 
   onRowClick(user: ISUser) {

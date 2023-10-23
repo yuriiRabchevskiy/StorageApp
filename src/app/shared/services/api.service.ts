@@ -106,7 +106,7 @@ export class ApiService extends ApiBase {
         return this.doPost(`order/${id}/sms/`, {});
     }
 
-    сancelOrder(id: number, data: ICancelOrder) {
+    cancelOrder(id: number, data: ICancelOrder) {
         return this.doPost('order/reject/' + id, data);
     }
     // storage method
