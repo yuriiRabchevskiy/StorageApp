@@ -61,7 +61,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     private _canceledLoadTimeMs: number = undefined;
     public clickInfo: IDoubleClick = {};
 
-    public get canViewMoveTo() {
+    public get canViewMassActions() {
         if (!this.moveToInfo) return false;
         if (this.canView) return true;
         return (this.isWarehouseManager && this.selectedTab.value == OrderStatus.Open);
