@@ -23,6 +23,10 @@
           [disabled]="!chosenVisibleOrders.length" title="Перемістити {{moveToInfo.title}}"
           (iClick)="showConfirmMoveTo = true">
         </app-i-button>
+        <app-i-button [useSprite]="false" icon="broadcast" *ngIf="isProcessingTab && canView"
+          [disabled]="!chosenVisibleOrders.length" title="Відправити смс"
+          (iClick)="showConfirmMassSms = true">
+        </app-i-button>
         <app-i-button [useSprite]="false" icon="lock" *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
           [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Закрити продажу"
           (iClick)="confirmation()">
@@ -244,6 +248,13 @@
   yesHeader="Перемістити {{chosenVisibleOrders?.length}}">
   <span header class="confirm-title">Перемістити усі
     (<b>{{chosenVisibleOrders?.length}}</b>) замовленя {{moveToInfo.title}}?
+  </span>
+</app-confirm>
+
+<app-confirm (confirm)="confirmMassSms($event)" *ngIf="showConfirmMassSms"
+  yesHeader="Відправити {{chosenVisibleOrders?.length}} смс">
+  <span header class="confirm-title">Відправити
+    (<b>{{chosenVisibleOrders?.length}}</b>) смс?
   </span>
 </app-confirm>
 
