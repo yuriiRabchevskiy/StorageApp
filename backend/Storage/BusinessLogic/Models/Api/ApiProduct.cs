@@ -6,6 +6,7 @@ namespace BusinessLogic.Models.Api
   {
     public int Id { get; set; }
     public int CategoryId { get; set; }
+    public string ProductCode { get; set; }
     public string ProductType { get; set; } // e.g. backpack, stairs
     public string Model { get; set; } // e.g. backpack, stairs
     public string Producer { get; set; }

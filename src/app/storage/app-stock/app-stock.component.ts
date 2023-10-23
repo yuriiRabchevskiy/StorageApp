@@ -25,6 +25,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
 
 
   public columns: ITableColumn[] = [
+    { title: 'Код', field: 'productCode', width: 80 },
     { title: 'Ім\'я', field: 'productType' },
     { title: 'Виробник', field: 'producer' },
     { title: 'Модель', field: 'model', width: 80 },
