@@ -19,7 +19,7 @@
           title="Повернути замовлення" (iClick)="confCancel()"
           [disabled]="viewData.length < 1 || selectedItems.length > 1">
         </app-i-button>
-        <app-i-button [useSprite]="false" icon="rocket" *ngIf="canViewMoveTo"
+        <app-i-button [useSprite]="false" icon="rocket" *ngIf="canViewMassActions"
           [disabled]="!chosenVisibleOrders.length" title="Перемістити {{moveToInfo.title}}"
           (iClick)="showConfirmMoveTo = true">
         </app-i-button>
@@ -75,7 +75,7 @@
         </colgroup>
 
         <colgroup *ngIf="!view.isMobile">
-          <col [width]="50" />
+          <col [width]="50" *ngIf="canViewMassActions" />
           <col />
           
           <!--coll for expand-->
@@ -92,7 +92,7 @@
           <!--cols for expand and id-->
           <th>
             <input [checked]="isMoveToAllCbChecked" type="checkbox" [indeterminate]="isMoveToAllIndeterminate" 
-            (change)="onMoveToAllChange($event)"/>
+            (change)="onMoveToAllChange($event)" *ngIf="canViewMassActions"/>
           </th>
           <th></th>
           
@@ -117,7 +117,8 @@
         <tr (click)="onItemClick(rowData)" [pSelectableRow]="rowData"
           [ngClass]="{'s-selected-row': rowData.id === selectedItem?.id}">
           
-          <td><input type="checkbox" [checked]="rowData.isChecked" (change)="onCheckedChange(rowData, $event)"/></td>
+          <td><input type="checkbox" [checked]="rowData.isChecked" 
+            (change)="onCheckedChange(rowData, $event)" *ngIf="canViewMassActions"/></td>
           
           <td class="expanded-cell">
             <i href="#" [pRowToggler]="rowData" [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
@@ -169,7 +170,7 @@
             <div class="products-list flex-col">
               <table class="check-order">
                 <colgroup>
-                  <col width="520px">
+                  <col width="360px">
                   <col>
                   <col width="110px">
                   <col width="110px">
