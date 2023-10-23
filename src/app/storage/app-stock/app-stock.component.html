@@ -14,25 +14,28 @@
                 <app-i-button *ngIf="canView" icon="add-icon" title="Додати Продукт" (iClick)="showDialogToAdd()">
                 </app-i-button>
                 <app-i-button [useSprite]="false" icon="pencil" *ngIf="canView" title="Редагувати Продукт"
-                    (iClick)="showDialogToEdit(selectedItem)"></app-i-button>
+                    (iClick)="showDialogToEdit(selectedItem)">
+                </app-i-button>
                 <app-i-button *ngIf="canView" icon="copy-icon" title="Копіювати Продукт" (iClick)="duplicate()">
                 </app-i-button>
                 <app-i-button *ngIf="canView" icon="del-icon" title="Видалити Продукт" (iClick)="confirmation()">
                 </app-i-button>
                 <app-i-button *ngIf="canView" icon="addition-icon" title="Поповнити склад"
-                    (iClick)="showAdditionDialog(true)"></app-i-button>
+                    (iClick)="showAdditionDialog(true)">
+                </app-i-button>
                 <app-i-button *ngIf="canView" icon="withdrawal-icon" title="Забрати зі складу"
                     (iClick)="showRemovalDialog(true)">
                 </app-i-button>
                 <app-i-button *ngIf="canView && wereHouses.length > 2" icon="transfer-icon" title="Перемістити продукт"
                     (iClick)="showTransferDialog()" [disabled]="!selectedItem || !isBalance">
                 </app-i-button>
-                <app-i-button icon="sell-icon" title="Додати до кошика" (iClick)="showSellDialog()" *ngIf="!isClient"
+                <app-i-button icon="sell-icon" title="Додати до кошика" (iClick)="showSellDialog()" 
+                    *ngIf="!isClient && !isWarehouseManager"
                     [disabled]="!selectedItem || !isBalance">
                 </app-i-button>
 
                 <ng-container right>
-                    <app-i-button *ngIf="!isClient && sellList.length > 0" icon="i-basket" title="Оформити замовлення"
+                    <app-i-button *ngIf="(!isClient && !isWarehouseManager) && sellList.length > 0" icon="i-basket" title="Оформити замовлення"
                         (iClick)="showBasketDialog()">
                     </app-i-button>
                     <button class="i-menu-button" title="Колонки" (click)="showColumnsPicker = true"
