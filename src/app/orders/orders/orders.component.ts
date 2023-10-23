@@ -343,7 +343,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
         const moveToInfo = this.moveToInfo;
 
-        const data = this.chosenVisibleOrders.slice().filter(it => it.isChecked);
+        const data = this.chosenVisibleOrders;
         const ids = data.map(it => it.id);
         moveToInfo.apiActionExecutor(this.apiService, ids).subscribe({
             next: (res: ApiResponse<any>) => {
