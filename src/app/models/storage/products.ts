@@ -9,6 +9,7 @@ export interface IProdOrder {
 export interface IProduct {
     id: number;
     categoryId: number;
+    productCode?: string;
     productType?: string;
     model?: string;
     producer?: string;
