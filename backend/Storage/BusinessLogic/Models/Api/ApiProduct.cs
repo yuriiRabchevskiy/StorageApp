@@ -34,5 +34,7 @@ namespace BusinessLogic.Models.Api
     public int TotalBalance { get; set; }
 
     public double Price { get; set; }
+
+    public string ProductCode { get; set; }
   }
 }
