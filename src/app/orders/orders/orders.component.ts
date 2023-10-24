@@ -262,7 +262,6 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         if (res.success) {
             res.items.map(it => {
                 it.openDate = new Date(it.openDate);
-                it.isChecked = true;
                 it.date = moment(it.openDate).format('DD/MM/YYYY');
                 it.itemsName = this.getItemsName(it.products);
                 const sellerSrName = it.seller?.split(' ');
@@ -353,7 +352,8 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         moveToInfo.apiActionExecutor(this.apiService, ids).subscribe({
             next: (res: ApiResponse<any>) => {
                 if (res.success) {
-                    this.data.forEach(d => d.status = moveToInfo.desiredStatus);
+                    data.forEach(d => d.status = moveToInfo.desiredStatus);
+                    this.filter();
                     return;
                 }
                 this.showApiErrorMessage('не вдалося змінити статус продаж, оновіть сторінку', res.errors)
@@ -363,7 +363,6 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             }
         });
 
-        this.filter();
         this.showConfirmMoveTo = false;
     }
 
@@ -412,7 +411,6 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
                 this.canceledOrdersIsLoading = false;
                 res.items.forEach(it => {
                     it.openDate = new Date(it.openDate);
-                    it.isChecked = true;
                 });
                 this.canceledOrders = res.items;
                 this.canceledRowGroupMetadata = this.updateRowGroupMetaData(this.canceledOrders);
