@@ -67,6 +67,7 @@ namespace DataAccess.Repository
         real.Model = it.Model;
         real.Producer = it.Producer;
         real.ProductType = it.ProductType;
+        real.ProductCode = it.ProductCode;
         real.RecommendedBuyPrice = it.RecommendedBuyPrice;
         real.RecommendedSalePrice = it.RecommendedSalePrice;
         real.Size = it.Size;

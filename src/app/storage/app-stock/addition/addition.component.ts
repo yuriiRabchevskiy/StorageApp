@@ -1,7 +1,7 @@
 import { FormControl, Validators } from '@angular/forms';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
-import { IProduct } from '../../../models/storage';
+import { IProduct, buildProductFullName } from '../../../models/storage';
 import { IWarehouse } from './../../../models/storage/werehouse';
 import { IAddition, AdditionItem } from '../../../models/storage/addition';
 
@@ -18,6 +18,9 @@ export interface ISaveAddition {
 
 export class AdditionComponent {
   @Input() addNext: boolean = false;
+
+  buildProductFullName = buildProductFullName;
+
   addCountError: boolean;
   count: number;
   expectedCount: number;

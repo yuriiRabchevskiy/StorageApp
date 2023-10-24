@@ -1,7 +1,7 @@
 import { FormControl, Validators } from '@angular/forms';
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
-import { IProduct } from '../../../models/storage';
+import { IProduct, buildProductFullName } from '../../../models/storage';
 import { IWarehouse } from './../../../models/storage/werehouse';
 import { IAddition, AdditionItem } from '../../../models/storage/addition';
 
@@ -20,6 +20,8 @@ export class ProdRemovalComponent implements OnInit {
   @Input() removeNext: boolean = false;
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() removeRequested: EventEmitter<ISaveAddition> = new EventEmitter<ISaveAddition>();
+
+  buildProductFullName = buildProductFullName;
 
   count: number;
   expectedCount: number;
