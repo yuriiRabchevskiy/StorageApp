@@ -56,7 +56,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
 
   typeFilter: NumberFilter<IProduct> = new NumberFilter<IProduct>();
 
-  globalSearchFields = ['productType', 'producer', 'model', 'size', 'color', 'freeNote', 'recommendedBuyPrice', 'recommendedSalePrice', 'id'];
+  globalSearchFields = ['productType', 'productCode',
+   'producer', 'model', 'size', 'color', 'freeNote', 'recommendedBuyPrice', 'recommendedSalePrice', 'id'];
 
   tabs: ICategory[] = [];
   _selectedTab: ICategory;

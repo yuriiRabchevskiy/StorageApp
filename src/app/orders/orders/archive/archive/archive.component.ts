@@ -6,7 +6,7 @@ import { UserService } from '@app/shared/services/user.service';
 import { ApiListComponent } from 'app/models/component';
 import { Dictionary, IDictionary } from 'app/models/dictionary';
 import { StringFilter } from 'app/models/filtering/filters';
-import { IOrder, IOrderAction, ITransaction } from 'app/models/storage';
+import { IOrder, IOrderAction, ITransaction, buildProductFullName } from 'app/models/storage';
 import { ApiService } from 'app/shared/services/api.service';
 import { groupBy } from 'lodash';
 import * as moment from 'moment-mini';
@@ -26,6 +26,9 @@ interface IDoubleClick {
 export class ArchiveComponent extends ApiListComponent<IOrder> {
 
   @ViewChild('dt', { static: true }) public dataTable: Table;
+
+  buildProductFullName = buildProductFullName;
+
   public selectedItem: IOrder;
   public orderDialog: boolean = false;
   public showConfirm: boolean = false;

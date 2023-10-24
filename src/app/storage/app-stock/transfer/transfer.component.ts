@@ -2,7 +2,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { IWarehouse } from './../../../models/storage/werehouse';
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { ApiService } from '../../../shared/services/api.service';
-import { IProduct } from '../../../models/storage';
+import { IProduct, buildProductFullName } from '../../../models/storage';
 import { ITransfer, TransferItem } from '../../../models/storage';
 import * as moment from 'moment-mini';
 import { SelectItem } from 'primeng/api';
@@ -14,6 +14,9 @@ import { SelectItem } from 'primeng/api';
 })
 
 export class TransferComponent implements OnInit {
+
+  buildProductFullName = buildProductFullName
+
   locationFrom: IWarehouse;
   locationTo: IWarehouse;
   fromCount: number;

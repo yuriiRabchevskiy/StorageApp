@@ -40,9 +40,17 @@
                         min="0" step="0.01">
                 </mat-form-field>
             </div>
+            <div class="flex-row flex-wrap">
+                <mat-form-field class="s-input-wrapper">
+                    <input matInput type="text" placeholder="Код" [(ngModel)]="product.productCode" 
+                       name="productCode" #productCode="ngModel">
+                </mat-form-field>
+            </div>
             <div class="flex-row flex-wrap flex-area-wrap" [class.area-xs]="product.isNew">
-                <mat-form-field class="s-area-wrapper">
-                    <textarea matInput placeholder="Нотатки" [(ngModel)]="product.freeNote" name="freeNote" #freeNote="ngModel"></textarea>
+                <mat-form-field class="s-area-wrapper" id="freeNoteWrap">
+                    <textarea id="freeNote" matInput placeholder="Нотатки" [(ngModel)]="product.freeNote" name="freeNote" 
+                        #freeNote="ngModel">
+                    </textarea>
                 </mat-form-field>
             </div>
         </div>

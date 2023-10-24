@@ -3,7 +3,7 @@
     <div class="dialog-body" *ngIf="product">
         <div class="d-page-wrap">
             <div class="d-body-header flex-row">
-                <div class="product-name">{{product.size}} {{product.color}} {{product.productType}} - {{product.model}} {{product.producer}}</div>
+                <div class="product-name">{{buildProductFullName(product)}}</div>
             </div>
             <div class="flex-row flex-wrap">
                 <mat-form-field class="s-input-wrapper">

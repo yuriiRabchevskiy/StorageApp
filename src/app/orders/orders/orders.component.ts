@@ -10,7 +10,7 @@ import { ApiResponse } from '../../models/api';
 import { ApiOrdersChanges } from '../../models/api/state/state';
 import { ApiListComponent, ITableColumn } from '../../models/component/list-api.component';
 import { NumberFilter, StringFilter } from '../../models/filtering/filters';
-import { IOrder, ITransaction, OrderStatus, IOrderAction } from '../../models/storage';
+import { IOrder, ITransaction, OrderStatus, IOrderAction, buildProductFullName } from '../../models/storage';
 import { ApiService, getDeliveryDescriptor } from '../../shared/services/api.service';
 import { TrackerService } from '../../shared/services/tracker.service';
 import { Dictionary, IDictionary } from './../../models/dictionary';
@@ -41,6 +41,9 @@ interface IMoveToInfo {
 })
 export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestroy {
     @ViewChild('dt', { static: true }) public dataTable: Table;
+
+    buildProductFullName = buildProductFullName;
+
     public selectedItem: IOrder;
     public orderDialog: boolean = false;
     public showConfirm: boolean = false;
