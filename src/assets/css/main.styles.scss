@@ -84,6 +84,16 @@ html {
     justify-content: space-between;
 }
 
+.page-head-links {
+    @extend .flex-row;
+    align-items: center;
+    color: grey;
+}
+
+.page-head-link {
+    color: grey;
+}
+
 .page-body {
     display: flex;
     flex-direction: column;
