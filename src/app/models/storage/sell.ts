@@ -1,4 +1,3 @@
-import { IOrder, Order, OrderStatus } from './order';
 
 export interface ISell {
     idProduct: number;

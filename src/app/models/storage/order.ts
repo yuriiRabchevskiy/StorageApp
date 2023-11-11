@@ -61,12 +61,17 @@ export interface ISaleOrder extends IOrder {
     productOrders: ISell[];
 }
 
+export interface IEditSaleOrder {
+    productOrders: ISell[];
+}
+
 export interface ITransaction {
     product: IProduct;
     quantity: number;
     price: number;
     buyPrice: number;
     totalPrice: number;
+    warehouseId: number;
 }
 
 export class Order implements IOrder {

@@ -13,9 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Storage.Code.Services;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using System.Linq;
-using DataAccess.Migrations;
-using System.Numerics;
 
 namespace Storage.Controllers
 {
@@ -79,16 +76,14 @@ namespace Storage.Controllers
       return new ApiResponse<ApiOrderAction>(data);
     }
 
-
-    // POST api/values
     [HttpPost]
     [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
-    public async Task<ApiResponseBase> Post([FromBody] ApiOrder product)
+    public async Task<ApiResponseBase> Post([FromBody] ApiOrder order)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
       isAdmin = isAdmin || await _userManager.IsInRoleAsync(user, UserRole.AdminAssistant).ConfigureAwait(false);
-      await _repo.UpdateAsync(user.Id, isAdmin, product);
+      await _repo.UpdateAsync(user.Id, isAdmin, order);
       return new ApiResponseBase();
     }
 

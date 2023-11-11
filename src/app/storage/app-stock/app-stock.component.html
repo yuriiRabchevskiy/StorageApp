@@ -31,7 +31,7 @@
                 <app-i-button *ngIf="canView" icon="withdrawal-icon" title="Забрати зі складу"
                     (iClick)="showRemovalDialog(true)">
                 </app-i-button>
-                <app-i-button *ngIf="canView && wereHouses.length > 2" icon="transfer-icon" title="Перемістити продукт"
+                <app-i-button *ngIf="canView && wareHouses.length > 2" icon="transfer-icon" title="Перемістити продукт"
                     (iClick)="showTransferDialog()" [disabled]="!selectedItem || !isBalance">
                 </app-i-button>
                 <app-i-button icon="sell-icon" title="Додати до кошика" (iClick)="showSellDialog()"
@@ -40,7 +40,7 @@
 
                 <ng-container right>
 
-                    <app-i-button *ngIf="(!isClient && !isWarehouseManager) && sellList.length > 0" icon="i-basket"
+                    <app-i-button *ngIf="(!isClient && !isWarehouseManager) && basketService.hasItems" icon="i-basket"
                         title="Оформити замовлення" (iClick)="showBasketDialog()">
                     </app-i-button>
                     <button class="i-menu-button" title="Колонки" (click)="showColumnsPicker = true"
@@ -72,7 +72,7 @@
                     <ng-container *ngFor="let column of columns">
                         <col *ngIf="visibleColumn(column)" [width]="column.width" />
                     </ng-container>
-                    <col *ngFor="let col of wereHouses" width="80px">
+                    <col *ngFor="let col of wareHouses" width="80px">
                 </colgroup>
             </ng-template>
 
@@ -85,7 +85,7 @@
                         </th>
                     </ng-container>
 
-                    <th *ngFor="let col of wereHouses" [pSortableColumn]="'wh_'+col.id">
+                    <th *ngFor="let col of wareHouses" [pSortableColumn]="'wh_'+col.id">
                         {{col.name}}
                         <p-sortIcon [field]="'wh_'+col.id"></p-sortIcon>
                     </th>
@@ -98,7 +98,7 @@
                                 (input)="dt.filter($event.target.value, column.field, null)" />
                         </th>
                     </ng-container>
-                    <th *ngFor="let col of wereHouses"></th>
+                    <th *ngFor="let col of wareHouses"></th>
                 </tr>
             </ng-template>
 
@@ -110,7 +110,7 @@
                             {{rowData[column.field]}}
                         </td>
                     </ng-container>
-                    <td *ngFor="let col of wereHouses">{{rowData['wh_'+col.id]}}</td>
+                    <td *ngFor="let col of wareHouses">{{rowData['wh_'+col.id]}}</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -121,23 +121,23 @@
     (saveProduct)="save($event)" [product]="selectedItem">
 </app-product>
 
-<app-transfer *ngIf="transferDialog" [product]="selectedItem" [locations]="wereHouses"
+<app-transfer *ngIf="transferDialog" [product]="selectedItem" [locations]="wareHouses"
     (onCloseDialog)="closeTransferDialog($event)" (transfer)="doTransfer($event)">
 </app-transfer>
 
-<app-addition *ngIf="additionDialog" [product]="selectedItem" [locations]="wereHouses"
+<app-addition *ngIf="additionDialog" [product]="selectedItem" [locations]="wareHouses"
     (onCloseDialog)="closeAdditionDialog($event)" (addition)="saveAddition($event)">
 </app-addition>
 
-<app-prod-removal *ngIf="removalDialog" [product]="selectedItem" [locations]="wereHouses"
+<app-prod-removal *ngIf="removalDialog" [product]="selectedItem" [locations]="wareHouses"
     (onCloseDialog)="closeRemovalDialog($event)" (removeRequested)="removeProducts($event)">
 </app-prod-removal>
 
-<app-sell *ngIf="sellDialog" [product]="selectedItem" [locations]="wereHouses" [sell]="sell"
+<app-sell *ngIf="sellDialog" [product]="selectedItem" [locations]="wareHouses" [sell]="sell"
     (onCloseDialog)="closeSellDialog($event)" (sale)="sale($event)">
 </app-sell>
 
-<app-basket *ngIf="basketDialog" [items]="sellList" [locations]="wereHouses" (onCloseDialog)="closeBasketDialog($event)"
+<app-basket *ngIf="basketDialog"  [locations]="wareHouses" (onCloseDialog)="closeBasketDialog($event)"
     (removeItem)="turnFromBasket($event)">
 </app-basket>
 

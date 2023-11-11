@@ -9,7 +9,7 @@ import { IUser, ISUser, IUserToEdit, IChangePassword } from '../../models/manage
 import { IProduct } from './../../models/storage/products';
 import { IWarehouse } from '../../models/storage/werehouse';
 import { ICategory } from './../../models/storage/categories';
-import { IOrder, ISaleOrder, IOrderAction, OrderOperation, DeliveryKind, deliveryTypes, IApiOrderMoveCommand } from './../../models/storage/order';
+import { IOrder, ISaleOrder, IOrderAction, OrderOperation, DeliveryKind, deliveryTypes, IApiOrderMoveCommand, IEditSaleOrder } from './../../models/storage/order';
 import { ICancelOrder } from '../../models/storage/index';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
@@ -151,6 +151,10 @@ export class ApiService extends ApiBase {
     // sale method
     sale(data: ISaleOrder) {
         return this.doPost('product/sell/', data);
+    }
+
+    editSale(orderId: number, data: IEditSaleOrder) {
+        return this.doPut(`product/sell/${orderId}`, data);
     }
 
     // manage method
