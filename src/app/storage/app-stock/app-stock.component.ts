@@ -1,3 +1,4 @@
+import { BasketService } from './../../shared/services/basket.service';
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { PreferenceService } from '@app/shared/services/preference.service';
@@ -49,15 +50,14 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   basketDialog: boolean = false;
   showConfirm: boolean = false;
 
-  sellList: any[] = [];
   categories: any[] = [];
-  wereHouses: IWarehouse[] = [];
+  wareHouses: IWarehouse[] = [];
   isBalance: boolean = false;
 
   typeFilter: NumberFilter<IProduct> = new NumberFilter<IProduct>();
 
   globalSearchFields = ['productType', 'productCode',
-   'producer', 'model', 'size', 'color', 'freeNote', 'recommendedBuyPrice', 'recommendedSalePrice', 'id'];
+    'producer', 'model', 'size', 'color', 'freeNote', 'recommendedBuyPrice', 'recommendedSalePrice', 'id'];
 
   tabs: ICategory[] = [];
   _selectedTab: ICategory;
@@ -72,7 +72,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.filter();
   }
 
-  constructor(userService: UserService, private apiService: ApiService, public router: Router, private tracker: TrackerService,
+  constructor(userService: UserService, private apiService: ApiService,
+    public router: Router, private tracker: TrackerService, public basketService: BasketService,
     notify: MessageService, preferences: PreferenceService) {
     super(userService, notify, preferences);
 
@@ -255,7 +256,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
       product: this.selectedItem,
       prodOrder: item
     };
-    this.sellList.push(sellItem);
+    this.basketService.sellList.push(sellItem);
     this.showSuccessMessage('Продукт додано до кошика');
     this.sellDialog = false;
   }
@@ -313,9 +314,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   loadWereHouse() {
     this.apiService.getWarehouses().subscribe(
       res => {
-        if (res.success) {
-          this.wereHouses = res.items;
-        }
+        if (!res.success) return;
+        this.wareHouses = res.items;
       },
       err => console.log(err));
   }
@@ -381,11 +381,10 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.basketDialog = true;
   }
 
-  closeBasketDialog(event) {
+  closeBasketDialog(accepted: boolean) {
     this.basketDialog = false;
-    if (event) {
-      this.sellList = [];
-    }
+    if (!accepted) return;
+    this.basketService.reset();
   }
 
   disabledRow(val: IProduct) {

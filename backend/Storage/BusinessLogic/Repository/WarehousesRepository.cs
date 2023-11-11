@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using BusinessLogic.Abstractions;
 using BusinessLogic.Models.Api.State;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -43,6 +44,8 @@ namespace BusinessLogic.Repository
       _di = serviceProvider;
       _mapper = mapper;
     }
+
+    #region Warehouse Management
 
     public List<ApiWarehouse> Get()
     {
@@ -84,181 +87,9 @@ namespace BusinessLogic.Repository
       context.SaveChanges();
     }
 
-    public void TransferProduct(string userId, int productId, ApiProdTransfer info)
-    {
-      using var context = _di.GetRequiredService<ApplicationDbContext>();
-      var from = getStockAndVerify(productId, info, context);
+    #endregion
 
-      using var transaction = context.Database.BeginTransaction();
-      try
-      {
-        var to = context.WarehouseProducts.FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.ToId);
-        if (to == null)
-        {
-          to = new WarehouseProducts() { ProductId = productId, WarehouseId = info.ToId, Quantity = 0 };
-          context.WarehouseProducts.Add(to);
-        }
-
-        to.Quantity += info.Quantity;
-        context.SaveChanges();
-
-        var date = DateTime.UtcNow;
-        context.ProductsTrqansactions.Add(new ProductAction
-        {
-          ProductId = productId,
-          Quantity = -info.Quantity,
-          WarehouseId = info.FromId,
-          UserId = userId,
-          Date = date,
-          Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Зменшення)",
-          Operation = OperationDescription.TransferRemove,
-          Price = 0,
-        });
-        context.SaveChanges();
-
-        context.ProductsTrqansactions.Add(new ProductAction()
-        {
-          ProductId = productId,
-          Quantity = info.Quantity,
-          WarehouseId = info.ToId,
-          UserId = userId,
-          Date = date,
-          Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Збільшення)",
-          Operation = OperationDescription.TransferAdd,
-          Price = 0,
-        });
-        context.SaveChanges();
-
-        // Commit transaction if all commands succeed, transaction will auto-rollback
-        // when disposed if either commands fails
-        transaction.Commit();
-      }
-      catch (Exception ex)
-      {
-        // TODO: Handle failure
-        throw ex;
-      }
-    }
-
-    public async Task SellOrderAsync(string userId, ApiSellOrder info)
-    {
-      var changesNotes = new List<ApiProdCountChange>();
-      await _semaphoreSlim.WaitAsync();
-      try
-      {
-        await using (var context = _di.GetRequiredService<ApplicationDbContext>())
-        {
-          await using (var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted))
-          {
-            var date = DateTime.UtcNow;
-            var order = _mapper.Map<Order>(info);
-            order.OpenDate = date;
-            order.Status = OrderStatus.Open;
-            order.Delivery = info.Delivery;
-            order.ResponsibleUserId = userId;
-            order.Transactions = new List<ProductAction>();
-
-            foreach (var productOrder in info.ProductOrders)
-            {
-              var from = getStockAndVerify(productOrder.IdProduct, productOrder, context);
-
-              changesNotes.Add(new ApiProdCountChange
-              {
-                ProductId = productOrder.IdProduct,
-                WarehouseId = productOrder.FromId,
-                NewCount = from.Quantity,
-                OldCount = from.Quantity + productOrder.Quantity
-              });
-
-              var prodOrder = new ProductAction
-              {
-                Date = date,
-                ProductId = productOrder.IdProduct,
-                Quantity = -productOrder.Quantity,
-                WarehouseId = productOrder.FromId,
-                Description = productOrder.Description,
-                Price = productOrder.Price,
-                BuyPrice = from.Product.RecommendedBuyPrice,
-                UserId = userId,
-                Operation = OperationDescription.Sold
-              };
-              order.Transactions.Add(prodOrder);
-            }
-
-            context.Orders.Add(order);
-            await context.SaveChangesAsync();
-
-            await transaction.CommitAsync();
-          }
-        }
-
-        await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
-      }
-      finally
-      {
-        _semaphoreSlim.Release();
-      }
-    }
-
-    public async Task<bool> CancelOrderAsync(string userId, int id, string reason)
-    {
-      var changesNotes = new List<ApiProdCountChange>();
-
-      await using var context = _di.GetRequiredService<ApplicationDbContext>();
-      await using var transaction = await context.Database.BeginTransactionAsync();
-      var order = await context.Orders.Include(it => it.Transactions)
-        .FirstOrDefaultAsync(it => it.Id == id).ConfigureAwait(false);
-
-      if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Поточне замовлення уже скасовано");
-      order.Status = OrderStatus.Canceled;
-      order.CloseDate = DateTime.UtcNow;
-      order.CanceledDate = DateTime.UtcNow;
-      order.CanceledByUserId = userId;
-      order.CancelReason = reason;
-
-
-      var warehouses = context.WarehouseProducts.Include(it => it.Product);
-      var revertActions = new List<ProductAction>();
-
-      var date = DateTime.UtcNow;
-      foreach (var action in order.Transactions)
-      {
-        var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
-        var oldCount = @from.Quantity;
-        @from.Quantity += action.Quantity * -1; // quantity is negative in sale action
-
-        changesNotes.Add(new ApiProdCountChange
-        {
-          ProductId = action.ProductId,
-          WarehouseId = @from.WarehouseId,
-          NewCount = @from.Quantity,
-          OldCount = oldCount
-        });
-
-        var restoreAction = new ProductAction
-        {
-          Date = date,
-          ProductId = action.ProductId,
-          Quantity = -action.Quantity, // quantity is negative in sale action
-          WarehouseId = action.WarehouseId,
-          Description = $"Скасовано замовлення {id}",
-          Price = action.Price,
-          BuyPrice = @from.Product.RecommendedBuyPrice,
-          UserId = userId,
-          Operation = OperationDescription.TransferAdd,
-        };
-        revertActions.Add(restoreAction);
-      }
-
-      order.Transactions.AddRange(revertActions);
-
-      await context.SaveChangesAsync();
-      await transaction.CommitAsync();
-
-      await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
-
-      return true;
-    }
+    #region Product +-
 
     public void RemoveProduct(string userId, int productId, ApiProdAction info)
     {
@@ -336,6 +167,260 @@ namespace BusinessLogic.Repository
       }
     }
 
+    public void TransferProduct(string userId, int productId, ApiProdTransfer info)
+    {
+      using var context = _di.GetRequiredService<ApplicationDbContext>();
+      var from = getStockAndVerify(productId, info, context);
+
+      using var transaction = context.Database.BeginTransaction();
+      try
+      {
+        var to = context.WarehouseProducts.FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.ToId);
+        if (to == null)
+        {
+          to = new WarehouseProducts() { ProductId = productId, WarehouseId = info.ToId, Quantity = 0 };
+          context.WarehouseProducts.Add(to);
+        }
+
+        to.Quantity += info.Quantity;
+        context.SaveChanges();
+
+        var date = DateTime.UtcNow;
+        context.ProductsTrqansactions.Add(new ProductAction
+        {
+          ProductId = productId,
+          Quantity = -info.Quantity,
+          WarehouseId = info.FromId,
+          UserId = userId,
+          Date = date,
+          Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Зменшення)",
+          Operation = OperationDescription.TransferRemove,
+          Price = 0,
+        });
+        context.SaveChanges();
+
+        context.ProductsTrqansactions.Add(new ProductAction()
+        {
+          ProductId = productId,
+          Quantity = info.Quantity,
+          WarehouseId = info.ToId,
+          UserId = userId,
+          Date = date,
+          Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Збільшення)",
+          Operation = OperationDescription.TransferAdd,
+          Price = 0,
+        });
+        context.SaveChanges();
+
+        // Commit transaction if all commands succeed, transaction will auto-rollback
+        // when disposed if either commands fails
+        transaction.Commit();
+      }
+      catch (Exception ex)
+      {
+        // TODO: Handle failure
+        throw ex;
+      }
+    }
+
+    #endregion
+
+    #region OrderManagement
+    public async Task SellOrderAsync(string userId, ApiSellOrder info)
+    {
+      var changesNotes = new List<ApiProdCountChange>();
+      await _semaphoreSlim.WaitAsync();
+      try
+      {
+        await using var context = _di.GetRequiredService<ApplicationDbContext>();
+        await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+
+        var date = DateTime.UtcNow;
+        var order = _mapper.Map<Order>(info);
+        order.OpenDate = date;
+        order.Status = OrderStatus.Open;
+        order.Delivery = info.Delivery;
+        order.ResponsibleUserId = userId;
+        order.Transactions = new List<ProductAction>();
+
+        var (orderTransactions, notes) = createAddOrderProductActions(info.ProductOrders, context, userId, date);
+        changesNotes.AddRange(notes);
+        order.Transactions.AddRange(orderTransactions);
+
+        context.Orders.Add(order);
+        await context.SaveChangesAsync();
+
+        await transaction.CommitAsync();
+        await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
+      }
+      finally
+      {
+        _semaphoreSlim.Release();
+      }
+    }
+
+    public async Task EditSellOrderAsync(string userId, ApiSellOrder command)
+    {
+      var date = DateTime.UtcNow;
+      var changesNotes = new List<ApiProdCountChange>();
+      await _semaphoreSlim.WaitAsync();
+      try
+      {
+        await using var context = _di.GetRequiredService<ApplicationDbContext>();
+        await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+        var existingOrder = await context.Orders
+          .Include(it => it.OrderEditions)
+          .Include(it => it.Transactions)
+          .Where(it => it.Id == command.Id).FirstOrDefaultAsync();
+
+        if (existingOrder == null) throw new Exception("Замовлення не знайдено");
+        if (existingOrder.Status != OrderStatus.Open) throw new Exception("Лише відкриті замовілення можна редашувати");
+
+        var existingProducts = existingOrder.Transactions;
+        var currentProducts = command.ProductOrders.ToList();
+
+        // completely new products that did not exist previously
+        var newProducts = currentProducts.Where(cp => existingProducts.All(ep => ep.ProductId != cp.IdProduct))
+          .ToList();
+        // products that were removed from order
+        var actionsToRevert = existingProducts.Where(ep => currentProducts.All(cp => ep.ProductId != cp.IdProduct))
+          .ToList();
+        // product whose quantity was changed
+        var quantityChanges = existingProducts.Where(ep =>
+        {
+          var cp = currentProducts.FirstOrDefault(cp => ep.ProductId == cp.IdProduct);
+          if(cp == null) return false;
+          var existingQuantity = -1 * ep.Quantity;
+          if (existingQuantity == cp.Quantity) return false;
+          var change = cp.Quantity - existingQuantity;
+          ep.Quantity = change * -1; // revert changes action is going to revert this value
+          return true;
+        }).ToList();
+        actionsToRevert.AddRange(quantityChanges);
+
+
+        var (addTransactions, addNotes) = createAddOrderProductActions(newProducts, context, userId, date);
+        var (removeTransactions, removeNotes) = await createRevertOrderProductActionsAsync(actionsToRevert, $"Відредаговано замовлення {command.Id}", context, userId, date);
+        existingOrder.Transactions.AddRange(addTransactions);
+        existingOrder.Transactions.AddRange(removeTransactions);
+        changesNotes.AddRange(addNotes);
+        changesNotes.AddRange(removeNotes);
+
+        await context.SaveChangesAsync();
+
+        await transaction.CommitAsync();
+
+
+        await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
+      }
+      finally
+      {
+        _semaphoreSlim.Release();
+      }
+    }
+
+    public async Task<bool> CancelOrderAsync(string userId, int id, string reason)
+    {
+      var changesNotes = new List<ApiProdCountChange>();
+      var date = DateTime.UtcNow;
+      await using var context = _di.GetRequiredService<ApplicationDbContext>();
+      await using var transaction = await context.Database.BeginTransactionAsync();
+      var order = await context.Orders.Include(it => it.Transactions)
+        .FirstOrDefaultAsync(it => it.Id == id).ConfigureAwait(false);
+
+      if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Поточне замовлення уже скасовано");
+      order.Status = OrderStatus.Canceled;
+      order.CloseDate = date;
+      order.CanceledDate = date;
+      order.CanceledByUserId = userId;
+      order.CancelReason = reason;
+
+      var message = $"Скасовано замовлення {id}";
+      var (revertActions, notes) = await createRevertOrderProductActionsAsync(order.Transactions, message, context, userId, date);
+      order.Transactions.AddRange(revertActions);
+      changesNotes.AddRange(notes);
+
+      await context.SaveChangesAsync();
+      await transaction.CommitAsync();
+
+      await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
+
+      return true;
+    }
+
+    private static async Task<(List<ProductAction>, List<ApiProdCountChange>)> createRevertOrderProductActionsAsync(List<ProductAction> actionsToRevert, string message,
+      ApplicationDbContext context, string userId, DateTime date)
+    {
+      var revertActions = new List<ProductAction>();
+      var changesNotes = new List<ApiProdCountChange>();
+
+      var warehouses = await context.WarehouseProducts.Include(it => it.Product).ToListAsync();
+      foreach (var action in actionsToRevert)
+      {
+        var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
+        var oldCount = from.Quantity;
+        from.Quantity += action.Quantity * -1; // quantity is negative in sale action
+
+        changesNotes.Add(new ApiProdCountChange
+        {
+          ProductId = action.ProductId,
+          WarehouseId = from.WarehouseId,
+          NewCount = from.Quantity,
+          OldCount = oldCount
+        });
+
+        var restoreAction = new ProductAction
+        {
+          Date = date,
+          ProductId = action.ProductId,
+          Quantity = -action.Quantity, // quantity is negative in sale action
+          WarehouseId = action.WarehouseId,
+          Description = message,
+          Price = action.Price,
+          BuyPrice = from.Product.RecommendedBuyPrice,
+          UserId = userId,
+          Operation = OperationDescription.TransferAdd,
+        };
+        revertActions.Add(restoreAction);
+      }
+
+      return (revertActions, changesNotes);
+    }
+
+    private static (List<ProductAction>, List<ApiProdCountChange>) createAddOrderProductActions(IEnumerable<ApiProdSell> products, ApplicationDbContext context,
+      string userId, DateTime date)
+    {
+      var changesNotes = new List<ApiProdCountChange>();
+      var transactions = new List<ProductAction>();
+      foreach (var productOrder in products)
+      {
+        var from = getStockAndVerify(productOrder.IdProduct, productOrder, context);
+
+        changesNotes.Add(new ApiProdCountChange
+        {
+          ProductId = productOrder.IdProduct,
+          WarehouseId = productOrder.FromId,
+          NewCount = from.Quantity,
+          OldCount = from.Quantity + productOrder.Quantity
+        });
+
+        var productAction = new ProductAction
+        {
+          Date = date,
+          ProductId = productOrder.IdProduct,
+          Quantity = -productOrder.Quantity,
+          WarehouseId = productOrder.FromId,
+          Description = productOrder.Description,
+          Price = productOrder.Price,
+          BuyPrice = from.Product.RecommendedBuyPrice,
+          UserId = userId,
+          Operation = OperationDescription.Sold
+        };
+        transactions.Add(productAction);
+      }
+      return (transactions, changesNotes);
+    }
+
     private static WarehouseProducts getStockAndVerify(int productId, ApiProdAction info, ApplicationDbContext context)
     {
       var from = context.WarehouseProducts.Include(it => it.Product).FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.FromId);
@@ -344,6 +429,12 @@ namespace BusinessLogic.Repository
       from.Quantity -= info.Quantity;
       return from;
     }
+
+
+    #endregion
+
+
+
 
   }
 }

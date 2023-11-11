@@ -7,7 +7,13 @@ export function buildProductFullName(p: IProduct) {
 }
 
 export interface IProdOrder {
+    /**
+     * Used to show description only
+     */
     product: IProduct;
+    /**
+     * Used to actually create a sale order
+     */
     prodOrder: ISell;
 }
 

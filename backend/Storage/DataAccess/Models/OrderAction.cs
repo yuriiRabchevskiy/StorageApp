@@ -3,7 +3,7 @@ using System;
 namespace DataAccess.Models
 {
 
-  public enum OrderOperation { Created, Updated, Closed, Canceled , Moved}
+  public enum OrderOperation { Created, Updated, Closed, Canceled, Moved, ProductsEdited}
   public class OrderAction
   {
     public int Id { get; set; }

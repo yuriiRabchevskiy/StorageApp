@@ -24,8 +24,7 @@
           (iClick)="showConfirmMoveTo = true">
         </app-i-button>
         <app-i-button [useSprite]="false" icon="broadcast" *ngIf="isProcessingTab && canView"
-          [disabled]="!chosenVisibleOrders.length" title="Відправити смс"
-          (iClick)="showConfirmMassSms = true">
+          [disabled]="!chosenVisibleOrders.length" title="Відправити смс" (iClick)="showConfirmMassSms = true">
         </app-i-button>
         <app-i-button [useSprite]="false" icon="lock" *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
           [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Закрити продажу"
@@ -39,6 +38,9 @@
         </app-i-button>
         <app-i-button icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
           [disabled]="viewData.length < 1 || selectedItems.length > 1">
+        </app-i-button>
+        <app-i-button *ngIf="(!isClient && !isWarehouseManager)" icon="i-basket" title="Редагувати товари"
+          (iClick)="restoreBasket()" [disabled]="viewData.length < 1 || selectedItems.length > 1 || basketService.hasItems">
         </app-i-button>
 
 
@@ -81,7 +83,7 @@
         <colgroup *ngIf="!view.isMobile">
           <col [width]="50" *ngIf="canViewMassActions" />
           <col />
-          
+
           <!--coll for expand-->
           <col [width]="50" />
 
@@ -95,11 +97,11 @@
         <tr>
           <!--cols for expand and id-->
           <th>
-            <input [checked]="isMoveToAllCbChecked" type="checkbox" [indeterminate]="isMoveToAllIndeterminate" 
-            (change)="onMoveToAllChange($event)" *ngIf="canViewMassActions"/>
+            <input [checked]="isMoveToAllCbChecked" type="checkbox" [indeterminate]="isMoveToAllIndeterminate"
+              (change)="onMoveToAllChange($event)" *ngIf="canViewMassActions" />
           </th>
           <th></th>
-          
+
           <th>#</th>
           <ng-container *ngFor="let column of columns">
             <th [pSortableColumn]="column?.field" *ngIf="visibleColumn(column)" pResizableColumn>
@@ -120,14 +122,14 @@
 
         <tr (click)="onItemClick(rowData)" [pSelectableRow]="rowData"
           [ngClass]="{'s-selected-row': rowData.id === selectedItem?.id}">
-          
-          <td><input type="checkbox" [checked]="rowData.isChecked" 
-            (change)="onCheckedChange(rowData, $event)" *ngIf="canViewMassActions"/></td>
-          
+
+          <td><input type="checkbox" [checked]="rowData.isChecked" (change)="onCheckedChange(rowData, $event)"
+              *ngIf="canViewMassActions" /></td>
+
           <td class="expanded-cell">
             <i href="#" [pRowToggler]="rowData" [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
           </td>
-          
+
           <td>{{rowData.id}}</td>
 
           <ng-container *ngFor="let column of columns">
