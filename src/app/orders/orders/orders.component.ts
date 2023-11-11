@@ -15,6 +15,7 @@ import { ApiService, getDeliveryDescriptor } from '../../shared/services/api.ser
 import { TrackerService } from '../../shared/services/tracker.service';
 import { Dictionary, IDictionary } from './../../models/dictionary';
 import { Observable } from 'rxjs';
+import { BasketService } from '@app/shared/services/basket.service';
 
 type MoveToAction = (apiService: ApiService, ids: number[]) => Observable<ApiResponse<any>>;
 
@@ -185,10 +186,10 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
     itemsFormatted = [];
 
-    constructor(userService: UserService, private apiService: ApiService, public router: Router, private tracker: TrackerService,
+    constructor(userService: UserService, private apiService: ApiService, 
+        public router: Router, private tracker: TrackerService, public basketService:BasketService,
         notify: MessageService, preferences: PreferenceService) {
         super(userService, notify, preferences);
-
 
         this.tracker.orderChanged.on(this.onOrdersChanged);
         const isAdmin = this.userService.getLocal().isAdmin;
@@ -337,6 +338,11 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             err => this.showWebErrorMessage('Продажу не закрито', err)
         );
         this.showConfirm = false;
+    }
+
+    restoreBasket() {
+       this.basketService.restore(this.selectedItem);
+       this.showInfoMessage("Замовлення відновлено і може бути редаговане на сторінці Складу");
     }
 
     async confirmMoveTo(val: boolean) {

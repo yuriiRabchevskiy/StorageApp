@@ -29,7 +29,8 @@ namespace BusinessLogic.Helpers
           Quantity = -it.Quantity,
           BuyPrice = it.BuyPrice,
           Product = mapper.Map<ApiProduct>(it.Product),
-          TotalPrice = -it.Price * it.Quantity
+          TotalPrice = -it.Price * it.Quantity,
+          WarehouseId = it.WarehouseId
         }).ToList();
         return api;
       }).ToList();

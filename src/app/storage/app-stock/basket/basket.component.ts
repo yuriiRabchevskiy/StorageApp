@@ -57,7 +57,7 @@ export class BasketComponent extends SecuredComponent {
     return location.name;
   }
 
-  remove(val) {
+  remove(val: IProdOrder) {
     this.items.splice(this.items.indexOf(val), 1);
     this.showInfoMessage('Товар видалено з кошика');
     this.removeItem.emit(val);

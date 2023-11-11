@@ -67,6 +67,7 @@ export interface ITransaction {
     price: number;
     buyPrice: number;
     totalPrice: number;
+    warehouseId: number;
 }
 
 export class Order implements IOrder {
