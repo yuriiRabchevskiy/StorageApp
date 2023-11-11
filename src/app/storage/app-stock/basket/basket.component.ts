@@ -7,31 +7,31 @@ import { MessageService } from 'primeng/api';
 import { OrderEditorComponent } from '../../../controls/index';
 import { SecuredComponent } from '../../../models/component';
 import { UserService } from '@app/shared/services/user.service';
+import { BasketService } from '@app/shared/services/basket.service';
 
 @Component({
   selector: 'app-basket',
   templateUrl: './basket.component.html',
   styleUrls: ['./basket.component.scss']
 })
-
 export class BasketComponent extends SecuredComponent {
   view: ViewState = new ViewState();
   @ViewChild('orderEditor', { static: true }) orderEditor: OrderEditorComponent;
   page: number = 1;
-  pages: string[] = ['Список товарів', 'Персональні дані'];
-  pageNames: string[] = this.pages;
+  pageNames: string[] = ['Список товарів', 'Персональні дані'];
   productPage: number = 1;
   clientPage: number = 2;
-  lastPage: number = 2;
+  lastPage: number = this.pageNames.length;;
+  
   order: ISaleOrder = new SaleOrder();
   isSaving: boolean = false;
 
-  _items: IProdOrder[];
-  get items() {
-    return this._items;
+  get isNewOrder() {
+    return !this.basketService.isEditing;
   }
-  @Input() set items(val) {
-    this._items = val;
+
+  get items() {
+    return this.basketService.sellList;
   }
 
   @Input() canEdit: boolean;
@@ -48,8 +48,15 @@ export class BasketComponent extends SecuredComponent {
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() sale: EventEmitter<ISaleOrder> = new EventEmitter<ISaleOrder>();
   @Output() removeItem: EventEmitter<any> = new EventEmitter<any>();
-  constructor(userService: UserService, private apiService: ApiService, notify: MessageService) {
+  
+  constructor(userService: UserService, private apiService: ApiService,
+    private basketService: BasketService, notify: MessageService) {
     super(userService, notify);
+
+    if(this.basketService.isEditing) {
+      this.pageNames = ['Редагований список товарів'];
+      this.lastPage = this.pageNames.length;
+    }
   }
 
   getLocationName(id: number) {
@@ -57,19 +64,20 @@ export class BasketComponent extends SecuredComponent {
     return location.name;
   }
 
-  remove(val) {
-    this.items.splice(this.items.indexOf(val), 1);
+  remove(val: IProdOrder) {
+    this.basketService.removeItem(val)
     this.showInfoMessage('Товар видалено з кошика');
     this.removeItem.emit(val);
   }
 
-  createOrder() {
-    this.order.orderNumber = this.orderEditor.orderEditForm.value.orderNumber;
-    this.order.clientName = this.orderEditor.orderEditForm.value.clientName;
-    this.order.clientAddress = this.orderEditor.orderEditForm.value.clientAddress;
-    this.order.clientPhone = this.orderEditor.orderEditForm.value.clientPhone;
+  private createOrder() {
+    const form = this.orderEditor.orderEditForm.value;
+    this.order.orderNumber = form.orderNumber;
+    this.order.clientName = form.clientName;
+    this.order.clientAddress = form.clientAddress;
+    this.order.clientPhone = form.clientPhone;
+    this.order.other = form.orderOther;
     this.order.status = this.orderEditor.status.value;
-    this.order.other = this.orderEditor.orderEditForm.value.orderOther;
     this.order.delivery = this.orderEditor.delivery.value;
     this.order.deliveryString = getDeliveryDescriptor(this.orderEditor.delivery.value);
     this.order.productOrders = this.items.map(it => it.prodOrder);
@@ -81,6 +89,11 @@ export class BasketComponent extends SecuredComponent {
   }
 
   save() {
+    if (this.basketService.isEditing) {
+      this.finishSaleEdit();
+      return;
+    }
+    // new sale
     this.createOrder();
     this.finishSale(this.order);
   }
@@ -103,8 +116,8 @@ export class BasketComponent extends SecuredComponent {
 
   finishSale(item: ISaleOrder) {
     this.isSaving = true;
-    this.apiService.sale(item).subscribe(
-      res => {
+    this.apiService.sale(item).subscribe({
+      next: (res) => {
         this.isSaving = false;
         if (res.success) {
           this.onCloseDialog.emit(true);
@@ -112,11 +125,33 @@ export class BasketComponent extends SecuredComponent {
         }
         this.showApiErrorMessage('Помилка при здійснені продажі!', res.errors);
       },
-      err => {
+      error: (err) => {
         this.isSaving = false;
         this.showWebErrorMessage('Не вдалося здійснити продажу', err);
       }
-    );
+    });
+
+  }
+
+  finishSaleEdit() {
+    this.isSaving = true;
+    const basket = this.basketService;
+    const productOrders = basket.sellList.map(it => it.prodOrder);
+    this.apiService.editSale(basket.orderId, { productOrders }).subscribe({
+      next: (res) => {
+        this.isSaving = false;
+        if (res.success) {
+          this.onCloseDialog.emit(true);
+          return this.showSuccessMessage('Продажу успішно відредаговано');
+        }
+        this.showApiErrorMessage('Помилка при редагуванні продажі!', res.errors);
+      },
+      error: (err) => {
+        this.isSaving = false;
+        this.showWebErrorMessage('Не вдалося відредагувати продажу', err);
+      }
+    });
+
   }
 
 }
