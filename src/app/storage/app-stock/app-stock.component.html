@@ -137,7 +137,7 @@
     (onCloseDialog)="closeSellDialog($event)" (sale)="sale($event)">
 </app-sell>
 
-<app-basket *ngIf="basketDialog" [items]="basketService.sellList" [locations]="wareHouses" (onCloseDialog)="closeBasketDialog($event)"
+<app-basket *ngIf="basketDialog"  [locations]="wareHouses" (onCloseDialog)="closeBasketDialog($event)"
     (removeItem)="turnFromBasket($event)">
 </app-basket>
 

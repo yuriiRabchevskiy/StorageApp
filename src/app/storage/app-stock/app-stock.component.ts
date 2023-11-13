@@ -256,7 +256,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
       product: this.selectedItem,
       prodOrder: item
     };
-    this.basketService.sellList.push(sellItem);
+    this.basketService.addItem(sellItem);
     this.showSuccessMessage('Продукт додано до кошика');
     this.sellDialog = false;
   }

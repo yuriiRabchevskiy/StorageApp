@@ -32,6 +32,13 @@ namespace BusinessLogic.Models.Api
     public IEnumerable<ApiProdSell> ProductOrders { get; set; }
   }
 
+  [Validator(typeof(ApiEditSellOrderValidation))]
+  public class ApiEditSellOrder
+  {
+    public int Id { get; set; }
+    public IEnumerable<ApiProdSell> ProductOrders { get; set; }
+  }
+
   public class ApiProdActionValidator : AbstractValidator<ApiProdAction>
   {
     public ApiProdActionValidator()
@@ -63,6 +70,14 @@ namespace BusinessLogic.Models.Api
   public class ApiSellOrderValidation : AbstractValidator<ApiSellOrder>
   {
     public ApiSellOrderValidation()
+    {
+      RuleFor(it => it.ProductOrders).NotEmpty();
+    }
+  }
+
+  public class ApiEditSellOrderValidation : AbstractValidator<ApiEditSellOrder>
+  {
+    public ApiEditSellOrderValidation()
     {
       RuleFor(it => it.ProductOrders).NotEmpty();
     }
