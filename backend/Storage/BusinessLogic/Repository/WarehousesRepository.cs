@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BusinessLogic.Repository
 {
@@ -244,7 +245,17 @@ namespace BusinessLogic.Repository
         order.ResponsibleUserId = userId;
         order.Transactions = new List<ProductAction>();
 
-        var (orderTransactions, notes) = createAddOrderProductActions(info.ProductOrders, context, userId, date);
+        var revertActions = info.ProductOrders.Select(it => new ProductRequest()
+        {
+          ProductId = it.IdProduct,
+          FromId = it.FromId,
+          Description = it.Description,
+          Price = it.Price,
+          Quantity = it.Quantity
+        }).ToList();
+
+        var message = $"Скасовано замовлення {order.Id}";
+        var (orderTransactions, notes) = await createRevertOrderProductActionsAsync(revertActions, message, context, userId, date);
         changesNotes.AddRange(notes);
         order.Transactions.AddRange(orderTransactions);
 
@@ -281,25 +292,64 @@ namespace BusinessLogic.Repository
         var currentProducts = command.ProductOrders.ToList();
 
         // completely new products that did not exist previously, warehouses are in play
-        var newProducts = currentProducts.Where(cp => !existingProducts.Any(ep => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId))
-          .ToList();
+        var newProducts = currentProducts
+          .Where(cp => !existingProducts.Any(ep => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId))
+          .Select(it => new ProductRequest()
+          {
+            Quantity = it.Quantity,
+            Description = it.Description,
+            Price = it.Price,
+            ProductId = it.IdProduct,
+            FromId = it.FromId
+          }).ToList();
         // products that were removed from order
-        var actionsToRevert = existingProducts.Where(ep => !currentProducts.Any(cp => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId))
+        var actionsToRevert = existingProducts
+          .Where(ep => !currentProducts.Any(cp => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId))
+          .Select(it => new ProductRequest()
+          {
+            Quantity = it.Quantity * -1,
+            Description = it.Description,
+            Price = it.Price,
+            ProductId = it.ProductId,
+            FromId = it.WarehouseId
+          })
           .ToList();
         // product whose quantity was changed
-        var quantityChanges = existingProducts.Where(ep =>
-        {
-          var cp = currentProducts.FirstOrDefault(cp => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId);
-          if(cp == null) return false;
-          var existingQuantity = -1 * ep.Quantity; // existing quantity is saved with -, so e.g. -1
-          if (existingQuantity == cp.Quantity) return false; // current quantity is provided as desired sale amount, e.g +2
-          var change = cp.Quantity - existingQuantity; // so we take 2 items we want to have - 1 we already have and receive 1 we need to sell
-          // or we may get 1 we have, had 2 so we need to restore 1 item.
-          ep.Quantity = change * -1; // revert changes action is going to revert this value
-          return true;
-        }).ToList();
-        actionsToRevert.AddRange(quantityChanges);
+        var productsWithQuantityChanges =
+          existingProducts.Where(ep =>
+          {
+            var cp = currentProducts.FirstOrDefault(cp => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId);
+            if (cp == null) return false;
+            var existingQuantity = -1 * ep.Quantity; // existing quantity is saved with -, so e.g. -1
+            return (existingQuantity != cp.Quantity);
+          }).ToList();
 
+
+
+        var message = $"Відредаговано замовлення {command.Id}";
+        productsWithQuantityChanges.ForEach(ep =>
+        {
+          var cp = currentProducts.First(cp => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId);
+          var existingQuantity = -1 * ep.Quantity; // existing quantity is saved with -, so e.g. -1
+          var change = cp.Quantity - existingQuantity; // so we take 2 items we want to have - 1 we already have and receive 1 we need to sell
+          var action = new ProductRequest()
+          {
+            Quantity = change,
+            Description = message,
+            Price = cp.Price,
+            ProductId = cp.IdProduct,
+            FromId = cp.FromId
+          };
+          if (change > 0)
+          {
+            newProducts.Add(action);
+          }
+          else
+          {
+            action.Quantity *= -1; // we have save it to the DBS with plus
+            actionsToRevert.Add(action);
+          }
+        });
 
         var (addTransactions, addNotes) = createAddOrderProductActions(newProducts, context, userId, date);
         var (removeTransactions, removeNotes) = await createRevertOrderProductActionsAsync(actionsToRevert, $"Відредаговано замовлення {command.Id}", context, userId, date);
@@ -337,8 +387,18 @@ namespace BusinessLogic.Repository
       order.CanceledByUserId = userId;
       order.CancelReason = reason;
 
+      var actionsToRevert = order.Transactions.Select(it => new ProductRequest()
+      {
+        Quantity = it.Quantity * -1,
+        Description = it.Description,
+        Price = it.Price,
+        ProductId = it.ProductId,
+        FromId = it.WarehouseId
+      }).ToList();
+
+
       var message = $"Скасовано замовлення {id}";
-      var (revertActions, notes) = await createRevertOrderProductActionsAsync(order.Transactions, message, context, userId, date);
+      var (revertActions, notes) = await createRevertOrderProductActionsAsync(actionsToRevert, message, context, userId, date);
       order.Transactions.AddRange(revertActions);
       changesNotes.AddRange(notes);
 
@@ -350,7 +410,7 @@ namespace BusinessLogic.Repository
       return true;
     }
 
-    private static async Task<(List<ProductAction>, List<ApiProdCountChange>)> createRevertOrderProductActionsAsync(List<ProductAction> actionsToRevert, string message,
+    private static async Task<(List<ProductAction>, List<ApiProdCountChange>)> createRevertOrderProductActionsAsync(List<ProductRequest> actionsToRevert, string message,
       ApplicationDbContext context, string userId, DateTime date)
     {
       var revertActions = new List<ProductAction>();
@@ -359,9 +419,9 @@ namespace BusinessLogic.Repository
       var warehouses = await context.WarehouseProducts.Include(it => it.Product).ToListAsync();
       foreach (var action in actionsToRevert)
       {
-        var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.WarehouseId);
+        var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.FromId);
         var oldCount = from.Quantity;
-        from.Quantity += action.Quantity * -1; // quantity is negative in sale action
+        from.Quantity += action.Quantity;
 
         changesNotes.Add(new ApiProdCountChange
         {
@@ -375,8 +435,8 @@ namespace BusinessLogic.Repository
         {
           Date = date,
           ProductId = action.ProductId,
-          Quantity = -action.Quantity, // quantity is negative in sale action
-          WarehouseId = action.WarehouseId,
+          Quantity = action.Quantity,
+          WarehouseId = action.FromId,
           Description = message,
           Price = action.Price,
           BuyPrice = from.Product.RecommendedBuyPrice,
@@ -389,18 +449,21 @@ namespace BusinessLogic.Repository
       return (revertActions, changesNotes);
     }
 
-    private static (List<ProductAction>, List<ApiProdCountChange>) createAddOrderProductActions(IEnumerable<ApiProdSell> products, ApplicationDbContext context,
+
+
+    private static (List<ProductAction>, List<ApiProdCountChange>) createAddOrderProductActions(
+      IEnumerable<ProductRequest> products, ApplicationDbContext context,
       string userId, DateTime date)
     {
       var changesNotes = new List<ApiProdCountChange>();
       var transactions = new List<ProductAction>();
       foreach (var productOrder in products)
       {
-        var from = getStockAndVerify(productOrder.IdProduct, productOrder, context);
+        var from = getStockAndVerify(productOrder.ProductId, productOrder, context);
 
         changesNotes.Add(new ApiProdCountChange
         {
-          ProductId = productOrder.IdProduct,
+          ProductId = productOrder.ProductId,
           WarehouseId = productOrder.FromId,
           NewCount = from.Quantity,
           OldCount = from.Quantity + productOrder.Quantity
@@ -409,7 +472,7 @@ namespace BusinessLogic.Repository
         var productAction = new ProductAction
         {
           Date = date,
-          ProductId = productOrder.IdProduct,
+          ProductId = productOrder.ProductId,
           Quantity = -productOrder.Quantity,
           WarehouseId = productOrder.FromId,
           Description = productOrder.Description,
@@ -430,6 +493,13 @@ namespace BusinessLogic.Repository
       if (from.Quantity < info.Quantity) throw new ArgumentException($"Не достатньо товарів на складі для здійстення продажі (ProductID: {from.Product.ProductType} - {from.Product.Model})");
       from.Quantity -= info.Quantity;
       return from;
+    }
+
+    private class ProductRequest : ApiProdAction
+    {
+      public double Price { get; set; }
+
+      public int ProductId { get; set; }
     }
 
 
