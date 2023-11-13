@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Storage.Code.Helpers;
-using Storage.Code.Hubs;
 using Storage.Code.Services;
-using Microsoft.AspNetCore.Hosting;
 using AutoMapper;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
@@ -51,14 +49,14 @@ namespace Storage.Controllers
       try
       {
         var data = await _repo.GetAsync().ConfigureAwait(false);
-        var exportItems = data.Select(it => mapper.Map<ApiProduct, CsvProduct>(it)).ToList();
+        var exportItems = data.Select(mapper.Map<ApiProduct, CsvProduct>).ToList();
         var exportService = new ExportService(configuration, "products.csv");
         await exportService.ExportAsync(exportItems).ConfigureAwait(false);
         return new ApiResponse<string>("Success");
       }
       catch (Exception e)
       {
-        return new ApiResponse<string>(e.Message + e.InnerException?.Message + e.GetType().ToString());
+        return new ApiResponse<string>(e.Message + e.InnerException?.Message + e.GetType());
       }
 
     }
@@ -125,6 +123,18 @@ namespace Storage.Controllers
 
       var user = await GetCurrentUserAsync();
       await _houseRepo.SellOrderAsync(user?.Id, model).ConfigureAwait(false);
+      return new ApiResponseBase();
+    }
+
+    [HttpPut("sell/{orderId:int}")]
+    [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
+    public async Task<ApiResponseBase> EditSaleAsync(int orderId, [FromBody] ApiEditSellOrder command)
+    {
+      if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
+
+      var user = await GetCurrentUserAsync();
+      command.Id = orderId;
+      await _houseRepo.EditSellOrderAsync(user?.Id, command).ConfigureAwait(false);
       return new ApiResponseBase();
     }
 

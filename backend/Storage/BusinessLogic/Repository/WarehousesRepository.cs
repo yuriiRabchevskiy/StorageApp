@@ -27,6 +27,7 @@ namespace BusinessLogic.Repository
     void RemoveProduct(string userId, int productId, ApiProdAction info);
     void AddProduct(string userId, int productId, ApiProdAction info);
     Task SellOrderAsync(string userId, ApiSellOrder info);
+    Task EditSellOrderAsync(string userId, ApiEditSellOrder command);
     Task<bool> CancelOrderAsync(string userId, int id, string reason);
   }
 
@@ -259,7 +260,7 @@ namespace BusinessLogic.Repository
       }
     }
 
-    public async Task EditSellOrderAsync(string userId, ApiSellOrder command)
+    public async Task EditSellOrderAsync(string userId, ApiEditSellOrder command)
     {
       var date = DateTime.UtcNow;
       var changesNotes = new List<ApiProdCountChange>();
@@ -279,20 +280,21 @@ namespace BusinessLogic.Repository
         var existingProducts = existingOrder.Transactions;
         var currentProducts = command.ProductOrders.ToList();
 
-        // completely new products that did not exist previously
-        var newProducts = currentProducts.Where(cp => existingProducts.All(ep => ep.ProductId != cp.IdProduct))
+        // completely new products that did not exist previously, warehouses are in play
+        var newProducts = currentProducts.Where(cp => !existingProducts.Any(ep => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId))
           .ToList();
         // products that were removed from order
-        var actionsToRevert = existingProducts.Where(ep => currentProducts.All(cp => ep.ProductId != cp.IdProduct))
+        var actionsToRevert = existingProducts.Where(ep => !currentProducts.Any(cp => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId))
           .ToList();
         // product whose quantity was changed
         var quantityChanges = existingProducts.Where(ep =>
         {
-          var cp = currentProducts.FirstOrDefault(cp => ep.ProductId == cp.IdProduct);
+          var cp = currentProducts.FirstOrDefault(cp => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId);
           if(cp == null) return false;
-          var existingQuantity = -1 * ep.Quantity;
-          if (existingQuantity == cp.Quantity) return false;
-          var change = cp.Quantity - existingQuantity;
+          var existingQuantity = -1 * ep.Quantity; // existing quantity is saved with -, so e.g. -1
+          if (existingQuantity == cp.Quantity) return false; // current quantity is provided as desired sale amount, e.g +2
+          var change = cp.Quantity - existingQuantity; // so we take 2 items we want to have - 1 we already have and receive 1 we need to sell
+          // or we may get 1 we have, had 2 so we need to restore 1 item.
           ep.Quantity = change * -1; // revert changes action is going to revert this value
           return true;
         }).ToList();

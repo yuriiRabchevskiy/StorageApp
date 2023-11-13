@@ -2,7 +2,7 @@ import { INDictionary } from '../index';
 import { ISell } from './sell';
 
 export function buildProductFullName(p: IProduct) {
-    const codeStr = p.productCode ? `#${p.productCode} - `: '';
+    const codeStr = p.productCode ? `${p.productCode} - `: '';
     return `${codeStr}${p.size ?? ''} ${p.color ?? ''} ${p.productType ?? ''} - ${p.model ?? ''} ${p.producer ?? ''}`;
 }
 
