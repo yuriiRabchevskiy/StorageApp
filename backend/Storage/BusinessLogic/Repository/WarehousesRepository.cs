@@ -11,10 +11,8 @@ using System.Threading.Tasks;
 using BusinessLogic.Abstractions;
 using BusinessLogic.Models.Api.State;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BusinessLogic.Repository
 {
@@ -245,7 +243,7 @@ namespace BusinessLogic.Repository
         order.ResponsibleUserId = userId;
         order.Transactions = new List<ProductAction>();
 
-        var revertActions = info.ProductOrders.Select(it => new ProductRequest()
+        var productOrders = info.ProductOrders.Select(it => new ProductRequest()
         {
           ProductId = it.IdProduct,
           FromId = it.FromId,
@@ -254,8 +252,9 @@ namespace BusinessLogic.Repository
           Quantity = it.Quantity
         }).ToList();
 
-        var message = $"Скасовано замовлення {order.Id}";
-        var (orderTransactions, notes) = await createRevertOrderProductActionsAsync(revertActions, message, context, userId, date);
+        var (orderTransactions, notes) = createAddOrderProductActions(productOrders, context, userId, date);
+        changesNotes.AddRange(notes);
+        order.Transactions.AddRange(orderTransactions);
         changesNotes.AddRange(notes);
         order.Transactions.AddRange(orderTransactions);
 
@@ -288,12 +287,24 @@ namespace BusinessLogic.Repository
         if (existingOrder == null) throw new Exception("Замовлення не знайдено");
         if (existingOrder.Status != OrderStatus.Open) throw new Exception("Лише відкриті замовілення можна редашувати");
 
-        var existingProducts = existingOrder.Transactions;
+        // I assume that 99% of time there is going to be just a single item per product
+        // only possible case is when we already have removed some items and re-added those, or when we were already changing quantities
+        var existingProducts = existingOrder.Transactions.GroupBy(it => new { it.WarehouseId, it.ProductId, it.Price })
+          .Select(it => new ProductRequest()
+          {
+            FromId = it.Key.WarehouseId,
+            ProductId = it.Key.ProductId,
+            Price = it.Key.Price,
+            Quantity = it.Sum(p => p.Quantity),
+            Description = null, // we do not modify existing records, so we are not interested in this field
+          })
+          .ToList();
+
         var currentProducts = command.ProductOrders.ToList();
 
         // completely new products that did not exist previously, warehouses are in play
         var newProducts = currentProducts
-          .Where(cp => !existingProducts.Any(ep => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId))
+          .Where(cp => !existingProducts.Any(ep => ep.ProductId == cp.IdProduct && ep.FromId == cp.FromId))
           .Select(it => new ProductRequest()
           {
             Quantity = it.Quantity,
@@ -304,21 +315,13 @@ namespace BusinessLogic.Repository
           }).ToList();
         // products that were removed from order
         var actionsToRevert = existingProducts
-          .Where(ep => !currentProducts.Any(cp => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId))
-          .Select(it => new ProductRequest()
-          {
-            Quantity = it.Quantity * -1,
-            Description = it.Description,
-            Price = it.Price,
-            ProductId = it.ProductId,
-            FromId = it.WarehouseId
-          })
+          .Where(ep => !currentProducts.Any(cp => ep.ProductId == cp.IdProduct && ep.FromId == cp.FromId))
           .ToList();
         // product whose quantity was changed
         var productsWithQuantityChanges =
           existingProducts.Where(ep =>
           {
-            var cp = currentProducts.FirstOrDefault(cp => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId);
+            var cp = currentProducts.FirstOrDefault(cp => ep.ProductId == cp.IdProduct && ep.FromId == cp.FromId);
             if (cp == null) return false;
             var existingQuantity = -1 * ep.Quantity; // existing quantity is saved with -, so e.g. -1
             return (existingQuantity != cp.Quantity);
@@ -329,7 +332,7 @@ namespace BusinessLogic.Repository
         var message = $"Відредаговано замовлення {command.Id}";
         productsWithQuantityChanges.ForEach(ep =>
         {
-          var cp = currentProducts.First(cp => ep.ProductId == cp.IdProduct && ep.WarehouseId == cp.FromId);
+          var cp = currentProducts.First(cp => ep.ProductId == cp.IdProduct && ep.FromId == cp.FromId);
           var existingQuantity = -1 * ep.Quantity; // existing quantity is saved with -, so e.g. -1
           var change = cp.Quantity - existingQuantity; // so we take 2 items we want to have - 1 we already have and receive 1 we need to sell
           var action = new ProductRequest()
@@ -346,8 +349,7 @@ namespace BusinessLogic.Repository
           }
           else
           {
-            action.Quantity *= -1; // we have save it to the DBS with plus
-            actionsToRevert.Add(action);
+            actionsToRevert.Add(action); // negative quantity will be reverted to positive one
           }
         });
 
@@ -387,15 +389,17 @@ namespace BusinessLogic.Repository
       order.CanceledByUserId = userId;
       order.CancelReason = reason;
 
-      var actionsToRevert = order.Transactions.Select(it => new ProductRequest()
-      {
-        Quantity = it.Quantity * -1,
-        Description = it.Description,
-        Price = it.Price,
-        ProductId = it.ProductId,
-        FromId = it.WarehouseId
-      }).ToList();
-
+      // I assume that 99% of time there is going to be just a single item per product
+      // only possible case is when we already have removed some items and re-added those, or when we were already changing quantities
+      var actionsToRevert = order.Transactions.GroupBy(it => new { it.WarehouseId, it.ProductId, it.Price })
+        .Select(it => new ProductRequest()
+        {
+          FromId = it.Key.WarehouseId,
+          ProductId = it.Key.ProductId,
+          Price = it.Key.Price,
+          Quantity = it.Sum(p => p.Quantity),
+          Description = null, // we do not modify existing records, so we are not interested in this field
+        }).Where(it => it.Quantity != 0).ToList(); // we want to revert only those products that have some quantities 
 
       var message = $"Скасовано замовлення {id}";
       var (revertActions, notes) = await createRevertOrderProductActionsAsync(actionsToRevert, message, context, userId, date);
@@ -421,7 +425,7 @@ namespace BusinessLogic.Repository
       {
         var from = warehouses.FirstOrDefault(it => it.ProductId == action.ProductId && it.WarehouseId == action.FromId);
         var oldCount = from.Quantity;
-        from.Quantity += action.Quantity;
+        from.Quantity += action.Quantity * -1; // quantity is negative in sale action
 
         changesNotes.Add(new ApiProdCountChange
         {
@@ -435,7 +439,7 @@ namespace BusinessLogic.Repository
         {
           Date = date,
           ProductId = action.ProductId,
-          Quantity = action.Quantity,
+          Quantity = -action.Quantity, // quantity is negative in sale action
           WarehouseId = action.FromId,
           Description = message,
           Price = action.Price,
