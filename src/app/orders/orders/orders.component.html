@@ -39,7 +39,7 @@
         <app-i-button icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
           [disabled]="viewData.length < 1 || selectedItems.length > 1">
         </app-i-button>
-        <app-i-button *ngIf="(!isClient && !isWarehouseManager)" icon="i-basket" title="Редагувати товари"
+        <app-i-button *ngIf="selectedTab.value === 0 && (!isClient && !isWarehouseManager)" icon="i-basket" title="Редагувати товари"
           (iClick)="restoreBasket()" [disabled]="viewData.length < 1 || selectedItems.length > 1 || basketService.hasItems">
         </app-i-button>
 
