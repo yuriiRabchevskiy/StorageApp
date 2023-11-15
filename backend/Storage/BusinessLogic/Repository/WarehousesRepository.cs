@@ -13,6 +13,8 @@ using BusinessLogic.Models.Api.State;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Azure;
+using Newtonsoft.Json;
 
 namespace BusinessLogic.Repository
 {
@@ -287,6 +289,16 @@ namespace BusinessLogic.Repository
         if (existingOrder == null) throw new Exception("Замовлення не знайдено");
         if (existingOrder.Status != OrderStatus.Open) throw new Exception("Лише відкриті замовілення можна редашувати");
 
+        context.OrderAction.Add(new OrderAction
+        {
+          Date = DateTime.UtcNow,
+          OrderId = existingOrder.Id,
+          UserId = userId,
+          Note = $"Змінено набір товарів",
+          Operation = OrderOperation.ProductsEdited,
+          OrderJson = JsonConvert.SerializeObject(command)
+        });
+
         // I assume that 99% of time there is going to be just a single item per product
         // only possible case is when we already have removed some items and re-added those, or when we were already changing quantities
         var existingProducts = existingOrder.Transactions.GroupBy(it => new { it.WarehouseId, it.ProductId, it.Price })
@@ -297,7 +309,7 @@ namespace BusinessLogic.Repository
             Price = it.Key.Price,
             Quantity = it.Sum(p => p.Quantity),
             Description = null, // we do not modify existing records, so we are not interested in this field
-          })
+          }).Where(it => it.Quantity != 0)
           .ToList();
 
         var currentProducts = command.ProductOrders.ToList();
@@ -355,6 +367,13 @@ namespace BusinessLogic.Repository
 
         var (addTransactions, addNotes) = createAddOrderProductActions(newProducts, context, userId, date);
         var (removeTransactions, removeNotes) = await createRevertOrderProductActionsAsync(actionsToRevert, $"Відредаговано замовлення {command.Id}", context, userId, date);
+
+        if (addTransactions.Count == 0 && removeTransactions.Count == 0)
+        {
+          await transaction.RollbackAsync();
+          return;
+        }
+
         existingOrder.Transactions.AddRange(addTransactions);
         existingOrder.Transactions.AddRange(removeTransactions);
         changesNotes.AddRange(addNotes);
