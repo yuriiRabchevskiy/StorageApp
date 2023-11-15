@@ -50,7 +50,7 @@ export class BasketService {
                     idProduct: p.product.id,
                     price: p.price,
                     quantity: p.quantity,
-                    description: "РљРѕСЂР·РёРЅСѓ РІС–РґРЅРѕРІР»РµРЅРѕ",
+                    description: "Корзину відновлено",
                     fromId: p.warehouseId,
                 },
                 product: p.product
