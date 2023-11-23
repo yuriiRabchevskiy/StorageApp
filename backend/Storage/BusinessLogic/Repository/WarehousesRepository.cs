@@ -37,7 +37,8 @@ namespace BusinessLogic.Repository
 
     private readonly IServiceProvider _di;
     private readonly IMapper _mapper;
-    static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+    private readonly IStateService _state;
+    static readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     IStateInformer Informer => _di.GetService<IStateInformer>();
 
@@ -45,6 +46,7 @@ namespace BusinessLogic.Repository
     {
       _di = serviceProvider;
       _mapper = mapper;
+      _state = serviceProvider.GetRequiredService<IStateService>();
     }
 
     #region Warehouse Management
@@ -261,8 +263,10 @@ namespace BusinessLogic.Repository
         order.Transactions.AddRange(orderTransactions);
 
         context.Orders.Add(order);
-        await context.SaveChangesAsync();
 
+        await _state.UpdateProductsStateCounterAsync(context);
+
+        await context.SaveChangesAsync();
         await transaction.CommitAsync();
         await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
       }
@@ -379,8 +383,9 @@ namespace BusinessLogic.Repository
         changesNotes.AddRange(addNotes);
         changesNotes.AddRange(removeNotes);
 
-        await context.SaveChangesAsync();
+        await _state.UpdateProductsStateCounterAsync(context);
 
+        await context.SaveChangesAsync();
         await transaction.CommitAsync();
 
 
@@ -424,6 +429,8 @@ namespace BusinessLogic.Repository
       var (revertActions, notes) = await createRevertOrderProductActionsAsync(actionsToRevert, message, context, userId, date);
       order.Transactions.AddRange(revertActions);
       changesNotes.AddRange(notes);
+
+      await _state.UpdateProductsStateCounterAsync(context);
 
       await context.SaveChangesAsync();
       await transaction.CommitAsync();
