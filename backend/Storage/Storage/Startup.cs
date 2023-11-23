@@ -23,6 +23,7 @@ using BusinessLogic.Models.Api;
 using BusinessLogic.Models.User;
 using Storage.Code.Services;
 using BusinessLogic.Repository.Reports;
+using BusinessLogic.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Hosting;
@@ -133,6 +134,7 @@ namespace Storage
       services.AddTransient<IValidator<ApiProdTransfer>, ApiProdTransferValidator>();
       services.AddTransient<IValidator<ApiProdSell>, ApiProdSellValidator>();
 
+      services.AddTransient<IStateService, StateService>();
       services.AddTransient<IEmailSender, EmailSender>();
       services.AddTransient<ISmsService, SmsService>();
       services.AddTransient<IStateInformer, TrackerHub>();

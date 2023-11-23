@@ -11,9 +11,6 @@ using BusinessLogic.Models.Api.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using MediatR.NotificationPublishers;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DataAccess.Repository
 {
@@ -32,17 +29,19 @@ namespace DataAccess.Repository
   {
     private readonly IServiceProvider _di;
     private readonly IMapper _mapper;
+    private readonly IStateService _state;
     IStateInformer Informer => _di.GetService<IStateInformer>();
 
     public OrdersRepository(IServiceProvider serviceProvider, IMapper mapper)
     {
       _di = serviceProvider;
       _mapper = mapper;
+      _state = serviceProvider.GetRequiredService<IStateService>();
     }
 
     public async Task<List<ApiOrder>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
-      await using var context = _di.GetService<ApplicationDbContext>();
+      await using var context = _di.GetRequiredService<ApplicationDbContext>();
       // Where(it => isAdmin || it.ResponsibleUserId == userId)
       var query = context.Orders
         .Where(it => it.Status != OrderStatus.Canceled) // we skip all canceled
@@ -112,38 +111,38 @@ namespace DataAccess.Repository
       await using var context = _di.GetRequiredService<ApplicationDbContext>();
       var order = await context.Orders.FindAsync(it.Id);
 
-      if (order != null)
+      if (order == null) return;
+
+      if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
+      if (!isAdmin && order.ResponsibleUserId != userId) throw new ArgumentException("Замовлення створене іншим користувачем і не може редагуватися");
+      order.ClientName = it.ClientName;
+      order.ClientAddress = it.ClientAddress;
+      order.ClientPhone = it.ClientPhone;
+      order.TrackingNumber = it.OrderNumber;
+      order.Other = it.Other;
+      order.Status = it.Status ?? OrderStatus.Open;
+      order.Delivery = it.Delivery;
+      order.Payment = it.Payment;
+      if (it.Status == OrderStatus.Delivered && order.CloseDate == null) order.CloseDate = DateTime.UtcNow;
+      if (it.Status == OrderStatus.Canceled && order.CanceledDate == null)
       {
-        if (order.Status == OrderStatus.Canceled) throw new ArgumentException("Замовлення скасоване і не може редагуватися");
-        if (!isAdmin && order.ResponsibleUserId != userId) throw new ArgumentException("Замовлення створене іншим користувачем і не може редагуватися");
-        order.ClientName = it.ClientName;
-        order.ClientAddress = it.ClientAddress;
-        order.ClientPhone = it.ClientPhone;
-        order.TrackingNumber = it.OrderNumber;
-        order.Other = it.Other;
-        order.Status = it.Status ?? OrderStatus.Open;
-        order.Delivery = it.Delivery;
-        order.Payment = it.Payment;
-        if (it.Status == OrderStatus.Delivered && order.CloseDate == null) order.CloseDate = DateTime.UtcNow;
-        if (it.Status == OrderStatus.Canceled && order.CanceledDate == null)
-        {
-          order.CanceledDate = DateTime.UtcNow;
-          order.CanceledByUserId = userId;
-        }
+        order.CanceledDate = DateTime.UtcNow;
+        order.CanceledByUserId = userId;
+      }
 
-        var note = order.ResponsibleUserId != userId ? "Відредаговано іншим продавцем" : null;
-        var operation = OrderOperation.Created;
-        if (order.Id != 0)
+      var note = order.ResponsibleUserId != userId ? "Відредаговано іншим продавцем" : null;
+      var operation = OrderOperation.Created;
+      if (order.Id != 0)
+      {
+        switch (order.Status)
         {
-          switch (order.Status)
-          {
-            case OrderStatus.Canceled: operation = OrderOperation.Canceled; break;
-            case OrderStatus.Delivered: operation = OrderOperation.Closed; break;
-            default: operation = OrderOperation.Updated; break;
-          }
+          case OrderStatus.Canceled: operation = OrderOperation.Canceled; break;
+          case OrderStatus.Delivered: operation = OrderOperation.Closed; break;
+          default: operation = OrderOperation.Updated; break;
         }
+      }
 
-        order.OrderEditions = new List<OrderAction>(new[] {
+      order.OrderEditions = new List<OrderAction>(new[] {
             new OrderAction {
               Date = DateTime.UtcNow,
               OrderId = order.Id,
@@ -153,15 +152,17 @@ namespace DataAccess.Repository
               OrderJson = JsonConvert.SerializeObject(it)}
             });
 
-        it.Products = null; // we do not want to sent this back to the client.
-        await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
-          {
-            OrderId = order.Id,
-            Order = it,
-            ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-          } }).ConfigureAwait(false);
-      }
+      it.Products = null; // we do not want to sent this back to the client.
+
+      await _state.UpdateProductsStateCounterAsync(context);
       await context.SaveChangesAsync().ConfigureAwait(false);
+
+      await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
+      {
+        OrderId = order.Id,
+        Order = it,
+        ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+      } }).ConfigureAwait(false);
     }
 
     public async Task MoveOrderToAsync(string userId, ApiOrderMoveCommand command)
@@ -193,6 +194,7 @@ namespace DataAccess.Repository
         });
       }
 
+      await _state.UpdateProductsStateCounterAsync(context);
       await context.SaveChangesAsync().ConfigureAwait(false);
 
       foreach (var order in orders)

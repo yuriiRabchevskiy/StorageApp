@@ -22,6 +22,25 @@ namespace DataAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DataAccess.Models.ApplicationState", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OrdersRevision")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductsRevision")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppState");
+                });
+
             modelBuilder.Entity("DataAccess.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
