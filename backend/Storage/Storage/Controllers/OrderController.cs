@@ -42,9 +42,12 @@ namespace Storage.Controllers
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
-      var data = await _repo.GetAsync(user.Id, isAdmin, DateTime.UtcNow.AddDays(-60), DateTime.UtcNow.AddHours(12)).ConfigureAwait(false);
+      var (data, revision) = await _repo.GetAsync(user.Id, isAdmin, DateTime.UtcNow.AddDays(-60), DateTime.UtcNow.AddHours(12)).ConfigureAwait(false);
 
-      return new ApiResponse<ApiOrder>(data);
+      return new ApiResponse<ApiOrder>(data)
+      {
+        Revision = revision
+      };
     }
 
     // GET api/values

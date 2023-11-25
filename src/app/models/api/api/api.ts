@@ -15,6 +15,7 @@ export interface IApiErrorResponse {
 
 export class ApiResponse<T> {
 
+    revision?: number;
     item: T;
     items: T[];
 

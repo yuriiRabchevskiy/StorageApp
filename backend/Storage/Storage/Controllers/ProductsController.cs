@@ -40,8 +40,11 @@ namespace Storage.Controllers
     [HttpGet]
     public async Task<ApiResponse<ApiProduct>> GetAsync()
     {
-      var data = await _repo.GetAsync().ConfigureAwait(false);
-      return new ApiResponse<ApiProduct>(data);
+      var (data, revision) = await _repo.GetAsync().ConfigureAwait(false);
+      return new ApiResponse<ApiProduct>(data)
+      {
+        Revision = revision
+      };
     }
 
     [HttpPost("export/generate")]
@@ -50,7 +53,7 @@ namespace Storage.Controllers
     {
       try
       {
-        var data = await _repo.GetAsync().ConfigureAwait(false);
+        var (data, revision) = await _repo.GetAsync().ConfigureAwait(false);
         var exportItems = data.Select(mapper.Map<ApiProduct, CsvProduct>).ToList();
         var exportService = new ExportService(configuration, "products.csv");
         await exportService.ExportAsync(exportItems).ConfigureAwait(false);

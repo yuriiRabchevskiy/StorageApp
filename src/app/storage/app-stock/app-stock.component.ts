@@ -25,8 +25,8 @@ import { ISaveResult } from './product/product.component';
 })
 export class AppStockComponent extends ApiListComponent<IProduct> implements OnDestroy {
 
-  private productsState = new EntityStateHandler(
-    (stateHandler: EntityStateHandler, diff: number) => {
+  private _productsState = new EntityStateHandler(
+    (_: EntityStateHandler, diff: number) => {
       this.showInfoMessage(
         `Стан продуктів на сервері і в браузері може відрізнятися.
       Пропущено ${diff - 1} змін.
@@ -309,6 +309,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   onDataReceived(res: ApiResponse<IProduct>) {
+    this._productsState.set(res.revision);
     res.items.map(it => this.updateBalanceFields(it, it.balance));
     super.onDataReceived(res);
     this.findTotalBalance(this.selectedItem);
@@ -377,7 +378,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
 
   private onProductsCountChanged = (info: ApiProdCountChanges) => {
     console.log('products count changed', info);
-    this.productsState.verifyState(info.stateRevision);
+    this._productsState.verify(info.stateRevision);
     info.changes.forEach(change => {
       const product = this.data.find(it => it.id === change.productId);
       const current = product.balance[change.warehouseId];

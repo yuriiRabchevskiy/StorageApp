@@ -12,7 +12,7 @@ namespace DataAccess.Repository
 {
   public interface IProductsRepository
   {
-    Task<List<ApiProduct>> GetAsync();
+    Task<(List<ApiProduct>, int)> GetAsync();
     int Add(ApiProduct product);
     void Update(ApiProduct product);
     void Delete(int productId);
@@ -30,7 +30,7 @@ namespace DataAccess.Repository
       _mapper = mapper;
     }
 
-    public async Task<List<ApiProduct>> GetAsync()
+    public async Task<(List<ApiProduct>, int)> GetAsync()
     {
       await using var context = _di.GetRequiredService<ApplicationDbContext>();
 
@@ -41,7 +41,10 @@ namespace DataAccess.Repository
         prod.Balance = it.State.ToDictionary(key => key.WarehouseId.ToString(), val => val.Quantity);
         return prod;
       }).OrderByDescending(it => it.Balance.Values.Sum() > 0).ToList();
-      return data;
+
+      var state = await context.AppState.FirstAsync();
+
+      return (data, state.ProductsRevision);
 
     }
 
