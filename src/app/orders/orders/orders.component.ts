@@ -12,7 +12,7 @@ import { ApiListComponent, ITableColumn } from '../../models/component/list-api.
 import { NumberFilter, StringFilter } from '../../models/filtering/filters';
 import { IOrder, ITransaction, OrderStatus, IOrderAction, buildProductFullName } from '../../models/storage';
 import { ApiService, getDeliveryDescriptor } from '../../shared/services/api.service';
-import { TrackerService } from '../../shared/services/tracker.service';
+import { EntityStateHandler, TrackerService } from '../../shared/services/tracker.service';
 import { Dictionary, IDictionary } from './../../models/dictionary';
 import { Observable } from 'rxjs';
 import { BasketService } from '@app/shared/services/basket.service';
@@ -44,6 +44,16 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     @ViewChild('dt', { static: true }) public dataTable: Table;
 
     buildProductFullName = buildProductFullName;
+    private _ordersState = new EntityStateHandler(
+        (_: EntityStateHandler, diff: number) => {
+          this.showInfoMessage(
+            `Стан замовлень на сервері і в браузері може відрізнятися.
+          Пропущено ${diff - 1} змін.
+          Рекомендується оновити список замовлень`)
+        }
+      );
+    
+
 
     public selectedItem: IOrder;
     public orderDialog: boolean = false;
@@ -261,6 +271,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
     onDataReceived(res: ApiResponse<IOrder>) {
 
+        this._ordersState.set(res.revision);
         res.items.map(it => {
             it.openDate = new Date(it.openDate);
             it.date = moment(it.openDate).format('DD/MM/YYYY');
@@ -498,6 +509,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
     private onOrdersChanged = (info?: ApiOrdersChanges) => {
         console.log('products count changed', info);
+        this._ordersState.verify(info.stateRevision);
         let shouldFilter = false;
         info.changes.forEach(orderChange => {
             const newOrder = orderChange.order;

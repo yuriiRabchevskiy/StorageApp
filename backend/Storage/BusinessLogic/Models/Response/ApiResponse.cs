@@ -7,6 +7,9 @@ namespace BusinessLogic.Models.Response
   [ExcludeFromCodeCoverage]
   public class ApiResponse<TModel> : ApiResponseBase
   {
+
+    public int? Revision { get; set; }
+
     /// <summary>
     /// Gets or sets the item. Should be used in case when just one item is returned.
     /// </summary>
@@ -48,6 +51,7 @@ namespace BusinessLogic.Models.Response
     {
       Items = items;
     }
+
   }
 
   public class ApiErrorResponse

@@ -80,7 +80,11 @@ export class EntityStateHandler {
 
     }
 
-    public verifyState(newState: number) {
+    public set(revision: number) {
+        this.revision = revision;
+    }
+
+    public verify(newState: number) {
         const currentState = this.revision;
         if(!currentState) {
             this.revision = newState;

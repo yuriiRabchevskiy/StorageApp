@@ -9,6 +9,7 @@ using System.Linq;
 using AutoMapper;
 using BusinessLogic.Models.Response;
 using BusinessLogic.Models.User;
+using Bv.Meter.WebApp.Common.Exceptions;
 using Storage.Code.Services;
 
 namespace Storage.Controllers
@@ -53,7 +54,7 @@ namespace Storage.Controllers
       user.Phone = model.Phone;
       var result = await _userManager.UpdateAsync(user);
 
-      if (!result.Succeeded) return new ApiResponseBase(new ApiError("code", "Виникла помилка редагування користувача"));
+      if (!result.Succeeded) throw new ApiErrorsException(new ApiError("code", "Виникла помилка редагування користувача"));
       var isAdmin = await _userManager.IsInRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
       if (model.IsAdmin && !isAdmin) await this._userManager.AddToRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
       if (!model.IsAdmin && isAdmin) await this._userManager.RemoveFromRoleAsync(user, UserRole.Admin).ConfigureAwait(false);
@@ -85,7 +86,7 @@ namespace Storage.Controllers
         IsActive = true
       };
       var result = await _userManager.CreateAsync(user, model.Password);
-      if (!result.Succeeded) return new ApiResponseBase(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
+      if (!result.Succeeded) throw new ApiErrorsException(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
       if (UserRole.IsSupportedRole(model.Role))
       {
         await _userManager.AddToRoleAsync(user, model.Role);
@@ -118,7 +119,7 @@ namespace Storage.Controllers
       var user = await _userManager.FindByIdAsync(id);
       user.IsActive = false;
       var result = await _userManager.UpdateAsync(user);
-      if (!result.Succeeded) return new ApiResponseBase(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
+      if (!result.Succeeded) throw new ApiErrorsException(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
 
       return new ApiResponseBase();
     }

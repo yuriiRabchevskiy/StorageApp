@@ -17,7 +17,7 @@ namespace DataAccess.Repository
   public interface IOrdersRepository
   {
     Task<ApiOrder> GetAsync(int orderId);
-    Task<List<ApiOrder>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till);
+    Task<(List<ApiOrder>, int)> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till);
     Task<List<ApiOrder>> GetArchiveAsync(string userId, bool isAdmin, DateTime from, DateTime till);
     Task<List<ApiOrder>> GetCanceledOrdersAsync(string userId, bool isAdmin, DateTime from, DateTime till);
 
@@ -39,7 +39,7 @@ namespace DataAccess.Repository
       _state = serviceProvider.GetRequiredService<IStateService>();
     }
 
-    public async Task<List<ApiOrder>> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
+    public async Task<(List<ApiOrder>, int)> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
       await using var context = _di.GetRequiredService<ApplicationDbContext>();
       // Where(it => isAdmin || it.ResponsibleUserId == userId)
@@ -51,7 +51,8 @@ namespace DataAccess.Repository
         .Include(ord => ord.Transactions)
         .ThenInclude(y => y.Product).AsNoTracking();
       var data = await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
-      return data.ToApi(_mapper);
+      var state = await context.AppState.FirstAsync();
+      return (data.ToApi(_mapper), state.OrdersRevision);
     }
 
     public async Task<ApiOrder> GetAsync(int orderId)
