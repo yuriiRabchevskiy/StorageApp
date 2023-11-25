@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Authorization;
 using Storage.Code.Services;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using BusinessLogic.Models.Response;
+using Bv.Meter.WebApp.Common.Exceptions;
 
 namespace Storage.Controllers
 {
@@ -131,8 +133,8 @@ namespace Storage.Controllers
     public async Task<ApiResponse<bool>> CancelOrder(int id, [FromBody] ApiOrderCancel model)
     {
       var user = await GetCurrentUserAsync().ConfigureAwait(false);
-      if (string.IsNullOrEmpty(model.Reason)) return new ApiResponse<bool>(OperationError.ApiModelValidation, "Не можна скасувати замовлення без вказування причини.");
-      if (model.Reason.Length < 6) return new ApiResponse<bool>(OperationError.ApiModelValidation, "Причина повинна містити принаймні 6 символів");
+      if (string.IsNullOrEmpty(model.Reason)) throw new ApiException(OperationError.ApiModelValidation, "Не можна скасувати замовлення без вказування причини.");
+      if (model.Reason.Length < 6) throw new ApiException(OperationError.ApiModelValidation, "Причина повинна містити принаймні 6 символів");
       await _houseRepo.CancelOrderAsync(user.Id, id, model.Reason);
       return new ApiResponse<bool>(true);
     }
@@ -159,7 +161,7 @@ namespace Storage.Controllers
       var sms = config.GetSection("Sms");
       var messageTemplate = sms.GetValue<string>("TtnMessage");
 
-      foreach ( var id in command.Ids)
+      foreach (var id in command.Ids)
       {
         var order = await _repo.GetAsync(id);
         var result = await sendOrderSmsAsync(smsService, order, messageTemplate);
@@ -168,7 +170,7 @@ namespace Storage.Controllers
 
       return new ApiResponse<SmsResponse>(results);
     }
-    private async Task<SmsResponse> sendOrderSmsAsync(ISmsService smsService,ApiOrder order, string messageTemplate)
+    private async Task<SmsResponse> sendOrderSmsAsync(ISmsService smsService, ApiOrder order, string messageTemplate)
     {
       try
       {
@@ -178,11 +180,16 @@ namespace Storage.Controllers
         var result = await smsService.SendSmsAsync(phone, message);
         return result;
       }
-      catch 
+      catch
       {
-        return new SmsResponse() { success=0, data=new ResponseData() {
-          messageID=$"Не вдалося відправити sms на замовлення {order.Id}"
-        } };
+        return new SmsResponse()
+        {
+          success = 0,
+          data = new ResponseData()
+          {
+            messageID = $"Не вдалося відправити sms на замовлення {order.Id}"
+          }
+        };
       }
     }
   }

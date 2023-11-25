@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Storage.Code.Hubs;
+using Storage.Middleware;
 
 namespace Storage
 {
@@ -159,6 +160,8 @@ namespace Storage
 
       app.UseCors(builder => builder.WithOrigins("http://localhost:1609", "http://localhost:3000", "http://localhost", "http://localhost:4200",
         "localhost:4200").AllowAnyHeader().AllowCredentials().AllowAnyMethod());
+
+      app.UseMiddleware<ErrorHandlingMiddleware>();
 
       app.UseRouting();
       app.UseAuthorization();

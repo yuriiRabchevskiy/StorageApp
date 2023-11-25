@@ -6,7 +6,7 @@ import { groupBy } from 'lodash';
 import * as moment from 'moment-mini';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { ApiResponse } from '../../models/api';
+import { ApiResponse, IApiErrorResponse } from '../../models/api';
 import { ApiOrdersChanges } from '../../models/api/state/state';
 import { ApiListComponent, ITableColumn } from '../../models/component/list-api.component';
 import { NumberFilter, StringFilter } from '../../models/filtering/filters';
@@ -76,7 +76,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         return (this.dataTable.filteredValue ?? this.dataTable.value ?? []);
     }
 
-    public get chosenVisibleOrders(): IOrder[]  {
+    public get chosenVisibleOrders(): IOrder[] {
         return this.visibleOrders.filter(it => it.isChecked);
     }
 
@@ -186,8 +186,8 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
     itemsFormatted = [];
 
-    constructor(userService: UserService, private apiService: ApiService, 
-        public router: Router, private tracker: TrackerService, public basketService:BasketService,
+    constructor(userService: UserService, private apiService: ApiService,
+        public router: Router, private tracker: TrackerService, public basketService: BasketService,
         notify: MessageService, preferences: PreferenceService) {
         super(userService, notify, preferences);
 
@@ -260,20 +260,20 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     }
 
     onDataReceived(res: ApiResponse<IOrder>) {
-        if (res.success) {
-            res.items.map(it => {
-                it.openDate = new Date(it.openDate);
-                it.date = moment(it.openDate).format('DD/MM/YYYY');
-                it.itemsName = this.getItemsName(it.products);
-                const sellerSrName = it.seller?.split(' ');
-                if (sellerSrName && sellerSrName.length > 1) {
-                    it.sellerShort = `${sellerSrName[0]} ${sellerSrName[1][0]}.`;
-                } else {
-                    it.sellerShort = it.seller;
-                }
-            });
-            res.items.sort(this.orderByDate);
-        }
+
+        res.items.map(it => {
+            it.openDate = new Date(it.openDate);
+            it.date = moment(it.openDate).format('DD/MM/YYYY');
+            it.itemsName = this.getItemsName(it.products);
+            const sellerSrName = it.seller?.split(' ');
+            if (sellerSrName && sellerSrName.length > 1) {
+                it.sellerShort = `${sellerSrName[0]} ${sellerSrName[1][0]}.`;
+            } else {
+                it.sellerShort = it.seller;
+            }
+        });
+        res.items.sort(this.orderByDate);
+
         super.onDataReceived(res);
         this.updateMetadata();
     }
@@ -294,7 +294,7 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     }
 
     showToEdit() {
-        if(this.isWarehouseManager) return;
+        if (this.isWarehouseManager) return;
         this.orderDialog = true;
     }
 
@@ -305,18 +305,13 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
 
     save(val: IOrder) {
         const item = val;
-        this.apiService.saveOrder(item).subscribe(
-            res => {
-                if (res.success) {
-                    this.showSuccessMessage('Зміни збережено');
-                    this.filter();
-                    return;
-                }
-                this.showApiErrorMessage('Не вдалося зберегти зміни', res.errors);
+        this.apiService.saveOrder(item).subscribe({
+            next: res => {
+                this.showSuccessMessage('Зміни збережено');
+                this.filter();
             },
-            err => this.showWebErrorMessage('Не вдалося зберегти зміни', err)
-
-        );
+            error: (err: IApiErrorResponse) => this.showApiErrorMessage('Не вдалося зберегти зміни', err)
+        });
         this.orderDialog = false;
     }
 
@@ -326,23 +321,19 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
             return;
         }
         this.selectedItem.status = OrderStatus.Delivered;
-        this.apiService.saveOrder(this.selectedItem).subscribe(
-            res => {
-                if (res.success) {
-                    this.showSuccessMessage('Продажу закрито');
-                    this.filter();
-                    return;
-                }
-                this.showApiErrorMessage('Продажу не закрито', res.errors);
+        this.apiService.saveOrder(this.selectedItem).subscribe({
+            next: res => {
+                this.showSuccessMessage('Продажу закрито');
+                this.filter();
             },
-            err => this.showWebErrorMessage('Продажу не закрито', err)
-        );
+            error: (err: IApiErrorResponse) => this.showApiErrorMessage('Продажу не закрито', err)
+        });
         this.showConfirm = false;
     }
 
     restoreBasket() {
-       this.basketService.restore(this.selectedItem);
-       this.showInfoMessage("Замовлення відновлено і може бути редаговане на сторінці Складу");
+        this.basketService.restore(this.selectedItem);
+        this.showInfoMessage("Замовлення відновлено і може бути редаговане на сторінці Складу");
     }
 
     async confirmMoveTo(val: boolean) {
@@ -357,15 +348,11 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         const ids = data.map(it => it.id);
         moveToInfo.apiActionExecutor(this.apiService, ids).subscribe({
             next: (res: ApiResponse<any>) => {
-                if (res.success) {
-                    data.forEach(d => d.status = moveToInfo.desiredStatus);
-                    this.filter();
-                    return;
-                }
-                this.showApiErrorMessage('не вдалося змінити статус продаж, оновіть сторінку', res.errors)
+                data.forEach(d => d.status = moveToInfo.desiredStatus);
+                this.filter();
             },
-            error: (err) => {
-                this.showWebErrorMessage(`не вдалося змінити статус продаж, оновіть сторінку`, err);
+            error: (err: IApiErrorResponse) => {
+                this.showApiErrorMessage(`не вдалося змінити статус продаж, оновіть сторінку`, err);
             }
         });
 
@@ -390,21 +377,17 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
         }
 
         const order = this.selectedItem;
-        this.apiService.cancelOrder(order.id, val.item).subscribe(
-            res => {
-                if (res.success) {
-                    this.showSuccessMessage('Продажу повернено');
-                    if (this.filteredData.length < 1) return;
-                    if (this.selectedItem.id === order.id) {
-                        this.remove(order);
-                    }
-                    this.select(this.filteredData[0]);
-                    return;
+        this.apiService.cancelOrder(order.id, val.item).subscribe({
+            next: res => {
+                this.showSuccessMessage('Продажу повернено');
+                if (this.filteredData.length < 1) return;
+                if (this.selectedItem.id === order.id) {
+                    this.remove(order);
                 }
-                this.showApiErrorMessage('Продажу не повернено', res.errors);
+                this.select(this.filteredData[0]);
             },
-            err => this.showWebErrorMessage('Продажу не повернено', err)
-        );
+            error: (err: IApiErrorResponse) => this.showApiErrorMessage('Продажу не повернено', err)
+        });
         this.showConfirmCancel = false;
     }
 
@@ -505,16 +488,12 @@ export class OrdersComponent extends ApiListComponent<IOrder> implements OnDestr
     }
 
     sentSms(order: IOrder) {
-        this.apiService.smsOrder(order.id).subscribe(
-            res => {
-                if (res.success) {
-                    this.showSuccessMessage(`Смс для клієнта ${order.clientName} відправлено успішно`);
-                    return;
-                }
-                this.showApiErrorMessage('Смс для клієнта ${order.clientName} не відправлено', res.errors);
-            },
-            err => this.showWebErrorMessage(`Смс для клієнта ${order.clientName} не відправлено`, err)
-        );
+        this.apiService.smsOrder(order.id).subscribe({
+            next: res =>
+                this.showSuccessMessage(`Смс для клієнта ${order.clientName} відправлено успішно`),
+            error: (err: IApiErrorResponse) =>
+                this.showApiErrorMessage(`Смс для клієнта ${order.clientName} не відправлено`, err)
+        });
     }
 
     private onOrdersChanged = (info?: ApiOrdersChanges) => {

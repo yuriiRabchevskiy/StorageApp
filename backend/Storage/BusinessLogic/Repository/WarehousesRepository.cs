@@ -264,11 +264,11 @@ namespace BusinessLogic.Repository
 
         context.Orders.Add(order);
 
-        await _state.UpdateProductsStateCounterAsync(context);
+        var revision = await _state.UpdateProductsStateCounterAsync(context);
 
         await context.SaveChangesAsync();
         await transaction.CommitAsync();
-        await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
+        await Informer.ProductsCountChangedAsync(changesNotes, revision).ConfigureAwait(false);
       }
       finally
       {
@@ -383,13 +383,13 @@ namespace BusinessLogic.Repository
         changesNotes.AddRange(addNotes);
         changesNotes.AddRange(removeNotes);
 
-        await _state.UpdateProductsStateCounterAsync(context);
+        var revision = await _state.UpdateProductsStateCounterAsync(context);
 
         await context.SaveChangesAsync();
         await transaction.CommitAsync();
 
 
-        await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
+        await Informer.ProductsCountChangedAsync(changesNotes, revision).ConfigureAwait(false);
       }
       finally
       {
@@ -430,12 +430,12 @@ namespace BusinessLogic.Repository
       order.Transactions.AddRange(revertActions);
       changesNotes.AddRange(notes);
 
-      await _state.UpdateProductsStateCounterAsync(context);
+      var revision = await _state.UpdateProductsStateCounterAsync(context);
 
       await context.SaveChangesAsync();
       await transaction.CommitAsync();
 
-      await Informer.ProductsCountChangedAsync(changesNotes).ConfigureAwait(false);
+      await Informer.ProductsCountChangedAsync(changesNotes, revision).ConfigureAwait(false);
 
       return true;
     }

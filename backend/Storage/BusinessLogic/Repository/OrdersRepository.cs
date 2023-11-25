@@ -154,7 +154,7 @@ namespace DataAccess.Repository
 
       it.Products = null; // we do not want to sent this back to the client.
 
-      await _state.UpdateProductsStateCounterAsync(context);
+      var revision = await _state.UpdateOrdersStateCounterAsync(context);
       await context.SaveChangesAsync().ConfigureAwait(false);
 
       await Informer.OrderChangedAsync(new[] {new ApiOrderDetailsChange
@@ -162,7 +162,7 @@ namespace DataAccess.Repository
         OrderId = order.Id,
         Order = it,
         ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-      } }).ConfigureAwait(false);
+      } }, revision).ConfigureAwait(false);
     }
 
     public async Task MoveOrderToAsync(string userId, ApiOrderMoveCommand command)
@@ -194,7 +194,7 @@ namespace DataAccess.Repository
         });
       }
 
-      await _state.UpdateProductsStateCounterAsync(context);
+      var revision = await _state.UpdateProductsStateCounterAsync(context);
       await context.SaveChangesAsync().ConfigureAwait(false);
 
       foreach (var order in orders)
@@ -205,7 +205,7 @@ namespace DataAccess.Repository
             OrderId = order.Id,
             Order = apiOrder,
             ChangeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-          } }).ConfigureAwait(false);
+          } }, revision).ConfigureAwait(false);
       }
     }
   }

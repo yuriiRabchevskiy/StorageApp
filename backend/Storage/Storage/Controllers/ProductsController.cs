@@ -12,8 +12,10 @@ using Storage.Code.Helpers;
 using Storage.Code.Services;
 using AutoMapper;
 using System.Linq;
+using BusinessLogic.Models.Response;
 using Microsoft.Extensions.Configuration;
 using BusinessLogic.Models.User;
+using Bv.Meter.WebApp.Common.Exceptions;
 
 namespace Storage.Controllers
 {
@@ -68,7 +70,8 @@ namespace Storage.Controllers
     [Authorize(Roles = $"{UserRole.Admin}")]
     public ApiResponseBase Post([FromBody] ApiProduct product)
     {
-      if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
+      if (!ModelState.IsValid) throw ModelState.ToApiErrorsException();
+
       _repo.Update(product);
       return new ApiResponseBase();
     }
@@ -78,7 +81,7 @@ namespace Storage.Controllers
     [Authorize(Roles = $"{UserRole.Admin}")]
     public ApiResponse<int> Put([FromBody] ApiProduct product)
     {
-      if (!ModelState.IsValid) return ModelState.ToApiResponse<int>();
+      if (!ModelState.IsValid) throw ModelState.ToApiErrorsException(); ;
 
       var id = _repo.Add(product);
       return new ApiResponse<int>(id);
@@ -97,7 +100,7 @@ namespace Storage.Controllers
     [Authorize(Roles = $"{UserRole.Admin}")]
     public async Task<ApiResponseBase> Transfer(int id, [FromBody] ApiProdTransfer prodTransfer)
     {
-      if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
+      if (!ModelState.IsValid) throw ModelState.ToApiErrorsException();
 
       var user = await GetCurrentUserAsync();
       _houseRepo.TransferProduct(user?.Id, id, prodTransfer);
@@ -108,7 +111,7 @@ namespace Storage.Controllers
     [Authorize(Roles = $"{UserRole.Admin}")]
     public async Task<ApiResponseBase> Add(int id, [FromBody] ApiProdAction model)
     {
-      if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
+      if (!ModelState.IsValid) throw ModelState.ToApiErrorsException();
 
       var user = await GetCurrentUserAsync();
       _houseRepo.AddProduct(user?.Id, id, model);
@@ -119,7 +122,7 @@ namespace Storage.Controllers
     [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
     public async Task<ApiResponseBase> Sell([FromBody] ApiSellOrder model)
     {
-      if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
+      if (!ModelState.IsValid) throw ModelState.ToApiErrorsException();
 
       var user = await GetCurrentUserAsync();
       await _houseRepo.SellOrderAsync(user?.Id, model).ConfigureAwait(false);
@@ -130,7 +133,7 @@ namespace Storage.Controllers
     [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
     public async Task<ApiResponseBase> EditSaleAsync(int orderId, [FromBody] ApiEditSellOrder command)
     {
-      if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
+      if (!ModelState.IsValid) throw ModelState.ToApiErrorsException();
 
       var user = await GetCurrentUserAsync();
       command.Id = orderId;
@@ -142,7 +145,7 @@ namespace Storage.Controllers
     [Authorize(Roles = $"{UserRole.Admin}")]
     public async Task<ApiResponseBase> Remove(int id, [FromBody] ApiProdAction model)
     {
-      if (!ModelState.IsValid) return ModelState.ToApiBaseResponse();
+      if (!ModelState.IsValid) throw ModelState.ToApiErrorsException();
       var user = await GetCurrentUserAsync();
       _houseRepo.RemoveProduct(user?.Id, id, model);
       return new ApiResponseBase();

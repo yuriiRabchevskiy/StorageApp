@@ -122,7 +122,7 @@ export class ApiService extends ApiBase {
         return this.doPost('product', data);
     }
 
-    deleteProduct(id) {
+    deleteProduct(id: string | number) {
         return this.doDelete('product', id);
     }
 

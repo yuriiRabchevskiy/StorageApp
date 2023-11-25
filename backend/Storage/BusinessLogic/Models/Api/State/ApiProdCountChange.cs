@@ -5,6 +5,7 @@ namespace BusinessLogic.Models.Api.State
 
   public class ApiProdCountChanges
   {
+    public int StateRevision { get; set; }
     public IEnumerable<ApiProdCountChange> Changes { get; set; }
   }
 

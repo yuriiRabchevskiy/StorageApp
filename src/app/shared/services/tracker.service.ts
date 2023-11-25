@@ -1,4 +1,4 @@
-import { ApiOrdersChanges } from './../../models/api/state/state';
+import { ApiOrdersChanges, AppState } from './../../models/api/state/state';
 import { HostListener, Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
 import { MessageService } from 'primeng/api';
@@ -6,6 +6,9 @@ import { ApiEndpointsConfig } from '../../api.config';
 import { UserService } from './user.service';
 import { ApiProdCountChanges } from '../../models/api/state/state';
 import { LiteEvent } from '../helpers/lite-event';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
+
+
 
 @Injectable()
 export class TrackerService {
@@ -67,4 +70,28 @@ export class TrackerService {
 
     }
 
+}
+
+export class EntityStateHandler {
+
+    public revision: number;
+
+    constructor(private handleMismatch: (state: EntityStateHandler, diff: number) => void) {
+
+    }
+
+    public verifyState(newState: number) {
+        const currentState = this.revision;
+        if(!currentState) {
+            this.revision = newState;
+            return;
+        }
+        const diff = newState - currentState;
+        if(diff <= 1) {
+            this.revision = newState;
+            return; // we should receive the same state or next
+        }
+        this.handleMismatch(this, diff);
+        // todo show state mismatch 
+    }
 }

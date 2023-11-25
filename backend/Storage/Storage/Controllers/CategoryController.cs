@@ -2,6 +2,7 @@ using DataAccess.Repository;
 using Microsoft.AspNetCore.Mvc;
 using SharedDataContracts.Api.Response;
 using BusinessLogic.Models.Api;
+using BusinessLogic.Models.Response;
 using BusinessLogic.Models.User;
 using Microsoft.AspNetCore.Identity;
 using DataAccess.Models;

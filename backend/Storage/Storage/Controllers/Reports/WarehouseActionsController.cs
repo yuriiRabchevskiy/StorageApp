@@ -9,6 +9,7 @@ using Storage.Controllers.Reports;
 using Microsoft.Extensions.Configuration;
 using BusinessLogic.Models.Api.Reports;
 using BusinessLogic.Helpers;
+using BusinessLogic.Models.Response;
 using BusinessLogic.Models.User;
 
 namespace Storage.Controllers

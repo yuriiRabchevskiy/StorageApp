@@ -91,21 +91,20 @@ export class ArchiveComponent extends ApiListComponent<IOrder> {
   }
 
   onDataReceived(res: ApiResponse<IOrder>) {
-    if (res.success) {
-      res.items.map(it => {
-        it.openDate = new Date(it.openDate);
-        it.date = moment(it.openDate).format('DD/MM/YYYY');
-        it.itemsName = this.getItemsName(it.products);
-        const sellerSrName = it.seller?.split(' ');
-        if (sellerSrName && sellerSrName.length > 1) {
-          it.sellerShort = `${sellerSrName[0]} ${sellerSrName[1][0]}.`;
-        } else {
-          it.sellerShort = it.seller;
-        }
+    res.items.map(it => {
+      it.openDate = new Date(it.openDate);
+      it.date = moment(it.openDate).format('DD/MM/YYYY');
+      it.itemsName = this.getItemsName(it.products);
+      const sellerSrName = it.seller?.split(' ');
+      if (sellerSrName && sellerSrName.length > 1) {
+        it.sellerShort = `${sellerSrName[0]} ${sellerSrName[1][0]}.`;
+      } else {
+        it.sellerShort = it.seller;
+      }
 
-      });
-      res.items.sort(this.orderByDate);
-    }
+    });
+    res.items.sort(this.orderByDate);
+
     super.onDataReceived(res);
     this.updateMetadata();
   }

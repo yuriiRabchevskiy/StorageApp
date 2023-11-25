@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using SharedDataContracts.Api.Response;
 
-namespace SharedDataContracts.Api.Response
+namespace BusinessLogic.Models.Response
 {
   [ExcludeFromCodeCoverage]
   public class ApiResponse<TModel> : ApiResponseBase
@@ -48,11 +48,33 @@ namespace SharedDataContracts.Api.Response
     {
       Items = items;
     }
+  }
 
-    public ApiResponse(OperationError code, string message = null, string field = null) : base(code, message, field) { }
+  public class ApiErrorResponse
+  {
+    /// <summary>
+    /// Gets or sets the errors.
+    /// </summary>
+    /// <value>
+    /// The errors.
+    /// </value>
+    public IReadOnlyCollection<ApiError> Errors { get; set; }
 
-    public ApiResponse(ApiError error) : base(error) { }
+    public ApiErrorResponse(ApiError error)
+    {
+      Errors = new List<ApiError>(1) { error };
+    }
 
-    public ApiResponse(List<ApiError> errors) : base(errors) { }
+    public ApiErrorResponse(IReadOnlyCollection<ApiError> errors)
+    {
+      Errors = errors;
+    }
+
+    public ApiErrorResponse(OperationError code, string message = null, string field = null)
+      : this(new ApiError { Code = code, Message = message, Field = field })
+    {
+
+    }
+
   }
 }

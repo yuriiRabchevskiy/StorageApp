@@ -6,6 +6,7 @@ namespace BusinessLogic.Models.Api.State
 {
   public class ApiOrderDetailsChanges
   {
+    public int StateRevision { get; set; }
     public IEnumerable<ApiOrderDetailsChange> Changes { get; set; }
   }
 
