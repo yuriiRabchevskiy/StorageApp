@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { IApiResponseBase } from '../api';
+import { IApiErrorResponse } from '../api';
 
 
 export class WorkProgress {
@@ -9,7 +9,7 @@ export class WorkProgress {
 
     constructor(private doRequest: () => Observable<any>,
         private onDataReceived: (res: any) => any,
-        private onDataReceiveError?: (res: any, parsed?: IApiResponseBase) => any) {
+        private onDataReceiveError?: (error?: IApiErrorResponse) => any) {
     }
 
     public doStopProgress() {
@@ -21,29 +21,24 @@ export class WorkProgress {
     public startRequest() {
         if (!this.doRequest()) return;
         this.startGetProgress();
-        this.doRequest().subscribe(
+        this.doRequest().subscribe({
             // parse data
-            res => {
+            next: res => {
                 this.onDataReceived(res);
             },
-            // error
-            err => {
+            error: (apiError: IApiErrorResponse) => {
                 this.stopGetProgress();
-                if (this.onDataReceiveError) {
-                    let msg = err;
-                    let apiErr: IApiResponseBase | undefined;
-                    if (err.status && err._body) {
-                        apiErr = JSON.parse(err._body) as IApiResponseBase;
-                    }
-                    this.onDataReceiveError(err, apiErr);
+                if (this.onDataReceiveError) {            
+                    this.onDataReceiveError(apiError);
                 } else {
-                    console.log(err);
+                    console.log(apiError);
                 }
             },
             // success
-            () => {
+            complete: () => {
                 this.stopGetProgress();
-            });
+            }
+        });
     }
 
     private startGetProgress() {

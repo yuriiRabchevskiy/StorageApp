@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { PreferenceService } from '@app/shared/services/preference.service';
 import { UserService } from '@app/shared/services/user.service';
 import { MessageService } from 'primeng/api';
-import { ApiResponse } from '../../models/api';
+import { ApiResponse, IApiErrorResponse } from '../../models/api';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { ApiService } from '../../shared/services/api.service';
 import { ISUser, IUserToEdit } from './../../models/manage';
@@ -27,7 +27,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
   }
 
   getUserRole(user: IUser) {
-   return UserRoleName.getRoleName(user.isAdmin, user.role);
+    return UserRoleName.getRoleName(user.isAdmin, user.role);
   }
 
   onRowClick(user: ISUser) {
@@ -59,29 +59,27 @@ export class UsersComponent extends ApiListComponent<ISUser> {
   delete(val: ISUser) {
     const deleteUser = val;
     this.work.showSpinner = true;
-    this.apiService.deleteUser(deleteUser.id).subscribe(
-      res => {
+    this.apiService.deleteUser(deleteUser.id).subscribe({
+      next: res => {
         this.work.showSpinner = false;
-        if (res.success) {
-          this.remove(deleteUser);
-          this.notify.add(
-            {
-              severity: 'success',
-              summary: 'Successfully',
-              detail: 'Користувача видалено'
-            });
-        }
+        this.remove(deleteUser);
+        this.notify.add(
+          {
+            severity: 'success',
+            summary: 'Successfully',
+            detail: 'Користувача видалено'
+          });
       },
-      err => {
+      error: (err: IApiErrorResponse) => {
         this.work.showSpinner = false;
         this.notify.add(
           {
             severity: 'error',
             summary: 'Error',
-            detail: 'Користувача не видалено' + err
+            detail: 'Користувача не видалено' + err.errors[0].message
           });
       }
-    );
+    });
     if (this.filteredData.length > 0) {
       this.selectedItem = this.filteredData[0];
     }
@@ -89,55 +87,43 @@ export class UsersComponent extends ApiListComponent<ISUser> {
 
   save(val: ISUser) {
     const user = val;
-    this.apiService.addUser(user).subscribe(
-      res => {
-        if (res.success) {
-          user.id = res.item;
-          this.notify.add(
-            {
-              severity: 'success',
-              summary: 'Successfully',
-              detail: 'Користувача додано'
-            });
-          this.add(user);
-          this.selectedItem = user;
-        } else {
-          this.notify.add(
-            {
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Користувача не додано: ' + res.errors[0].message
-            }
-          );
-        }
+    this.apiService.addUser(user).subscribe({
+      next: res => {
+        user.id = res.item;
+        this.notify.add(
+          {
+            severity: 'success',
+            summary: 'Successfully',
+            detail: 'Користувача додано'
+          });
+        this.add(user);
+        this.selectedItem = user;
       },
-      err => {
+      error: (err: IApiErrorResponse) => {
         this.notify.add(
           {
             severity: 'error',
             summary: 'Error',
-            detail: 'Користувача не додано' + err
+            detail: 'Користувача не додано' + err.errors[0].message
           });
       }
-    );
+    });
     this.displayDialog = false;
   }
 
   saveChange(val: IUserToEdit) {
     const user = val;
     this.updateField(this.selectedItem, val);
-    this.apiService.editUser(this.selectedItem.id, user).subscribe(
-      res => {
-        if (res.success) {
-          this.notify.add(
-            {
-              severity: 'success',
-              summary: 'Successfully',
-              detail: 'Зміни збережено'
-            });
-        }
+    this.apiService.editUser(this.selectedItem.id, user).subscribe({
+      next: res => {
+        this.notify.add(
+          {
+            severity: 'success',
+            summary: 'Successfully',
+            detail: 'Зміни збережено'
+          });
       },
-      err => {
+      error: (err: IApiErrorResponse) => {
         this.notify.add(
           {
             severity: 'error',
@@ -146,7 +132,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
           });
         console.log(err);
       }
-    );
+    });
     this.selectedItem = this.filteredData[0];
     this.displayEditDialog = false;
   }

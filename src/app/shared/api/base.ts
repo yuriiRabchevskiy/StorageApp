@@ -1,8 +1,17 @@
 import { UserService } from './../services/user.service';
-import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ApiResponse } from '../../models/api';
+import { Observable, catchError, throwError } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { API_COMMUNICATION_ERROR, ApiResponse, IApiErrorInfo, IApiErrorResponse } from '../../models/api';
 import { ApiEndpointsConfig } from '../../api.config';
+
+function extractApiError(err: HttpErrorResponse) {
+    const error = err && err.error;
+    if (error && error.errors) {
+        error.httpStatus = err.status;
+        return error as IApiErrorResponse; // if there are errors => it is our API error
+    }
+    return undefined; // some unknown error
+}
 
 export class ApiBase {
 
@@ -40,21 +49,51 @@ export class ApiBase {
 
     protected doGet<T>(urlStr: string): Observable<ApiResponse<T>> {
         const url = ApiEndpointsConfig.getFromApi(urlStr);
-        return this._http.get<ApiResponse<T>>(url, this.options);
+        return this._http.get<ApiResponse<T>>(url, this.options)
+        .pipe(
+            catchError(error => this.mapHttpErrorToApiOne(error))
+        );;
     }
 
     protected doPost<T>(urlStr: string, data): Observable<ApiResponse<T>> {
         const url = ApiEndpointsConfig.getFromApi(urlStr);
-        return this._http.post<ApiResponse<T>>(url, JSON.stringify(data), this.options);
+        return this._http.post<ApiResponse<T>>(url, JSON.stringify(data), this.options)
+        .pipe(
+            catchError(error => this.mapHttpErrorToApiOne(error))
+        );;
     }
 
     protected doPut<T>(urlStr: string, data): Observable<ApiResponse<T>> {
         const url = ApiEndpointsConfig.getFromApi(urlStr);
-        return this._http.put<ApiResponse<T>>(url, JSON.stringify(data), this.options);
+        return this._http.put<ApiResponse<T>>(url, JSON.stringify(data), this.options)
+        .pipe(
+            catchError(error => this.mapHttpErrorToApiOne(error))
+        );;
     }
 
-    protected doDelete<T>(urlStr: string, id: string): Observable<ApiResponse<T>> {
+    protected doDelete<T>(urlStr: string, id: string | number): Observable<ApiResponse<T>> {
         const url = ApiEndpointsConfig.getFromApi(urlStr + '/' + id);
-        return this._http.delete<ApiResponse<T>>(url, this.options);
+        return this._http.delete<ApiResponse<T>>(url, this.options).pipe(
+            catchError(error => this.mapHttpErrorToApiOne(error))
+        );
+    }
+
+    protected mapHttpErrorToApiOne(error: HttpErrorResponse) {
+        const apiError = extractApiError(error);
+        if (apiError) return throwError(() => apiError); // truthy the api error here
+        console.error('Unknown API service error occurred', error);
+        const message = error && (error.message || error.statusText || error.toString()) || 'Communication Error';
+        const errorMsg: IApiErrorInfo = {
+            message,
+            field: undefined,
+            code: API_COMMUNICATION_ERROR,
+            details: undefined
+        };
+        const apiErrorWrap: IApiErrorResponse = {
+            errors: [errorMsg],
+            wasConnectionError: true,
+            httpStatus: error.status
+        };
+        return throwError(apiErrorWrap);
     }
 }

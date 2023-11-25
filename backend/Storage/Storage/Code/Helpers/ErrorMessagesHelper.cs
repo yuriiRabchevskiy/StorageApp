@@ -4,20 +4,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BusinessLogic.Models.Response;
+using Bv.Meter.WebApp.Common.Exceptions;
 
 namespace Storage.Code.Helpers
 {
   public static class ErrorMessagesHelper
   {
 
-    public static ApiResponseBase ToApiBaseResponse(this ModelStateDictionary modelState)
+    public static ApiErrorsException ToApiErrorsException(this ModelStateDictionary modelState)
     {
-      return new ApiResponseBase(modelState.ToApiErrors());
+      return new ApiErrorsException(modelState.ToApiErrors());
     }
 
-    public static ApiResponse<T> ToApiResponse<T>(this ModelStateDictionary modelState)
+    public static ApiErrorResponse ToApiResponse<T>(this ModelStateDictionary modelState)
     {
-      return new ApiResponse<T>(modelState.ToApiErrors());
+      return new ApiErrorResponse(modelState.ToApiErrors());
     }
 
     public static List<ApiError> ToApiErrors(this ModelStateDictionary modelState)

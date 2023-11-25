@@ -12,6 +12,7 @@ using Storage.Controllers.Reports;
 using Microsoft.Extensions.Configuration;
 using BusinessLogic.Helpers;
 using System;
+using BusinessLogic.Models.Response;
 
 namespace Storage.Controllers
 {

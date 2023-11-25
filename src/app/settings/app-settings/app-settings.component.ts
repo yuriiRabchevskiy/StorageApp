@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { UserService } from '@app/shared/services/user.service';
-import {MessageService} from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { SecuredComponent } from '../../models/component/base-api.component';
 import { IUser } from '../../models/manage/user';
 import { matchOtherValidator } from '../../shared/directive/math-validator';
@@ -74,14 +74,12 @@ export class AppSettingsComponent extends SecuredComponent implements OnInit {
       this.changePassword(this.userForm.value);
       this.apiService.changePassword(this.newPass).subscribe(
         res => {
-          if (res.success) {
-            this.notify.add(
-              {
-                severity: 'success',
-                summary: 'Successfully',
-                detail: 'Пароль змінено'
-              });
-          }
+          this.notify.add(
+            {
+              severity: 'success',
+              summary: 'Successfully',
+              detail: 'Пароль змінено'
+            });
         },
         err => {
           this.notify.add(

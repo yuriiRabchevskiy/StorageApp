@@ -12,6 +12,8 @@ namespace SharedDataContracts.Api.Response
     public OperationError Code { get; set; }
     public string Field { get; set; }
 
+    public string Details { get; set; }
+
     public ApiError() { }
     public ApiError(string field, string message) : this()
     {

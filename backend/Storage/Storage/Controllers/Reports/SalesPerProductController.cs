@@ -10,6 +10,7 @@ using BusinessLogic.Repository.Reports;
 using Storage.Controllers.Reports;
 using Microsoft.Extensions.Configuration;
 using BusinessLogic.Helpers;
+using BusinessLogic.Models.Response;
 
 namespace Storage.Controllers
 {

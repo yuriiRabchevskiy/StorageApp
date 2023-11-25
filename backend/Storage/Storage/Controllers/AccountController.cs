@@ -7,7 +7,9 @@ using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using BusinessLogic.Models.Response;
 using BusinessLogic.Models.User;
+using Bv.Meter.WebApp.Common.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -60,7 +62,7 @@ namespace Storage.Controllers
       }
 
 
-      return new ApiResponse<LoginResult>(OperationError.LoginOrPasswordIsInvalid, "User with such login and password does not exist");
+      throw new ApiException(OperationError.LoginOrPasswordIsInvalid, "User with such login and password does not exist");
     }
 
     [HttpPost("logout")]
@@ -101,7 +103,7 @@ namespace Storage.Controllers
         return new ApiResponse<string>("Код для відновлення паролю відправлено на ваш емейл");
       }
 
-      return new ApiResponse<string>(new ApiError("Невідомо", "Виникла помилка відновлення паролю"));
+      throw new ApiException("Виникла помилка відновлення паролю");
 
     }
 
@@ -121,7 +123,7 @@ namespace Storage.Controllers
       var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false);
       var password = Guid.NewGuid().ToString("N").Substring(0, 8);
       var result = await _userManager.ResetPasswordAsync(user, code, password).ConfigureAwait(false);
-      if (!result.Succeeded) return new ApiResponse<string>(new ApiError("code", "Виникла помилка відновленню паролю"));
+      if (!result.Succeeded) throw new ApiException("Виникла помилка відновленню паролю");
       return new ApiResponse<string>(password);
     }
 
@@ -131,7 +133,7 @@ namespace Storage.Controllers
     {
       var user = await GetCurrentUserAsync();
       var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword).ConfigureAwait(false);
-      if (!result.Succeeded) return new ApiResponse<string>(new ApiError("code", "Виникла помилка відновленню паролю"));
+      if (!result.Succeeded) throw new ApiException("Виникла помилка відновленню паролю");
       return new ApiResponse<string>(model.NewPassword);
     }
 

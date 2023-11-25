@@ -6,8 +6,8 @@ namespace BusinessLogic.Abstractions
 {
   public interface IStateInformer
   {
-    Task ProductsCountChangedAsync(IEnumerable<ApiProdCountChange> changes);
+    Task ProductsCountChangedAsync(IEnumerable<ApiProdCountChange> changes, int revision );
 
-    Task OrderChangedAsync(IEnumerable<ApiOrderDetailsChange> changes);
+    Task OrderChangedAsync(IEnumerable<ApiOrderDetailsChange> changes, int revision);
   }
 }

@@ -8,6 +8,7 @@ import { OrderEditorComponent } from '../../../controls/index';
 import { SecuredComponent } from '../../../models/component';
 import { UserService } from '@app/shared/services/user.service';
 import { BasketService } from '@app/shared/services/basket.service';
+import { IApiErrorResponse } from '@app/models/api';
 
 @Component({
   selector: 'app-basket',
@@ -22,7 +23,7 @@ export class BasketComponent extends SecuredComponent {
   productPage: number = 1;
   clientPage: number = 2;
   lastPage: number = this.pageNames.length;;
-  
+
   order: ISaleOrder = new SaleOrder();
   isSaving: boolean = false;
 
@@ -48,12 +49,12 @@ export class BasketComponent extends SecuredComponent {
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() sale: EventEmitter<ISaleOrder> = new EventEmitter<ISaleOrder>();
   @Output() removeItem: EventEmitter<any> = new EventEmitter<any>();
-  
+
   constructor(userService: UserService, private apiService: ApiService,
     private basketService: BasketService, notify: MessageService) {
     super(userService, notify);
 
-    if(this.basketService.isEditing) {
+    if (this.basketService.isEditing) {
       this.pageNames = ['Редагований список товарів'];
       this.lastPage = this.pageNames.length;
     }
@@ -119,15 +120,12 @@ export class BasketComponent extends SecuredComponent {
     this.apiService.sale(item).subscribe({
       next: (res) => {
         this.isSaving = false;
-        if (res.success) {
-          this.onCloseDialog.emit(true);
-          return this.showSuccessMessage('Продажу здійснено успішно');
-        }
-        this.showApiErrorMessage('Помилка при здійснені продажі!', res.errors);
+        this.onCloseDialog.emit(true);
+        this.showSuccessMessage('Продажу здійснено успішно');
       },
-      error: (err) => {
+      error: (err: IApiErrorResponse) => {
         this.isSaving = false;
-        this.showWebErrorMessage('Не вдалося здійснити продажу', err);
+        this.showApiErrorMessage('Не вдалося здійснити продажу', err);
       }
     });
 
@@ -140,15 +138,12 @@ export class BasketComponent extends SecuredComponent {
     this.apiService.editSale(basket.orderId, { productOrders }).subscribe({
       next: (res) => {
         this.isSaving = false;
-        if (res.success) {
-          this.onCloseDialog.emit(true);
-          return this.showSuccessMessage('Продажу успішно відредаговано');
-        }
-        this.showApiErrorMessage('Помилка при редагуванні продажі!', res.errors);
+        this.onCloseDialog.emit(true);
+        this.showSuccessMessage('Продажу успішно відредаговано');
       },
-      error: (err) => {
+      error: (err: IApiErrorResponse) => {
         this.isSaving = false;
-        this.showWebErrorMessage('Не вдалося відредагувати продажу', err);
+        this.showApiErrorMessage('Не вдалося відредагувати продажу', err);
       }
     });
 

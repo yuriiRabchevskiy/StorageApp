@@ -19,12 +19,12 @@ namespace Storage.Code.Hubs
       _context = context;
     }
 
-    public Task ProductsCountChangedAsync(IEnumerable<ApiProdCountChange> changes)
+    public Task ProductsCountChangedAsync(IEnumerable<ApiProdCountChange> changes, int revision)
     {
-      return _context.Clients.All.SendAsync("productsCountChanged", new ApiProdCountChanges { Changes = changes });
+      return _context.Clients.All.SendAsync("productsCountChanged", new ApiProdCountChanges { Changes = changes, StateRevision = revision });
     }
 
-    public Task OrderChangedAsync(IEnumerable<ApiOrderDetailsChange> changes)
+    public Task OrderChangedAsync(IEnumerable<ApiOrderDetailsChange> changes, int revision)
     {
       var changesL = changes.ToList();
       foreach (var change in changesL.Where(it => it.Order.Products != null))
@@ -32,7 +32,11 @@ namespace Storage.Code.Hubs
         change.Order.Products = null; // we do not want to sent products
       }
 
-      return _context.Clients.All.SendAsync("orderChanged", new ApiOrderDetailsChanges { Changes = changesL });
+      return _context.Clients.All.SendAsync("orderChanged", new ApiOrderDetailsChanges
+      {
+        Changes = changesL,
+        StateRevision = revision
+      });
     }
   }
 

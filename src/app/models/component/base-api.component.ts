@@ -2,7 +2,7 @@ import { Directive } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Observable } from 'rxjs';
 import { ViewState } from '../../shared/helpers';
-import { ApiResponse, IApiErrorInfo } from '../api';
+import { ApiResponse, IApiErrorInfo, IApiErrorResponse } from '../api';
 import { UserService } from './../../shared/services/user.service';
 import { WorkProgress } from './work-progress';
 import { UserRoleName } from '../manage/user';
@@ -52,7 +52,8 @@ export abstract class SecuredComponent {
       });
   }
 
-  showApiErrorMessage(summary: string, errors: IApiErrorInfo[]) {
+  showApiErrorMessage(summary: string, res: IApiErrorResponse) {
+    const errors = res.errors || [];
     const message = errors.map(it => `${it.field}: ${it.message}\n`).reduce((text, line) => text += line, '');
     this.notify.add(
       {
@@ -61,16 +62,6 @@ export abstract class SecuredComponent {
         detail: message
       });
   }
-
-  showWebErrorMessage(summary: string, error: string) {
-    this.notify.add(
-      {
-        severity: 'error',
-        summary: summary,
-        detail: error
-      });
-  }
-
 }
 
 @Directive()

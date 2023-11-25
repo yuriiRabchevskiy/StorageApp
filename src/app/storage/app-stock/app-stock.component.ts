@@ -1,3 +1,4 @@
+import { IApiErrorResponse } from './../../models/api/api/api';
 import { BasketService } from './../../shared/services/basket.service';
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
@@ -13,7 +14,7 @@ import { ApiService } from '../../shared/services/api.service';
 import { ApiProdCountChanges } from './../../models/api/state/state';
 import { NumberFilter } from './../../models/filtering/filters';
 import { IWarehouse } from './../../models/storage/werehouse';
-import { TrackerService } from './../../shared/services/tracker.service';
+import { EntityStateHandler, TrackerService } from './../../shared/services/tracker.service';
 import { ISaveAddition } from './addition/addition.component';
 import { ISaveResult } from './product/product.component';
 
@@ -24,6 +25,14 @@ import { ISaveResult } from './product/product.component';
 })
 export class AppStockComponent extends ApiListComponent<IProduct> implements OnDestroy {
 
+  private productsState = new EntityStateHandler(
+    (stateHandler: EntityStateHandler, diff: number) => {
+      this.showInfoMessage(
+        `Стан продуктів на сервері і в браузері може відрізнятися.
+      Пропущено ${diff - 1} змін.
+      Рекомендується оновити список продуктів`)
+    }
+  );
 
   public columns: ITableColumn[] = [
     { title: 'Код', field: 'productCode', width: 80 },
@@ -82,7 +91,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.typeFilter.getNumber = (it) => it.categoryId;
     this.filters.push(this.typeFilter);
     this.loadCategory();
-    this.loadWereHouse();
+    this.loadWareHouses();
 
     this.initHiddenColumns('stockColumns');
   }
@@ -120,15 +129,12 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.apiService.deleteProduct(deleteProd.id).subscribe(
       res => {
         this.work.showSpinner = false;
-        if (res.success) {
-          this.remove(deleteProd);
-          return this.showSuccessMessage('Товар видалено');
-        }
-        this.showApiErrorMessage('Помилка при видаленні товару!', res.errors);
+        this.remove(deleteProd);
+        return this.showSuccessMessage('Товар видалено');
       },
-      err => {
+      (err: IApiErrorResponse) => {
         this.work.showSpinner = false;
-        this.showWebErrorMessage('Не вдалось видалити товар', err);
+        this.showApiErrorMessage('Не вдалось видалити товар', err);
       }
     );
     if (this.filteredData.length > 0) {
@@ -156,26 +162,20 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
       this.isBalance = false;
       this.apiService.addProduct(product).subscribe(
         res => {
-          if (res.success) {
-            this.oldItem = this.cloneModel(product);
-            (<any>product).isNew = false;
-            product.id = res.item;
-            return this.showSuccessMessage('Товар додано');
-          }
-          this.showApiErrorMessage('Помилка при додаванні товару!', res.errors);
+          this.oldItem = this.cloneModel(product);
+          (<any>product).isNew = false;
+          product.id = res.item;
+          return this.showSuccessMessage('Товар додано');
         },
-        err => this.showWebErrorMessage('Не вдалось створити новий товар', err)
+        (err: IApiErrorResponse) => this.showApiErrorMessage('Не вдалось створити новий товар', err)
 
       );
     } else {
       this.apiService.editProduct(product).subscribe(
         res => {
-          if (res.success) {
-            return this.showSuccessMessage('Зміни збережено');
-          }
-          this.showApiErrorMessage('Помилка при редагуванні товару!', res.errors);
+          this.showSuccessMessage('Зміни збережено');
         },
-        err => this.showWebErrorMessage('Не вдалось відредагувати товар', err)
+        (err: IApiErrorResponse) => this.showApiErrorMessage('Не вдалось відредагувати товар', err)
       );
     }
     this.selectedItem = val.product;
@@ -195,14 +195,11 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.updateBalanceFields(this.selectedItem, balance);
     this.apiService.doTransfer(this.selectedItem.id, item).subscribe(
       res => {
-        if (res.success) {
-          this.filter();
-          return this.showSuccessMessage('Трансфер успішно виконано');
-        }
-        this.showApiErrorMessage('Помилка при поповнені складу!', res.errors);
+        this.filter();
+        this.showSuccessMessage('Трансфер успішно виконано');
       },
-      err => {
-        this.showWebErrorMessage('Не вдалось здійснити трансфер', err);
+      (err: IApiErrorResponse) => {
+        this.showApiErrorMessage('Не вдалось здійснити трансфер', err);
       }
     );
     this.transferDialog = false;
@@ -215,13 +212,10 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     this.updateBalanceFields(this.selectedItem, balance);
     this.apiService.removeProductsFromWarehouse(this.selectedItem.id, item).subscribe(
       res => {
-        if (res.success) {
-          return this.showSuccessMessage('Надлишки успішно видалені');
-        }
-        this.showApiErrorMessage('Помилка при видалені товару зі складу!', res.errors);
+        this.showSuccessMessage('Надлишки успішно видалені');
       },
-      err => {
-        this.showWebErrorMessage('Не вдалось видалити надлишки', err);
+      (err: IApiErrorResponse) => {
+        this.showApiErrorMessage('Не вдалось видалити товару зі складу', err);
       }
     );
     this.showRemovalDialog(val.more);
@@ -233,16 +227,9 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     balance[item.fromId] = (balance[item.fromId] || 0) + item.quantity;
     this.updateBalanceFields(this.selectedItem, balance);
     this.apiService.addProductsToWarehouse(this.selectedItem.id, item).subscribe(
-      res => {
-        if (res.success) {
-          return this.showSuccessMessage('Склад поповнено');
-        }
-        this.showApiErrorMessage('Помилка при поповнені складу!', res.errors);
+      res => this.showSuccessMessage('Склад поповнено'),
+      (err: IApiErrorResponse) => this.showApiErrorMessage('Не вдалося поповнити склад', err)
 
-      },
-      err => {
-        this.showWebErrorMessage('Не вдалося поповнити склад', err);
-      }
     );
     this.showAdditionDialog(val.more);
   }
@@ -302,19 +289,16 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   loadCategory() {
     this.apiService.getCategories().subscribe(
       res => {
-        if (res.success) {
-          this.tabs = res.items;
-          this.categories = res.items.map(it => it);
-          this.tabs.unshift({ name: 'Усі', id: 0, isActive: true });
-        }
+        this.tabs = res.items;
+        this.categories = res.items.map(it => it);
+        this.tabs.unshift({ name: 'Усі', id: 0, isActive: true });
       },
       err => console.log(err));
   }
 
-  loadWereHouse() {
+  private loadWareHouses() {
     this.apiService.getWarehouses().subscribe(
       res => {
-        if (!res.success) return;
         this.wareHouses = res.items;
       },
       err => console.log(err));
@@ -325,9 +309,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   onDataReceived(res: ApiResponse<IProduct>) {
-    if (res.success) {
-      res.items.map(it => this.updateBalanceFields(it, it.balance));
-    }
+    res.items.map(it => this.updateBalanceFields(it, it.balance));
     super.onDataReceived(res);
     this.findTotalBalance(this.selectedItem);
   }
@@ -394,7 +376,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   private onProductsCountChanged = (info: ApiProdCountChanges) => {
-    console.log('products coutn chaneged', info);
+    console.log('products count changed', info);
+    this.productsState.verifyState(info.stateRevision);
     info.changes.forEach(change => {
       const product = this.data.find(it => it.id === change.productId);
       const current = product.balance[change.warehouseId];

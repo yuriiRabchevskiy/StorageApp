@@ -1,4 +1,4 @@
-import { ForgotPassword } from './../models/api/api/api';
+import { ForgotPassword, IApiErrorResponse } from './../models/api/api/api';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
@@ -9,7 +9,7 @@ import { IForgotPassword } from '../models/api';
 import { UserService } from '../shared/services/user.service';
 
 import { Dictionary } from './../models/dictionary';
-import {MessageService} from 'primeng/api';
+import { MessageService } from 'primeng/api';
 
 interface IUrlParamsPair {
   url: string;
@@ -70,25 +70,22 @@ export class LoginComponent implements OnInit {
     this.connectionError = false;
     this.error = false;
 
-    this.apiService.login(data).subscribe(
-      (res) => {
-        if (!res.success) {
-          this.error = true;
+    this.apiService.login(data).subscribe({
+      next: (res) => {
+        this.error = false;
+        this.apiService.token = res.item.token;
+        this.userService.setLocal(res.item);
+        if (res.item.isAdmin) {
+          this.router.navigate([urlAndParams.url], { queryParams: urlAndParams.params });
         } else {
-          this.error = false;
-          this.apiService.token = res.item.token;
-          this.userService.setLocal(res.item);
-          if (res.item.isAdmin) {
-            this.router.navigate([urlAndParams.url], { queryParams: urlAndParams.params });
-          } else {
-            this.router.navigate(['/storage']);
-          }
+          this.router.navigate(['/storage']);
         }
       },
-      (err) => {
-        this.connectionError = true;
+      error: (err: IApiErrorResponse) => {
+        this.connectionError = err.wasConnectionError; // connection error
+        this.error = !err.wasConnectionError; // or credentials error
       }
-    );
+    });
   }
 
   separateUrlAndParams(url: string): IUrlParamsPair {
@@ -113,25 +110,24 @@ export class LoginComponent implements OnInit {
     let data = new ForgotPassword();
     data.email = event.email;
     this.forgotPass = data;
-    this.apiService.forgotPassword(this.forgotPass).subscribe(
-      res => {
-        if (res.success) {
-          this.notifi.add(
-            {
-              severity: 'success',
-              summary: 'Successfully',
-              detail: 'Лист відправлено'
-            });
-        }
+    this.apiService.forgotPassword(this.forgotPass).subscribe({
+      next: res => {
+        this.notifi.add(
+          {
+            severity: 'success',
+            summary: 'Successfully',
+            detail: 'Лист відправлено'
+          });
       },
-      err => {
+      error: (err: IApiErrorResponse) => {
         this.notifi.add(
           {
             severity: 'error',
             summary: 'Error',
-            detail: 'Лист відправити не вдалося' + err
+            detail: 'Лист відправити не вдалося' + err.errors[0].message
           });
       }
+    }
     );
   }
 

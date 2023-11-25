@@ -24,10 +24,7 @@ export class OpenOrdersLightComponent extends BaseApiComponent<string> {
   }
 
   onDataReceived(res: ApiResponse<string>) {
-    if (res.success) {
-      this.data = this.sanitizer.bypassSecurityTrustHtml(res.item);
-    }
-
+    this.data = this.sanitizer.bypassSecurityTrustHtml(res.item);
   }
 
 
