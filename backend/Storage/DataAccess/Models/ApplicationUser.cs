@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 
 namespace DataAccess.Models
@@ -9,5 +10,7 @@ namespace DataAccess.Models
     public string Phone { get; set; }
     public string Notes { get; set; }
     public bool IsActive { get; set; }
+
+    public ICollection<UserDiscount> Discounts { get; set; }
   }
 }

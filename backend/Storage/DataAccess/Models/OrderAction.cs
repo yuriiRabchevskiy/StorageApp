@@ -13,7 +13,6 @@ namespace DataAccess.Models
     public string Note { get; set; }
     public OrderOperation? Operation { get; set; }
     public string OrderJson { get; set; }
-
     public ApplicationUser User { get; set; }
 
   }
