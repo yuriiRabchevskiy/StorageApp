@@ -28,6 +28,8 @@ namespace DataAccess.Models
     public string CancelReason { get; set; }
     public string CanceledByUserId { get; set; }
 
+    public double DiscountMultiplier { get; set; }
+
     public List<ProductAction> Transactions { get; set; }
     public ICollection<OrderAction> OrderEditions { get; set; }
     public ApplicationUser ResponsibleUser { get; set; }

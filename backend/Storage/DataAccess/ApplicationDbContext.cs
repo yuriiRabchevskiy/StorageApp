@@ -17,6 +17,7 @@ namespace DataAccess
     public DbSet<Preference> UserPreferences { get; set; }
     public DbSet<OrderAction> OrderAction { get; set; }
     public DbSet<ApplicationState> AppState { get; set; }
+    public DbSet<UserDiscount> UserDiscounts { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)

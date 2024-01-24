@@ -172,6 +172,9 @@ namespace DataAccess.Migrations
                     b.Property<int>("Delivery")
                         .HasColumnType("int");
 
+                    b.Property<double>("DiscountMultiplier")
+                        .HasColumnType("float");
+
                     b.Property<DateTime>("OpenDate")
                         .HasColumnType("datetime2");
 
@@ -331,6 +334,9 @@ namespace DataAccess.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("DiscountMultiplier")
+                        .HasColumnType("float");
+
                     b.Property<int>("Operation")
                         .HasColumnType("int");
 
@@ -363,6 +369,27 @@ namespace DataAccess.Migrations
                     b.HasIndex("WarehouseId");
 
                     b.ToTable("ProductsTrqansactions");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.UserDiscount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("DiscountMultiplier")
+                        .HasColumnType("float");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDiscounts");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Warehouse", b =>
@@ -669,6 +696,15 @@ namespace DataAccess.Migrations
                     b.Navigation("Warehouse");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.UserDiscount", b =>
+                {
+                    b.HasOne("DataAccess.Models.ApplicationUser", "User")
+                        .WithMany("Discounts")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DataAccess.Models.WarehouseProducts", b =>
                 {
                     b.HasOne("DataAccess.Models.Product", "Product")
@@ -737,6 +773,11 @@ namespace DataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Discounts");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Category", b =>

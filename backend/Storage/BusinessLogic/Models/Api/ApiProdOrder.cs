@@ -12,6 +12,8 @@ namespace BusinessLogic.Models.Api
     public double BuyPrice { get; set; }
     public double TotalPrice { get; set; }
 
+    public double DiscountMultiplier { get; set; }
+
     public int WarehouseId { get; set; }
   }
 }

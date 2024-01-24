@@ -17,6 +17,8 @@ namespace DataAccess.Models
     public DateTime Date { get; set; }
     public int Quantity { get; set; }
     public double Price { get; set; }
+
+    public double DiscountMultiplier { get; set; } = 1.0;
     public double BuyPrice { get; set; }
     public string Description { get; set; }
 
