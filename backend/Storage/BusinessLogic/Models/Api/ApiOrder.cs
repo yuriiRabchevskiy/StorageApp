@@ -19,11 +19,15 @@ namespace BusinessLogic.Models.Api
     public DateTime? OpenDate { get; set; }
     public DateTime? CloseDate { get; set; }
     public double? TotalPrice { get; set; }
+
+    public double? TotalDiscount { get; set; }
     public double? TotalBuyPrice { get; set; }
     public string Seller { get; set; }
     public string CanceledBy { get; set; }
     public string CancelReason { get; set; }
     public DateTime? CancelDate { get; set; }
+
+    public double DiscountMultiplier { get; set; }
 
     public IEnumerable<ApiProdOrder> Products { get; set; }
   }

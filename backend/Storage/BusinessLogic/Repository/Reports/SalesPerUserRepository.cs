@@ -51,6 +51,7 @@ namespace BusinessLogic.Repository.Reports
           Category = it.Key,
           OrdersCount = it.Count(),
           Sales = it.Sum(trn => trn.TotalPrice),
+          Discount = it.Sum(trn => trn.TotalDiscount),
           BuyPrice = it.Sum(trn => trn.TotalBuyPrice),
           Quantity = it.Sum(trn => trn.Products.Sum(prod => prod.Quantity))
         };

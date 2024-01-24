@@ -20,8 +20,10 @@ namespace BusinessLogic.Helpers
           api.CancelDate = ord.CanceledDate;
         }
 
+        api.DiscountMultiplier = ord.DiscountMultiplier;
         api.Seller = ord.ResponsibleUser?.BuildFullName();
         api.TotalPrice = ord.Transactions?.Sum(trn => -trn.Price * trn.Quantity * trn.DiscountMultiplier);
+        api.TotalDiscount = ord.Transactions?.Sum(trn => -trn.Price * trn.Quantity * (1 - trn.DiscountMultiplier));
         api.TotalBuyPrice = ord.Transactions?.Sum(trn => -trn.BuyPrice * trn.Quantity);
 
         api.Products = ord.Transactions?.GroupBy(it => new { it.WarehouseId, it.ProductId, it.Price, it.BuyPrice, it.DiscountMultiplier })
