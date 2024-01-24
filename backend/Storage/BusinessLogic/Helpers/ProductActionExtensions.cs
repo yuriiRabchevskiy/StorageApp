@@ -7,7 +7,7 @@ namespace BusinessLogic.Helpers
 {
   public static class ProductActionExtensions
   {
-    public static Dictionary<OperationDescription, string> _translations = new Dictionary<OperationDescription, string>()
+    private static readonly Dictionary<OperationDescription, string> _translations = new()
     {
       [OperationDescription.StockRenew] = "Поповненя на склад",
       [OperationDescription.Delete] = "Вилучення зі складу",

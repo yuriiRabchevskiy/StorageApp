@@ -44,7 +44,8 @@ namespace BusinessLogic.Repository.Reports
         return new ApiSale
         {
           Category = products[it.Key].BuildFullName(),
-          Sales = -it.Sum(trn => trn.Price * trn.Quantity),
+          Sales = -it.Sum(trn => trn.Price * trn.Quantity * trn.DiscountMultiplier),
+          Discount = -it.Sum(trn => trn.Price * trn.Quantity * (1 - trn.DiscountMultiplier)),
           BuyPrice = -it.Sum(trn => trn.BuyPrice * trn.Quantity),
           Quantity = -it.Sum(trn => trn.Quantity)
         };

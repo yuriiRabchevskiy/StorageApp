@@ -23,6 +23,8 @@ namespace BusinessLogic.Models.Api
   public class ApiProdSell : ApiProdAction
   {
     public double Price { get; set; }
+
+    public double DiscountMultiplier { get; set; }
     public int IdProduct { get; set; }
   }
 

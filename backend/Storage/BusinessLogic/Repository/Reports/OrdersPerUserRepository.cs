@@ -19,7 +19,7 @@ namespace BusinessLogic.Repository.Reports
 
   public class OrdersOverviewRepository : IOrdersOverviewRepository
   {
-    private IServiceProvider _di;
+    private readonly IServiceProvider _di;
     private readonly IMapper _mapper;
 
     public OrdersOverviewRepository(IServiceProvider serviceProvider, IMapper mapper)
@@ -60,8 +60,10 @@ namespace BusinessLogic.Repository.Reports
           CanceledPrice = canceled.Sum(trn => trn.TotalPrice),
           OpenCount = open.Count,
           OpenPrice = open.Sum(trn => trn.TotalPrice),
+          OpenDiscount = open.Sum(trn => trn.TotalDiscount),
           ClosedCount = closed.Count,
           ClosedPrice = closed.Sum(trn => trn.TotalPrice),
+          CloseDiscount = closed.Sum(trn => trn.TotalDiscount),
           BuyPrice = it.Sum(trn => trn.TotalBuyPrice),
           Quantity = it.Sum(trn => trn.Products.Sum(prod => prod.Quantity))
         };

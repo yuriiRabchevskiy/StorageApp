@@ -13,7 +13,6 @@ using BusinessLogic.Models.Api.State;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Azure;
 using Newtonsoft.Json;
 
 namespace BusinessLogic.Repository
@@ -84,7 +83,7 @@ namespace BusinessLogic.Repository
 
     public void Delete(int id)
     {
-      using var context = _di.GetService<ApplicationDbContext>();
+      using var context = _di.GetRequiredService<ApplicationDbContext>();
       var product = context.Warehouses.Find(id);
       if (product == null) return;
       product.IsActive = false;
@@ -97,7 +96,7 @@ namespace BusinessLogic.Repository
 
     public void RemoveProduct(string userId, int productId, ApiProdAction info)
     {
-      using var context = _di.GetService<ApplicationDbContext>();
+      using var context = _di.GetRequiredService<ApplicationDbContext>();
       var from = getStockAndVerify(productId, info, context);
 
       using var transaction = context.Database.BeginTransaction();
@@ -113,7 +112,8 @@ namespace BusinessLogic.Repository
           Description = info.Description,
           UserId = userId,
           Date = date,
-          Operation = OperationDescription.Delete
+          Operation = OperationDescription.Delete,
+          DiscountMultiplier = 1
         };
         context.ProductsTrqansactions.Add(action);
         context.SaveChanges();
@@ -132,7 +132,7 @@ namespace BusinessLogic.Repository
 
     public void AddProduct(string userId, int productId, ApiProdAction info)
     {
-      using var context = _di.GetService<ApplicationDbContext>();
+      using var context = _di.GetRequiredService<ApplicationDbContext>();
       var from = context.WarehouseProducts.FirstOrDefault(it => it.ProductId == productId && it.WarehouseId == info.FromId);
       if (@from == null)
       {
@@ -157,6 +157,7 @@ namespace BusinessLogic.Repository
           Description = $"Товар додано адміністратором",
           Operation = OperationDescription.StockRenew,
           Price = 0,
+          DiscountMultiplier = 1
         });
         context.SaveChanges();
 
@@ -200,6 +201,7 @@ namespace BusinessLogic.Repository
           Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Зменшення)",
           Operation = OperationDescription.TransferRemove,
           Price = 0,
+          DiscountMultiplier = 1
         });
         context.SaveChanges();
 
@@ -213,6 +215,7 @@ namespace BusinessLogic.Repository
           Description = $"Переміщення товару зі складу {info.FromId} на склад {info.ToId} (Збільшення)",
           Operation = OperationDescription.TransferAdd,
           Price = 0,
+          DiscountMultiplier = 1
         });
         context.SaveChanges();
 
@@ -239,6 +242,9 @@ namespace BusinessLogic.Repository
         await using var context = _di.GetRequiredService<ApplicationDbContext>();
         await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
 
+
+        await verifyOrderIntegrityAsynct(context, info, userId);
+
         var date = DateTime.UtcNow;
         var order = _mapper.Map<Order>(info);
         order.OpenDate = date;
@@ -253,6 +259,7 @@ namespace BusinessLogic.Repository
           FromId = it.FromId,
           Description = it.Description,
           Price = it.Price,
+          DiscountMultiplier = it.DiscountMultiplier,
           Quantity = it.Quantity
         }).ToList();
 
@@ -327,7 +334,8 @@ namespace BusinessLogic.Repository
             Description = it.Description,
             Price = it.Price,
             ProductId = it.IdProduct,
-            FromId = it.FromId
+            FromId = it.FromId,
+            DiscountMultiplier = it.DiscountMultiplier,
           }).ToList();
         // products that were removed from order
         var actionsToRevert = existingProducts
@@ -348,7 +356,9 @@ namespace BusinessLogic.Repository
         var message = $"Відредаговано замовлення {command.Id}";
         productsWithQuantityChanges.ForEach(ep =>
         {
-          var cp = currentProducts.First(cp => ep.ProductId == cp.IdProduct && ep.FromId == cp.FromId);
+          // the same product with the same discount
+          var cp = currentProducts.First(cp => ep.ProductId == cp.IdProduct && ep.FromId == cp.FromId
+                                                                            && ep.DiscountMultiplier == cp.DiscountMultiplier);
           var existingQuantity = -1 * ep.Quantity; // existing quantity is saved with -, so e.g. -1
           var change = cp.Quantity - existingQuantity; // so we take 2 items we want to have - 1 we already have and receive 1 we need to sell
           var action = new ProductRequest()
@@ -357,7 +367,8 @@ namespace BusinessLogic.Repository
             Description = message,
             Price = cp.Price,
             ProductId = cp.IdProduct,
-            FromId = cp.FromId
+            FromId = cp.FromId,
+            DiscountMultiplier = cp.DiscountMultiplier,
           };
           if (change > 0)
           {
@@ -415,12 +426,13 @@ namespace BusinessLogic.Repository
 
       // I assume that 99% of time there is going to be just a single item per product
       // only possible case is when we already have removed some items and re-added those, or when we were already changing quantities
-      var actionsToRevert = order.Transactions.GroupBy(it => new { it.WarehouseId, it.ProductId, it.Price })
+      var actionsToRevert = order.Transactions.GroupBy(it => new { it.WarehouseId, it.ProductId, it.Price, it.DiscountMultiplier })
         .Select(it => new ProductRequest()
         {
           FromId = it.Key.WarehouseId,
           ProductId = it.Key.ProductId,
           Price = it.Key.Price,
+          DiscountMultiplier = it.Key.DiscountMultiplier,
           Quantity = it.Sum(p => p.Quantity),
           Description = null, // we do not modify existing records, so we are not interested in this field
         }).Where(it => it.Quantity != 0).ToList(); // we want to revert only those products that have some quantities 
@@ -469,6 +481,7 @@ namespace BusinessLogic.Repository
           WarehouseId = action.FromId,
           Description = message,
           Price = action.Price,
+          DiscountMultiplier = action.DiscountMultiplier,
           BuyPrice = from.Product.RecommendedBuyPrice,
           UserId = userId,
           Operation = OperationDescription.TransferAdd,
@@ -507,6 +520,7 @@ namespace BusinessLogic.Repository
           WarehouseId = productOrder.FromId,
           Description = productOrder.Description,
           Price = productOrder.Price,
+          DiscountMultiplier = productOrder.DiscountMultiplier,
           BuyPrice = from.Product.RecommendedBuyPrice,
           UserId = userId,
           Operation = OperationDescription.Sold
@@ -525,18 +539,27 @@ namespace BusinessLogic.Repository
       return from;
     }
 
-    private class ProductRequest : ApiProdAction
+    private static async Task<bool> verifyOrderIntegrityAsynct(ApplicationDbContext context, ApiSellOrder order, string userId)
     {
-      public double Price { get; set; }
-
-      public int ProductId { get; set; }
+      var userDiscounts = await context.UserDiscounts.Where(it => it.UserId == userId)
+        .Select(it => it.DiscountMultiplier)
+        .ToListAsync();
+      userDiscounts = userDiscounts.Count == 0 ? new List<double>(new[] { 1.0 }) : userDiscounts;
+      // we need to check that user can actually apply discounts levels to the order
+      if (!userDiscounts.Contains(order.DiscountMultiplier)) return false;
+      if (order.ProductOrders.Any(po => !userDiscounts.Contains(po.DiscountMultiplier))) return false;
+      return true;
     }
 
+    private class ProductRequest : ApiProdAction
+    {
+      public double Price { get; init; }
+
+      public double DiscountMultiplier { get; init; }
+      public int ProductId { get; init; }
+    }
 
     #endregion
-
-
-
 
   }
 }
