@@ -7,7 +7,7 @@ import { ApiResponse, IApiErrorResponse } from '../../models/api';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { ApiService } from '../../shared/services/api.service';
 import { ISUser, IUserToEdit } from './../../models/manage';
-import { IUser, UserRoleName } from './../../models/manage/user';
+import { ICurrentUser, UserRoleName } from './../../models/manage/user';
 
 @Component({
   selector: 'app-users',
@@ -26,7 +26,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
     super(userService, notify, preferences);
   }
 
-  getUserRole(user: IUser) {
+  getUserRole(user: ICurrentUser) {
     return UserRoleName.getRoleName(user.isAdmin, user.role);
   }
 

@@ -12,19 +12,32 @@ export class UserRoleName {
         { label: 'Помічник Адміністратора', value: UserRoleName.adminAssistant },
         { label: 'Продавець', value: UserRoleName.user },
         { label: 'Клієнт', value: UserRoleName.client },
-        { label: 'Завскладу', value: UserRoleName.warehouseManager }    
-      ];
-      
-    static getRoleName(isAdmin: boolean, role: string ) {
+        { label: 'Завскладу', value: UserRoleName.warehouseManager }
+    ];
+
+    static getRoleName(isAdmin: boolean, role: string) {
         if (isAdmin) return 'Адміністратор';
         switch (role) {
-          case UserRoleName.adminAssistant: return 'Помічник Адміністратора';
-          case UserRoleName.user: return 'Продавець';
-          case UserRoleName.warehouseManager: return 'Завскладу';
-          default: return 'Клієнт';
+            case UserRoleName.adminAssistant: return 'Помічник Адміністратора';
+            case UserRoleName.user: return 'Продавець';
+            case UserRoleName.warehouseManager: return 'Завскладу';
+            default: return 'Клієнт';
         }
-    }  
-} 
+    }
+}
+
+export interface ILoginCommand {
+    login: string;
+    password: string;
+}
+
+export interface ICurrentUser {
+    userName: string;
+    token: string;
+    isAdmin: boolean;
+    role: UserRole;
+    discounts: number[];
+}
 
 export interface IUserToEdit {
     id: string;
@@ -34,6 +47,27 @@ export interface IUserToEdit {
     phone: string;
     role: UserRole;
     notes?: string;
+    discounts?: number[];
+}
+
+export interface IUser {
+    id: string;
+    isActive?: boolean;
+    discounts?: number[];
+
+    login: string;
+    name: string;
+    surname: string;
+    email: string;
+    phone: string;
+    notes?: string;
+    isAdmin: boolean;
+    role: UserRole;
+}
+
+export interface IRegisterUserCommand extends IUser {
+    discounts: number[]
+    password: string;
 }
 
 export class UserToEdit implements IUserToEdit {
@@ -44,8 +78,9 @@ export class UserToEdit implements IUserToEdit {
     phone: string;
     notes?: string;
     role: UserRole;
+    discounts: number[] = [1.0];
 
-    public constructor(val: ISUser) {
+    public constructor(val: IUser) {
         this.id = val.id;
         this.login = val.login;
         this.name = val.name;
@@ -53,31 +88,11 @@ export class UserToEdit implements IUserToEdit {
         this.phone = val.phone;
         this.notes = val.notes;
         this.role = val.role;
+
     }
 }
 
-export interface ISUser {
-    id: string;
-    login: string;
-    name: string;
-    surname: string;
-    email: string;
-    phone: string;
-    notes?: string;
-    password: string;
-    isActive?: boolean;
-    isAdmin: boolean;
-    role: UserRole;
-}
-
-export interface IUser {
-    userName: string;
-    token: string;
-    isAdmin: boolean;
-    role: UserRole;
-}
-
-export class User implements ISUser {
+export class User implements IUser {
     id: string;
     token: string;
     login: string = '';
@@ -90,6 +105,7 @@ export class User implements ISUser {
     isActive?: boolean = false;
     isAdmin: boolean = false;
     role: UserRole = 'User';
+    discounts: number[] = [1.0];
 
     public constructor() { }
 }

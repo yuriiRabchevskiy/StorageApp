@@ -1,22 +1,21 @@
-import { Injectable, EventEmitter } from '@angular/core';
-import { IDictionary, Dictionary } from './../../models/dictionary';
-import { IUser } from './../../models/manage/user';
+import { Injectable } from '@angular/core';
+import { ICurrentUser } from './../../models/manage/user';
 
 @Injectable()
 export class UserService {
 
-  private static user: IUser;
+  private static user: ICurrentUser;
 
   static updateUser() {
     UserService.user = JSON.parse(localStorage.getItem('user'));
   }
 
-  setLocal(user: IUser) {
+  setLocal(user: ICurrentUser) {
     UserService.user = user;
     localStorage.setItem('user', JSON.stringify(user));
   }
 
-  getLocal(): IUser {
+  getLocal(): ICurrentUser {
     return UserService.user;
   }
 

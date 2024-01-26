@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
   private desiredUrl: string = '/storage';
 
   constructor(private apiService: ApiService, public userService: UserService,
-    private router: Router, private activeRoute: ActivatedRoute, private notifi: MessageService) {
+    private router: Router, private activeRoute: ActivatedRoute, private notify: MessageService) {
     let query = this.activeRoute.snapshot.queryParams;
     let returnUrl = <string>query['return'];
     if (returnUrl && !returnUrl.startsWith('#/login'))
@@ -89,20 +89,20 @@ export class LoginComponent implements OnInit {
   }
 
   separateUrlAndParams(url: string): IUrlParamsPair {
-    let urlAndParams = this.desiredUrl.split('?');
-    let baseUrl = urlAndParams[0];
+    const urlAndParams = this.desiredUrl.split('?');
+    const baseUrl = urlAndParams[0];
     let params = null;
-    let paramsDictionnary = new Dictionary<string>();
+    const paramsDictionary = new Dictionary<string>();
     if (urlAndParams.length > 1) {
       params = urlAndParams[1]
       let splittedParams = params.split('&');
       splittedParams.forEach(element => {
         let key = element.split('=')[0];
         let value = element.split('=')[1];
-        paramsDictionnary[key] = value;
+        paramsDictionary[key] = value;
       });
     }
-    let rez: IUrlParamsPair = { url: baseUrl, params: paramsDictionnary };
+    let rez: IUrlParamsPair = { url: baseUrl, params: paramsDictionary };
     return rez;
   }
 
@@ -112,7 +112,7 @@ export class LoginComponent implements OnInit {
     this.forgotPass = data;
     this.apiService.forgotPassword(this.forgotPass).subscribe({
       next: res => {
-        this.notifi.add(
+        this.notify.add(
           {
             severity: 'success',
             summary: 'Successfully',
@@ -120,7 +120,7 @@ export class LoginComponent implements OnInit {
           });
       },
       error: (err: IApiErrorResponse) => {
-        this.notifi.add(
+        this.notify.add(
           {
             severity: 'error',
             summary: 'Error',

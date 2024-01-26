@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 
 import { ApiBase } from '../api/base';
 import { ApiResponse } from './../../models/api';
-import { IUser, ISUser, IUserToEdit, IChangePassword } from '../../models/manage/user';
+import { ICurrentUser, IUser, IUserToEdit, IChangePassword, IRegisterUserCommand, ILoginCommand } from '../../models/manage/user';
 import { IProduct } from './../../models/storage/products';
 import { IWarehouse } from '../../models/storage/werehouse';
 import { ICategory } from './../../models/storage/categories';
@@ -28,7 +28,7 @@ export class ApiService extends ApiBase {
 
     checkAuth(): Observable<ApiResponse<boolean>> { return this.doPost('account/auth', {}); }
 
-    login(data): Observable<ApiResponse<IUser>> {
+    login(data: ILoginCommand): Observable<ApiResponse<ICurrentUser>> {
         return this.doPost('account/login', data);
     }
 
@@ -158,7 +158,7 @@ export class ApiService extends ApiBase {
     }
 
     // manage method
-    getUsers(): Observable<ApiResponse<ISUser>> {
+    getUsers(): Observable<ApiResponse<IUser>> {
         return this.doGet('user');
     }
 
@@ -166,7 +166,7 @@ export class ApiService extends ApiBase {
         return this.doPost('user/' + id, user);
     }
 
-    addUser(user: ISUser): Observable<ApiResponse<string>> {
+    addUser(user: IUser): Observable<ApiResponse<string>> {
         return this.doPut('user', user);
     }
 
