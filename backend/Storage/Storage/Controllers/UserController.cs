@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using SharedDataContracts.Api.Response;
 using BusinessLogic.Models.Api;
@@ -10,6 +11,8 @@ using AutoMapper;
 using BusinessLogic.Models.Response;
 using BusinessLogic.Models.User;
 using Bv.Meter.WebApp.Common.Exceptions;
+using DataAccess;
+using Microsoft.EntityFrameworkCore;
 using Storage.Code.Services;
 
 namespace Storage.Controllers
@@ -44,7 +47,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("{id}")]
-    public async Task<ApiResponseBase> EditUser(string id, [FromBody] RegisterDto model)
+    public async Task<ApiResponseBase> EditUser(string id, [FromBody] EditUserCommand model, [FromServices] ApplicationDbContext context)
     {
       var user = await _userManager.FindByIdAsync(id);
       user.Surname = model.Surname;
@@ -70,59 +73,89 @@ namespace Storage.Controllers
 
         await _userManager.AddToRoleAsync(user, model.Role);
       }
+
+
+      await updateDiscountsInfo(id, model, context);
+
       return new ApiResponseBase();
     }
 
-    [HttpPut]
-    public async Task<ApiResponseBase> Register([FromBody] RegisterDto model)
+    private static async Task updateDiscountsInfo(string id, EditUserCommand model, ApplicationDbContext context)
     {
-      var user = new ApplicationUser
+      var userDb = await context.Users.Include(it => it.Discounts).FirstAsync(it => it.Id == id);
+      if (userDb.Discounts.Count == 1)
       {
-        UserName = model.Login,
-        Email = model.Email,
-        Name = model.Name,
-        Surname = model.Surname,
-        Phone = model.Phone,
-        IsActive = true
-      };
-      var result = await _userManager.CreateAsync(user, model.Password);
-      if (!result.Succeeded) throw new ApiErrorsException(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
-      if (UserRole.IsSupportedRole(model.Role))
-      {
-        await _userManager.AddToRoleAsync(user, model.Role);
+        var firstDiscount = userDb.Discounts.First();
+        if (model.DiscountMultiplier == firstDiscount.DiscountMultiplier) return;
+        firstDiscount.DiscountMultiplier = model.DiscountMultiplier;
       }
       else
       {
-        await _userManager.AddToRoleAsync(user, UserRole.User);
+        var exists = userDb.Discounts.FirstOrDefault(it => it.DiscountMultiplier == model.DiscountMultiplier);
+        if (exists != null) return;
+        userDb.Discounts.Add(new UserDiscount()
+        {
+          DiscountMultiplier = model.DiscountMultiplier
+        });
       }
-
-      try
-      {
-        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(false);
-      }
-      catch
-      {
-        // optional feature
-      }
-
-      //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
-      //await _emailSender.SendEmailAsync(model.Email, "Підтвердження аккаунту", $"Будь ласка підтвердіть ваш аккаунт перейшовши за посиланням: <a href='{callbackUrl}'>посилання</a>");
-
-      return new ApiResponseBase();
+      await context.SaveChangesAsync();
     }
 
 
-    [HttpDelete("{id}")]
-    public async Task<ApiResponseBase> Deactivate(string id)
+  [HttpPut]
+  public async Task<ApiResponseBase> Register([FromBody] RegisterUserCommand model)
+  {
+    var user = new ApplicationUser
     {
-      var user = await _userManager.FindByIdAsync(id);
-      user.IsActive = false;
-      var result = await _userManager.UpdateAsync(user);
-      if (!result.Succeeded) throw new ApiErrorsException(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
-
-      return new ApiResponseBase();
+      UserName = model.Login,
+      Email = model.Email,
+      Name = model.Name,
+      Surname = model.Surname,
+      Phone = model.Phone,
+      IsActive = true,
+      Discounts = new List<UserDiscount>(new[]{new UserDiscount()
+        {
+          DiscountMultiplier = model.DiscountMultiplier
+        }})
+    };
+    var result = await _userManager.CreateAsync(user, model.Password);
+    if (!result.Succeeded) throw new ApiErrorsException(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
+    if (UserRole.IsSupportedRole(model.Role))
+    {
+      await _userManager.AddToRoleAsync(user, model.Role);
+    }
+    else
+    {
+      await _userManager.AddToRoleAsync(user, UserRole.User);
     }
 
+    try
+    {
+      var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+      await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(false);
+    }
+    catch
+    {
+      // optional feature
+    }
+
+    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
+    //await _emailSender.SendEmailAsync(model.Email, "Підтвердження аккаунту", $"Будь ласка підтвердіть ваш аккаунт перейшовши за посиланням: <a href='{callbackUrl}'>посилання</a>");
+
+    return new ApiResponseBase();
   }
+
+
+  [HttpDelete("{id}")]
+  public async Task<ApiResponseBase> Deactivate(string id)
+  {
+    var user = await _userManager.FindByIdAsync(id);
+    user.IsActive = false;
+    var result = await _userManager.UpdateAsync(user);
+    if (!result.Succeeded) throw new ApiErrorsException(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
+
+    return new ApiResponseBase();
+  }
+
+}
 }

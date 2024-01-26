@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 
 namespace BusinessLogic.Models.User
 {
@@ -52,13 +50,25 @@ namespace BusinessLogic.Models.User
     public string Phone { get; set; }
     public bool IsAdmin { get; set; } = false;
     public string Role { get; set; } = User.UserRole.User;
+
+    public List<double> Discounts { get; set; }
   }
 
-  public class RegisterDto : UserDto
+  public class RegisterUserCommand : UserDto
   {
     [Required]
     [StringLength(100, ErrorMessage = "PASSWORD_MIN_LENGTH", MinimumLength = 6)]
     public string Password { get; set; }
+
+    [Range(0.0, 1.0, ErrorMessage = "Множник знижки має бути між 0 і 1 ")]
+    public double DiscountMultiplier { get; set; } = 1.0;
+  }
+
+  public class EditUserCommand : UserDto
+  {
+
+    [Range(0.0, 1.0, ErrorMessage = "Множник знижки має бути між 0 і 1 ")]
+    public double DiscountMultiplier { get; set; } = 1.0;
   }
 
   public class LoginResult
@@ -67,6 +77,8 @@ namespace BusinessLogic.Models.User
     public string UserName { get; set; }
     public bool IsAdmin { get; set; } = false;
     public string Role { get; set; } = User.UserRole.User;
+
+    public List<double> UserDiscounts { get; set; }
   }
 
   public class ForgotPasswordModel

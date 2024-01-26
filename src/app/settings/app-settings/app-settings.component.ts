@@ -5,7 +5,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { UserService } from '@app/shared/services/user.service';
 import { MessageService } from 'primeng/api';
 import { SecuredComponent } from '../../models/component/base-api.component';
-import { IUser } from '../../models/manage/user';
+import { ICurrentUser } from '../../models/manage/user';
 import { matchOtherValidator } from '../../shared/directive/math-validator';
 import { ApiService } from '../../shared/services/api.service';
 import { ChangePassword, IChangePassword } from './../../models/manage/user';
@@ -17,7 +17,7 @@ import { ChangePassword, IChangePassword } from './../../models/manage/user';
 })
 
 export class AppSettingsComponent extends SecuredComponent implements OnInit {
-  user: IUser;
+  user: ICurrentUser;
   newPass: IChangePassword;
   hide: boolean = true;
   userForm: FormGroup;

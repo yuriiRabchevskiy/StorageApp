@@ -5,7 +5,7 @@ import { ViewState } from '../../shared/helpers';
 import { ApiResponse, IApiErrorInfo, IApiErrorResponse } from '../api';
 import { UserService } from './../../shared/services/user.service';
 import { WorkProgress } from './work-progress';
-import { UserRoleName } from '../manage/user';
+import { ICurrentUser, UserRoleName } from '../manage/user';
 
 export abstract class SecuredComponent {
   public view: ViewState = new ViewState();
@@ -15,6 +15,9 @@ export abstract class SecuredComponent {
   public isAdminAssistant: boolean = false;
   public isClient: boolean = false;
   public isWarehouseManager: boolean = false;
+
+  public userDiscountPercent: number = 0;
+  public userDiscountMultiplier: number = 1.0;
 
   constructor(public userService: UserService, protected notify: MessageService) {
 
@@ -26,6 +29,8 @@ export abstract class SecuredComponent {
     this.isAdmin = user.isAdmin;
     this.canView = user.isAdmin;
     this.canEdit = user.isAdmin;
+
+    this.getClientDiscountsInfo(user);
   }
 
   cloneModel<T>(source: T): T {
@@ -61,6 +66,17 @@ export abstract class SecuredComponent {
         summary: summary,
         detail: message
       });
+  }
+
+  private getClientDiscountsInfo(user: ICurrentUser) {
+    if (!this.isClient) return false;
+
+    // client user can see it's own discount
+    // such client should have exactly 1 discount value
+    const userDiscount = user.discounts?.length == 1 && user.discounts[0];    
+    if (userDiscount > 1 || userDiscount < 0) return false; // discount has to be between 0 and 1
+    this.userDiscountMultiplier = userDiscount;
+    this.userDiscountPercent = (1 - userDiscount) * 100;
   }
 }
 

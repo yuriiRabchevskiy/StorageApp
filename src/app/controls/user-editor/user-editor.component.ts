@@ -18,7 +18,9 @@ export class UserEditorComponent implements OnInit {
   phone: FormControl;
   notes: FormControl;
   role: FormControl;
+  discountPercent: FormControl;
 
+  UserRoleName = UserRoleName;
   userRoles = UserRoleName.selectionList;
 
   _user: ISUser;
@@ -42,7 +44,9 @@ export class UserEditorComponent implements OnInit {
     this.createFormControls();
     this.createUserForm();
   }
+
   createFormControls() {
+    const discountPercent = this.detDiscountPercent(this.userToEdit.discounts)
     this.login = new FormControl(this.userToEdit.login, [
       Validators.required
     ]);
@@ -51,6 +55,7 @@ export class UserEditorComponent implements OnInit {
     this.phone = new FormControl(this.userToEdit.phone);
     this.role = new FormControl(this.userToEdit.role);
     this.notes = new FormControl(this.userToEdit.notes);
+    this.discountPercent = new FormControl(discountPercent);
   }
 
   createUserForm() {
@@ -61,16 +66,28 @@ export class UserEditorComponent implements OnInit {
       phone: this.phone,
       role: this.role,
       notes: this.notes,
+      discountPercent: this.discountPercent
     });
   }
 
   save(event: Event) {
     event.preventDefault();
     if (!this.userForm.valid) return;
-    this.saveChange.emit(this.userForm.value);
+    const result: IUserToEdit = {
+      ...this.userForm.value
+    }
+    result.discounts = [this.discountPercent.value];
+    this.saveChange.emit(result);
   }
 
   closeDialog() {
     this.onCloseDialog.emit(false);
+  }
+
+  private detDiscountPercent(discounts?: number[]) {
+    if (!discounts || discounts.length !== 1) return 0;
+    const discountMultiplier = discounts[0];
+    if (discountMultiplier < 0 || discountMultiplier > 1) return 0;
+    return (1 - discountMultiplier) * 100;
   }
 }

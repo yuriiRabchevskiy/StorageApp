@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using BusinessLogic.Models.Response;
 using BusinessLogic.Models.User;
 using Bv.Meter.WebApp.Common.Exceptions;
+using DataAccess;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using SharedDataContracts.Api.Response;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Storage.Code.Services;
 
 namespace Storage.Controllers
@@ -41,14 +43,17 @@ namespace Storage.Controllers
     }
 
     [HttpPost("login")]
-    public async Task<ApiResponse<LoginResult>> Login([FromBody] LoginDto model)
+    public async Task<ApiResponse<LoginResult>> Login([FromBody] LoginDto model, [FromServices] ApplicationDbContext context)
     {
       var result = await _signInManager.PasswordSignInAsync(model.Login, model.Password, false, false);
 
       if (result.Succeeded)
       {
-        var appUser = _userManager.Users.SingleOrDefault(r => (r.UserName ?? "").ToLower() == (model.Login ?? "").ToLower());
+        var appUser = _userManager.Users.Single(r => (r.UserName ?? "").ToLower() == (model.Login ?? "").ToLower());
         if (!appUser.IsActive) throw new AuthenticationException("User is deactivated");
+
+        var userDiscounts = await context.UserDiscounts.Where(it => it.UserId == appUser.Id).Select(it => it.DiscountMultiplier)
+          .OrderByDescending(it => it).ToListAsync();
 
         var userRoles = await _userManager.GetRolesAsync(appUser).ConfigureAwait(false);
         var response = new ApiResponse<LoginResult>(new LoginResult
@@ -57,6 +62,7 @@ namespace Storage.Controllers
           UserName = appUser.UserName,
           IsAdmin = await _userManager.IsInRoleAsync(appUser, UserRole.Admin).ConfigureAwait(false),
           Role = userRoles.FirstOrDefault(),
+          UserDiscounts = userDiscounts
         });
         return response;
       }
