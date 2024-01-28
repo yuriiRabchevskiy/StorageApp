@@ -38,6 +38,7 @@ namespace BusinessLogic.Models.Api
   public class ApiEditSellOrder
   {
     public int Id { get; set; }
+    public double DiscountMultiplier { get; set; }
     public IEnumerable<ApiProdSell> ProductOrders { get; set; }
   }
 

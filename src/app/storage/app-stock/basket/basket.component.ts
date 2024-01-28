@@ -86,7 +86,7 @@ export class BasketComponent extends SecuredComponent {
 
   getOrderTotal() {
     if (!this.items) return;
-    return this.items.map((it) => it.prodOrder.price * it.prodOrder.quantity).reduce((a, b) => a + b);
+    return this.items.map((it) => it.prodOrder.price * it.prodOrder.quantity * it.prodOrder.discountMultiplier).reduce((a, b) => a + b);
   }
 
   save() {
@@ -135,7 +135,10 @@ export class BasketComponent extends SecuredComponent {
     this.isSaving = true;
     const basket = this.basketService;
     const productOrders = basket.sellList.map(it => it.prodOrder);
-    this.apiService.editSale(basket.orderId, { productOrders }).subscribe({
+    this.apiService.editSale(basket.orderId, {
+      productOrders: productOrders,
+      discountMultiplier: basket.orderDiscountMultiplier
+    }).subscribe({
       next: (res) => {
         this.isSaving = false;
         this.onCloseDialog.emit(true);
