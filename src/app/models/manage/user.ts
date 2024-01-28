@@ -1,5 +1,12 @@
 declare type UserRole = 'Admin' | 'AdminAssistant' | 'User' | 'Client' | 'WarehouseManager';
 
+export function detDiscountPercent(discounts?: number[]) {
+    if (!discounts || discounts.length !== 1) return 0;
+    const discountMultiplier = discounts[0];
+    if (discountMultiplier < 0 || discountMultiplier > 1) return 0;
+    return Math.round((1 - discountMultiplier) * 100);
+  }
+
 export class UserRoleName {
     static admin: UserRole = 'Admin';
     static adminAssistant: UserRole = 'AdminAssistant';
@@ -36,7 +43,7 @@ export interface ICurrentUser {
     token: string;
     isAdmin: boolean;
     role: UserRole;
-    discounts: number[];
+    discountMultipliers: number[];
 }
 
 export interface IUserToEdit {
@@ -47,13 +54,14 @@ export interface IUserToEdit {
     phone: string;
     role: UserRole;
     notes?: string;
-    discounts?: number[];
+    discountMultipliers?: number[];
 }
 
 export interface IUser {
     id: string;
     isActive?: boolean;
-    discounts?: number[];
+    discountMultipliers?: number[];
+    discountPercent?: number;
 
     login: string;
     name: string;
@@ -78,7 +86,7 @@ export class UserToEdit implements IUserToEdit {
     phone: string;
     notes?: string;
     role: UserRole;
-    discounts: number[] = [1.0];
+    discountMultipliers: number[] = [1.0];
 
     public constructor(val: IUser) {
         this.id = val.id;
@@ -88,6 +96,7 @@ export class UserToEdit implements IUserToEdit {
         this.phone = val.phone;
         this.notes = val.notes;
         this.role = val.role;
+        this.discountMultipliers = val.discountMultipliers;
 
     }
 }
@@ -105,7 +114,7 @@ export class User implements IUser {
     isActive?: boolean = false;
     isAdmin: boolean = false;
     role: UserRole = 'User';
-    discounts: number[] = [1.0];
+    discountMultipliers: number[] = [1.0];
 
     public constructor() { }
 }

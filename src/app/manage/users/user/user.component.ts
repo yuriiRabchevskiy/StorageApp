@@ -5,10 +5,9 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { matchOtherValidator } from '../../../shared/directive/math-validator';
 import { ApiService } from '../../../shared/services/api.service';
-import { ISUser } from './../../../models/manage';
-import { User, UserRoleName } from './../../../models/manage/user';
+import { User, IUser, UserRoleName } from './../../../models/manage/user';
 
-export function nameValidator(items: ISUser[]): ValidatorFn {
+export function nameValidator(items: IUser[]): ValidatorFn {
   return (control: AbstractControl): any => {
     const name = items.some(it => it.login === control.value);
     return name ? { invalid: control.value } : null;
@@ -36,12 +35,12 @@ export class UserComponent implements OnInit {
   role: FormControl;
   userRoles = UserRoleName.selectionList;
 
-  user: ISUser;
+  user: IUser;
 
-  @Input() userList: ISUser[] = [];
+  @Input() userList: IUser[] = [];
 
   @Output() onCloseDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Output() saveUser: EventEmitter<ISUser> = new EventEmitter<ISUser>();
+  @Output() saveUser: EventEmitter<IUser> = new EventEmitter<IUser>();
 
   constructor(private apiService: ApiService, public router: Router,
     iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {

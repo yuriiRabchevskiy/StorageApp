@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 
 import { ApiBase } from '../api/base';
 import { ApiResponse } from './../../models/api';
-import { ICurrentUser, IUser, IUserToEdit, IChangePassword, IRegisterUserCommand, ILoginCommand } from '../../models/manage/user';
+import { ICurrentUser, IUser, IUserToEdit, IChangePassword, ILoginCommand, detDiscountPercent } from '../../models/manage/user';
 import { IProduct } from './../../models/storage/products';
 import { IWarehouse } from '../../models/storage/werehouse';
 import { ICategory } from './../../models/storage/categories';
@@ -159,15 +159,17 @@ export class ApiService extends ApiBase {
 
     // manage method
     getUsers(): Observable<ApiResponse<IUser>> {
-        return this.doGet('user');
+        return this.doGet<IUser>('user').pipe(tap(x => {
+            x.items.map(u => u.discountPercent = detDiscountPercent(u.discountMultipliers))
+        }));
     }
 
     editUser(id: string, user: IUserToEdit): Observable<any> {
-        return this.doPost('user/' + id, user);
+        return this.doPut('user/' + id, user);
     }
 
     addUser(user: IUser): Observable<ApiResponse<string>> {
-        return this.doPut('user', user);
+        return this.doPost('user', user);
     }
 
     deleteUser(id) {

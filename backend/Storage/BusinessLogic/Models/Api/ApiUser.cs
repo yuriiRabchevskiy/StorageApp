@@ -19,5 +19,7 @@ namespace BusinessLogic.Models.Api
     public bool IsAdmin { get; set; }
     public string Role { get; set; } = User.UserRole.User;
 
+    public List<double> DiscountMultipliers { get; set; }
+
   }
 }

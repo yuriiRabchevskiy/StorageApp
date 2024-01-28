@@ -43,7 +43,8 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     { title: 'Колір', field: 'color' },
     { title: 'Нотатки', field: 'freeNote', width: 300 },
     { title: 'Ціна покупки', field: 'recommendedBuyPrice', width: 110, hideFilter: true, shouldHideFunc: () => !this.canView },
-    { title: 'Ціна продажу', field: 'recommendedSalePrice', width: 110, hideFilter: true },
+    { title: 'Ціна', field: 'recommendedSalePrice', width: 110, hideFilter: true },
+    { title: 'Спец-ціна', field: 'discountedPrice', width: 110, hideFilter: true, shouldHideFunc: () => this.isClient },
     { title: 'Id', field: 'id', width: 46, hideFilter: true, shouldHideFunc: () => !this.canView },
   ];
 
@@ -310,7 +311,10 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
 
   onDataReceived(res: ApiResponse<IProduct>) {
     this._productsState.set(res.revision);
-    res.items.map(it => this.updateBalanceFields(it, it.balance));
+    res.items.map(it => {
+      this.updateBalanceFields(it, it.balance);
+      it.discountedPrice = this.getDiscountedPrice(it.recommendedSalePrice);
+    });
     super.onDataReceived(res);
     this.findTotalBalance(this.selectedItem);
   }

@@ -19,7 +19,7 @@
     <p-table class="prime-table" [value]="filteredData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
         [pageLinks]="4" [rows]="100" selectionMode="single" [responsive]="true" [scrollable]="true" scrollWidth="100%"
         scrollHeight="calc(100% - 54px)" #dt dataKey="id"
-        [globalFilterFields]="['login', 'email', 'name', 'surname', 'phone', 'isAdmin']">
+        [globalFilterFields]="['login', 'email', 'name', 'surname', 'phone', 'isAdmin', 'discountPercent']">
         <ng-template pTemplate="colgroup">
             <colgroup *ngIf="view.isMobile">
                 <col>
@@ -32,6 +32,7 @@
                 <col>
                 <col>
                 <col width="120px">
+                <col>
                 <col>
             </colgroup>
         </ng-template>
@@ -61,6 +62,10 @@
                     Роль
                     <p-sortIcon field="isAdmin"></p-sortIcon>
                 </th>
+                <th pSortableColumn="discountPercent">
+                    Знижка %
+                    <p-sortIcon field="discountPercent"></p-sortIcon>
+                </th>
                 <th>Нотатки</th>
             </tr>
         </ng-template>
@@ -77,7 +82,7 @@
                     {{ getUserRole(rowData) }}
 
                 </td>
-
+                <td>{{rowData.discountPercent}}</td>
                 <td>{{rowData.notes}}</td>
             </tr>
         </ng-template>

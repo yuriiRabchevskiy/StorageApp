@@ -11,7 +11,8 @@ export class ColumnsPickerComponent implements OnInit {
   private _columns: ITableColumn[];
   public get columns() { return this._columns; }
   @Input() public set columns(value: ITableColumn[]) {
-    this._columns = value;
+    const safeColumns = value || [];
+    this._columns = safeColumns.filter(sc => !sc.shouldHideFunc || !sc.shouldHideFunc());
   }
 
   private _hiddenColumns: Set<string>;

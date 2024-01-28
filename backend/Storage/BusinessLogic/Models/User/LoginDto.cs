@@ -24,8 +24,6 @@ namespace BusinessLogic.Models.User
   }
 
 
-
-
   public class LoginDto
   {
     [Required]
@@ -51,7 +49,7 @@ namespace BusinessLogic.Models.User
     public bool IsAdmin { get; set; } = false;
     public string Role { get; set; } = User.UserRole.User;
 
-    public List<double> Discounts { get; set; }
+    public List<double> DiscountMultipliers { get; set; }
   }
 
   public class RegisterUserCommand : UserDto
@@ -61,14 +59,14 @@ namespace BusinessLogic.Models.User
     public string Password { get; set; }
 
     [Range(0.0, 1.0, ErrorMessage = "Множник знижки має бути між 0 і 1 ")]
-    public double DiscountMultiplier { get; set; } = 1.0;
+    public List<double> DiscountMultipliers { get; set; } = new(new []{ 1.0 });
   }
 
   public class EditUserCommand : UserDto
   {
 
     [Range(0.0, 1.0, ErrorMessage = "Множник знижки має бути між 0 і 1 ")]
-    public double DiscountMultiplier { get; set; } = 1.0;
+    public List<double> DiscountMultipliers { get; set; } = new(new[] { 1.0 });
   }
 
   public class LoginResult
@@ -78,7 +76,7 @@ namespace BusinessLogic.Models.User
     public bool IsAdmin { get; set; } = false;
     public string Role { get; set; } = User.UserRole.User;
 
-    public List<double> UserDiscounts { get; set; }
+    public List<double> DiscountMultipliers { get; set; }
   }
 
   public class ForgotPasswordModel

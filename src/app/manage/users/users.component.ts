@@ -6,7 +6,7 @@ import { MessageService } from 'primeng/api';
 import { ApiResponse, IApiErrorResponse } from '../../models/api';
 import { ApiListComponent } from '../../models/component/list-api.component';
 import { ApiService } from '../../shared/services/api.service';
-import { ISUser, IUserToEdit } from './../../models/manage';
+import { IUser, IUserToEdit } from './../../models/manage';
 import { ICurrentUser, UserRoleName } from './../../models/manage/user';
 
 @Component({
@@ -14,8 +14,8 @@ import { ICurrentUser, UserRoleName } from './../../models/manage/user';
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss']
 })
-export class UsersComponent extends ApiListComponent<ISUser> {
-  selectedItem: ISUser;
+export class UsersComponent extends ApiListComponent<IUser> {
+  selectedItem: IUser;
 
   displayDialog: boolean = false;
   displayEditDialog: boolean = false;
@@ -30,7 +30,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
     return UserRoleName.getRoleName(user.isAdmin, user.role);
   }
 
-  onRowClick(user: ISUser) {
+  onRowClick(user: IUser) {
     if (this.selectedItem.id !== user.id) {
       this.selectedItem = user;
       return;
@@ -56,7 +56,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
   }
 
 
-  delete(val: ISUser) {
+  delete(val: IUser) {
     const deleteUser = val;
     this.work.showSpinner = true;
     this.apiService.deleteUser(deleteUser.id).subscribe({
@@ -85,7 +85,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
     }
   }
 
-  save(val: ISUser) {
+  save(val: IUser) {
     const user = val;
     this.apiService.addUser(user).subscribe({
       next: res => {
@@ -141,7 +141,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
     return this.apiService.getUsers();
   }
 
-  onDataReceived(res: ApiResponse<ISUser>) {
+  onDataReceived(res: ApiResponse<IUser>) {
     super.onDataReceived(res);
   }
 
@@ -157,7 +157,7 @@ export class UsersComponent extends ApiListComponent<ISUser> {
   }
 
   // for update field in p-table
-  updateField(user: ISUser, val) {
+  updateField(user: IUser, val) {
     Object.keys(val).map(key => user[key] = val[key]);
   }
 

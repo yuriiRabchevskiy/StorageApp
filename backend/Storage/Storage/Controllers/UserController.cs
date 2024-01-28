@@ -34,19 +34,21 @@ namespace Storage.Controllers
 
     // GET api/values
     [HttpGet]
-    public ApiResponse<ApiUser> Get()
+    public ApiResponse<ApiUser> Get([FromServices] ApplicationDbContext context)
     {
-      var users = new ApiResponse<ApiUser>(_userManager.Users.Where(it => it.IsActive).ToList().Select(it =>
+      var dbUsers = context.Users.Include(it => it.Discounts).Where(it => it.IsActive).ToList();
+      var users = new ApiResponse<ApiUser>(dbUsers.Select(it =>
       {
         var user = _mapper.Map<ApiUser>(it);
         user.IsAdmin = _userManager.IsInRoleAsync(it, UserRole.Admin).Result;
         user.Role = _userManager.GetRolesAsync(it).Result.FirstOrDefault();
+        user.DiscountMultipliers = it.Discounts.Select(x => x.DiscountMultiplier).OrderByDescending(x => x).ToList();
         return user;
       }).ToList());
       return users;
     }
 
-    [HttpPost("{id}")]
+    [HttpPut("{id}")]
     public async Task<ApiResponseBase> EditUser(string id, [FromBody] EditUserCommand model, [FromServices] ApplicationDbContext context)
     {
       var user = await _userManager.FindByIdAsync(id);
@@ -80,82 +82,71 @@ namespace Storage.Controllers
       return new ApiResponseBase();
     }
 
-    private static async Task updateDiscountsInfo(string id, EditUserCommand model, ApplicationDbContext context)
+    private static async Task updateDiscountsInfo(string id, EditUserCommand edited, ApplicationDbContext context)
     {
       var userDb = await context.Users.Include(it => it.Discounts).FirstAsync(it => it.Id == id);
-      if (userDb.Discounts.Count == 1)
-      {
-        var firstDiscount = userDb.Discounts.First();
-        if (model.DiscountMultiplier == firstDiscount.DiscountMultiplier) return;
-        firstDiscount.DiscountMultiplier = model.DiscountMultiplier;
-      }
-      else
-      {
-        var exists = userDb.Discounts.FirstOrDefault(it => it.DiscountMultiplier == model.DiscountMultiplier);
-        if (exists != null) return;
-        userDb.Discounts.Add(new UserDiscount()
-        {
-          DiscountMultiplier = model.DiscountMultiplier
-        });
-      }
+      var exitingMultipliers = userDb.Discounts.Select(it => it.DiscountMultiplier).ToList();
+      var deletedDiscounts = userDb.Discounts.Where(ex => !edited.DiscountMultipliers.Contains(ex.DiscountMultiplier)).ToList();
+      var newDiscounts = edited.DiscountMultipliers.Where(mul => !exitingMultipliers.Contains(mul)).ToList();
+
+      context.RemoveRange(deletedDiscounts);
+      newDiscounts.ForEach(mul => userDb.Discounts.Add(new UserDiscount { DiscountMultiplier = mul }));
+
       await context.SaveChangesAsync();
     }
 
 
-  [HttpPut]
-  public async Task<ApiResponseBase> Register([FromBody] RegisterUserCommand model)
-  {
-    var user = new ApplicationUser
+    [HttpPost]
+    public async Task<ApiResponseBase> Register([FromBody] RegisterUserCommand model)
     {
-      UserName = model.Login,
-      Email = model.Email,
-      Name = model.Name,
-      Surname = model.Surname,
-      Phone = model.Phone,
-      IsActive = true,
-      Discounts = new List<UserDiscount>(new[]{new UserDiscount()
-        {
-          DiscountMultiplier = model.DiscountMultiplier
-        }})
-    };
-    var result = await _userManager.CreateAsync(user, model.Password);
-    if (!result.Succeeded) throw new ApiErrorsException(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
-    if (UserRole.IsSupportedRole(model.Role))
-    {
-      await _userManager.AddToRoleAsync(user, model.Role);
-    }
-    else
-    {
-      await _userManager.AddToRoleAsync(user, UserRole.User);
+      var user = new ApplicationUser
+      {
+        UserName = model.Login,
+        Email = model.Email,
+        Name = model.Name,
+        Surname = model.Surname,
+        Phone = model.Phone,
+        IsActive = true,
+        Discounts = model.DiscountMultipliers.Select(mul => new UserDiscount { DiscountMultiplier = mul }).ToList(),
+      };
+      var result = await _userManager.CreateAsync(user, model.Password);
+      if (!result.Succeeded) throw new ApiErrorsException(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
+      if (UserRole.IsSupportedRole(model.Role))
+      {
+        await _userManager.AddToRoleAsync(user, model.Role);
+      }
+      else
+      {
+        await _userManager.AddToRoleAsync(user, UserRole.User);
+      }
+
+      try
+      {
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(false);
+      }
+      catch
+      {
+        // optional feature
+      }
+
+      //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
+      //await _emailSender.SendEmailAsync(model.Email, "Підтвердження аккаунту", $"Будь ласка підтвердіть ваш аккаунт перейшовши за посиланням: <a href='{callbackUrl}'>посилання</a>");
+
+      return new ApiResponseBase();
     }
 
-    try
+
+    [HttpDelete("{id}")]
+    public async Task<ApiResponseBase> Deactivate(string id)
     {
-      var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-      await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(false);
-    }
-    catch
-    {
-      // optional feature
+      var user = await _userManager.FindByIdAsync(id);
+      user.IsActive = false;
+      var result = await _userManager.UpdateAsync(user);
+      if (!result.Succeeded) throw new ApiErrorsException(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
+
+      return new ApiResponseBase();
     }
 
-    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, HttpContext.Request.Scheme);
-    //await _emailSender.SendEmailAsync(model.Email, "Підтвердження аккаунту", $"Будь ласка підтвердіть ваш аккаунт перейшовши за посиланням: <a href='{callbackUrl}'>посилання</a>");
-
-    return new ApiResponseBase();
   }
-
-
-  [HttpDelete("{id}")]
-  public async Task<ApiResponseBase> Deactivate(string id)
-  {
-    var user = await _userManager.FindByIdAsync(id);
-    user.IsActive = false;
-    var result = await _userManager.UpdateAsync(user);
-    if (!result.Succeeded) throw new ApiErrorsException(result.Errors.Select(it => new ApiError { Message = it.Description }).ToList());
-
-    return new ApiResponseBase();
-  }
-
-}
 }
