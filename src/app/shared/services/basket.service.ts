@@ -7,6 +7,7 @@ import { IProdOrder } from '@app/models/storage/products';
 export class BasketService {
 
     public orderId: number = undefined;
+    public orderDiscountMultiplier = 1.0;
     public sellList: IProdOrder[] = [];
 
     public get isEditing() {
@@ -39,11 +40,13 @@ export class BasketService {
     public reset() {
         this.sellList = [];
         this.orderId = undefined;
+        this.orderDiscountMultiplier = 1.0;
     }
 
     public restore(order: IOrder) {
         this.reset();
         this.orderId = order.id;
+        this.orderDiscountMultiplier = order.discountMultiplier;
         const sellList: IProdOrder[] = order.products.map(p => {
             return {
                 prodOrder: {
@@ -52,6 +55,7 @@ export class BasketService {
                     quantity: p.quantity,
                     description: "Відновлена корзина",
                     fromId: p.warehouseId,
+                    discountMultiplier: p.discountMultiplier,
                 },
                 product: p.product
             };

@@ -69,7 +69,8 @@ export abstract class SecuredComponent {
   }
 
   private getClientDiscountsInfo(user: ICurrentUser) {
-    // temp if (!this.isClient) return false;
+    // temp 
+    if (!this.isClient) return false;
 
     // client user can see it's own discount
     // such client should have exactly 1 discount value

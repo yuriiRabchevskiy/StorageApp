@@ -5,6 +5,7 @@ export interface ISell {
     quantity: number;
     description?: string;
     price: number;
+    discountMultiplier: number;
 }
 
 export class Sell implements ISell {
@@ -13,7 +14,9 @@ export class Sell implements ISell {
     quantity: number = 1;
     description?: string;
     price: number;
+    discountMultiplier: number;
     public constructor(price: number) {
         this.price = price;
+        this.discountMultiplier = 1.0;
     }
 }

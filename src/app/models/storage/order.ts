@@ -34,6 +34,7 @@ export interface IOrder {
     closeDate?: Date;
     seller?: string;
     products?: ITransaction[]; // to display for user
+    discountMultiplier?: number;
 
     // client properties
     date?: string;
@@ -59,10 +60,12 @@ export interface IOrderAction {
 
 export interface ISaleOrder extends IOrder {
     productOrders: ISell[];
+    discountMultiplier?: number;
 }
 
 export interface IEditSaleOrder {
     productOrders: ISell[];
+    discountMultiplier?: number;
 }
 
 export interface ITransaction {
@@ -72,6 +75,7 @@ export interface ITransaction {
     buyPrice: number;
     totalPrice: number;
     warehouseId: number;
+    discountMultiplier?: number;
 }
 
 export class Order implements IOrder {
@@ -88,6 +92,7 @@ export class Order implements IOrder {
     openDate?: Date;
     closeDate?: Date;
     seller?: string;
+    discountMultiplier?: number = 1.0;
 
     products?: ITransaction[]; // to display for user
 

@@ -44,7 +44,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     { title: 'Нотатки', field: 'freeNote', width: 300 },
     { title: 'Ціна покупки', field: 'recommendedBuyPrice', width: 110, hideFilter: true, shouldHideFunc: () => !this.canView },
     { title: 'Ціна', field: 'recommendedSalePrice', width: 110, hideFilter: true },
-    { title: 'Спец-ціна', field: 'discountedPrice', width: 110, hideFilter: true, shouldHideFunc: () => this.isClient },
+    { title: 'Спец-ціна', field: 'discountedPrice', width: 110, hideFilter: true, shouldHideFunc: () => !this.isClient },
     { title: 'Id', field: 'id', width: 46, hideFilter: true, shouldHideFunc: () => !this.canView },
   ];
 

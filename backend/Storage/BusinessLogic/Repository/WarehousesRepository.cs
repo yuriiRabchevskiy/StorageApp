@@ -10,10 +10,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using BusinessLogic.Abstractions;
 using BusinessLogic.Models.Api.State;
+using Bv.Meter.WebApp.Common.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BusinessLogic.Repository
 {
@@ -26,7 +28,7 @@ namespace BusinessLogic.Repository
     void TransferProduct(string userId, int productId, ApiProdTransfer info);
     void RemoveProduct(string userId, int productId, ApiProdAction info);
     void AddProduct(string userId, int productId, ApiProdAction info);
-    Task SellOrderAsync(string userId, ApiSellOrder info);
+    Task SellOrderAsync(string userId, ApiSellOrder command);
     Task EditSellOrderAsync(string userId, ApiEditSellOrder command);
     Task<bool> CancelOrderAsync(string userId, int id, string reason);
   }
@@ -233,7 +235,7 @@ namespace BusinessLogic.Repository
     #endregion
 
     #region OrderManagement
-    public async Task SellOrderAsync(string userId, ApiSellOrder info)
+    public async Task SellOrderAsync(string userId, ApiSellOrder command)
     {
       var changesNotes = new List<ApiProdCountChange>();
       await _semaphoreSlim.WaitAsync();
@@ -243,17 +245,18 @@ namespace BusinessLogic.Repository
         await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
 
 
-        await verifyOrderIntegrityAsynct(context, info, userId);
+        var isValid = await verifyOrderIntegrityAsync(context, command.DiscountMultiplier, command.ProductOrders, userId);
+        if (!isValid) throw new ApiException("Зазначена знижка не доступна для користувача");
 
         var date = DateTime.UtcNow;
-        var order = _mapper.Map<Order>(info);
+        var order = _mapper.Map<Order>(command);
         order.OpenDate = date;
         order.Status = OrderStatus.Open;
-        order.Delivery = info.Delivery;
+        order.Delivery = command.Delivery;
         order.ResponsibleUserId = userId;
         order.Transactions = new List<ProductAction>();
 
-        var productOrders = info.ProductOrders.Select(it => new ProductRequest()
+        var productOrders = command.ProductOrders.Select(it => new ProductRequest()
         {
           ProductId = it.IdProduct,
           FromId = it.FromId,
@@ -288,10 +291,16 @@ namespace BusinessLogic.Repository
       var date = DateTime.UtcNow;
       var changesNotes = new List<ApiProdCountChange>();
       await _semaphoreSlim.WaitAsync();
+
       try
       {
         await using var context = _di.GetRequiredService<ApplicationDbContext>();
         await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+
+
+        var isValid = await verifyOrderIntegrityAsync(context, command.DiscountMultiplier, command.ProductOrders, userId);
+        if (!isValid) throw new ApiException("Зазначена знижка не доступна для користувача");
+
         var existingOrder = await context.Orders
           .Include(it => it.OrderEditions)
           .Include(it => it.Transactions)
@@ -539,15 +548,16 @@ namespace BusinessLogic.Repository
       return from;
     }
 
-    private static async Task<bool> verifyOrderIntegrityAsynct(ApplicationDbContext context, ApiSellOrder order, string userId)
+    private static async Task<bool> verifyOrderIntegrityAsync(ApplicationDbContext context, double discountMultiplier,
+      IEnumerable<ApiProdSell> productOrders, string userId)
     {
       var userDiscounts = await context.UserDiscounts.Where(it => it.UserId == userId)
         .Select(it => it.DiscountMultiplier)
         .ToListAsync();
-      userDiscounts = userDiscounts.Count == 0 ? new List<double>(new[] { 1.0 }) : userDiscounts;
+      userDiscounts.Add(1.0); // no discount option is always on the table
       // we need to check that user can actually apply discounts levels to the order
-      if (!userDiscounts.Contains(order.DiscountMultiplier)) return false;
-      if (order.ProductOrders.Any(po => !userDiscounts.Contains(po.DiscountMultiplier))) return false;
+      if (!userDiscounts.Contains(discountMultiplier)) return false;
+      if (productOrders.Any(po => !userDiscounts.Contains(po.DiscountMultiplier))) return false;
       return true;
     }
 
