@@ -69,15 +69,21 @@ export abstract class SecuredComponent {
   }
 
   private getClientDiscountsInfo(user: ICurrentUser) {
-    if (!this.isClient) return false;
+    // temp if (!this.isClient) return false;
 
     // client user can see it's own discount
     // such client should have exactly 1 discount value
-    const userDiscount = user.discounts?.length == 1 && user.discounts[0];    
+    const userDiscount = user.discountMultipliers?.length == 1 && user.discountMultipliers[0];
+    if (!userDiscount) return;
     if (userDiscount > 1 || userDiscount < 0) return false; // discount has to be between 0 and 1
     this.userDiscountMultiplier = userDiscount;
     this.userDiscountPercent = (1 - userDiscount) * 100;
   }
+
+  protected getDiscountedPrice(price: number) {
+    return Math.floor(price * this.userDiscountMultiplier)
+  }
+
 }
 
 @Directive()

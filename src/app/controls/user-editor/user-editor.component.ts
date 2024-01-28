@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserRoleName } from '@app/models/manage/user';
-import { ISUser, IUserToEdit, UserToEdit } from './../../models/manage';
+import { UserRoleName, detDiscountPercent } from '@app/models/manage/user';
+import { IUser, IUserToEdit, UserToEdit } from './../../models/manage';
 
 @Component({
   selector: 'app-user-editor',
@@ -23,12 +23,12 @@ export class UserEditorComponent implements OnInit {
   UserRoleName = UserRoleName;
   userRoles = UserRoleName.selectionList;
 
-  _user: ISUser;
+  _user: IUser;
   userToEdit: IUserToEdit;
   get user() {
     return this._user;
   }
-  @Input() set user(val: ISUser) {
+  @Input() set user(val: IUser) {
     this._user = val;
     if (!this._user) return;
     this.userToEdit = new UserToEdit(val);
@@ -46,7 +46,7 @@ export class UserEditorComponent implements OnInit {
   }
 
   createFormControls() {
-    const discountPercent = this.detDiscountPercent(this.userToEdit.discounts)
+    const discountPercent = detDiscountPercent(this.userToEdit.discountMultipliers)
     this.login = new FormControl(this.userToEdit.login, [
       Validators.required
     ]);
@@ -76,7 +76,7 @@ export class UserEditorComponent implements OnInit {
     const result: IUserToEdit = {
       ...this.userForm.value
     }
-    result.discounts = [this.discountPercent.value];
+    result.discountMultipliers = [(1 - this.discountPercent.value / 100)];
     this.saveChange.emit(result);
   }
 
@@ -84,10 +84,5 @@ export class UserEditorComponent implements OnInit {
     this.onCloseDialog.emit(false);
   }
 
-  private detDiscountPercent(discounts?: number[]) {
-    if (!discounts || discounts.length !== 1) return 0;
-    const discountMultiplier = discounts[0];
-    if (discountMultiplier < 0 || discountMultiplier > 1) return 0;
-    return (1 - discountMultiplier) * 100;
-  }
+
 }

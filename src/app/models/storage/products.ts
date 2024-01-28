@@ -29,6 +29,7 @@ export interface IProduct {
     freeNote?: string;
     recommendedBuyPrice?: number;
     recommendedSalePrice?: number;
+    discountedPrice?: number;
     balance?: INDictionary<number>;
     isNew?: boolean;
     isActive?: boolean;
@@ -45,6 +46,7 @@ export class Product implements IProduct {
     freeNote: string;
     recommendedBuyPrice: number;
     recommendedSalePrice: number;
+    discountedPrice?: number;
     isNew: boolean = false;
     isActive: boolean = false;
     balance = {};

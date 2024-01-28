@@ -5,7 +5,8 @@
             </mat-tab>
         </mat-tab-group>
         <div class="page-head-links">
-            <a class="page-head-link" href="https://storageaccountsweeta8a5.blob.core.windows.net/exports/products.csv" target="_blank">
+            <a class="page-head-link" href="https://storageaccountsweeta8a5.blob.core.windows.net/exports/products.csv"
+                target="_blank">
                 products.csv
             </a>
         </div>
@@ -137,7 +138,7 @@
     (onCloseDialog)="closeSellDialog($event)" (sale)="sale($event)">
 </app-sell>
 
-<app-basket *ngIf="basketDialog"  [locations]="wareHouses" (onCloseDialog)="closeBasketDialog($event)"
+<app-basket *ngIf="basketDialog" [locations]="wareHouses" (onCloseDialog)="closeBasketDialog($event)"
     (removeItem)="turnFromBasket($event)">
 </app-basket>
 

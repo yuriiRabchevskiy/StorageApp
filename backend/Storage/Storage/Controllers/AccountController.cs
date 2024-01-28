@@ -62,7 +62,7 @@ namespace Storage.Controllers
           UserName = appUser.UserName,
           IsAdmin = await _userManager.IsInRoleAsync(appUser, UserRole.Admin).ConfigureAwait(false),
           Role = userRoles.FirstOrDefault(),
-          UserDiscounts = userDiscounts
+          DiscountMultipliers = userDiscounts
         });
         return response;
       }
@@ -79,7 +79,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("auth")]
-    public async Task<ApiResponse<Boolean>> Auth([FromBody] LoginDto model)
+    public async Task<ApiResponse<bool>> Auth([FromBody] LoginDto model)
     {
       var result = await GetCurrentUserAsync().ConfigureAwait(false);
       if (result == null) return new ApiResponse<bool>(false);

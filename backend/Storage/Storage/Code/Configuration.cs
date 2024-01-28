@@ -21,8 +21,12 @@ namespace Storage.Code
         cfg.CreateMap<ApiOrder, Order>()
           .ForMember(it => it.TrackingNumber, opt => opt.MapFrom(src => src.OrderNumber));
         cfg.CreateMap<OrderAction, ApiOrderAction>().ReverseMap();
-        cfg.CreateMap<ApplicationUser, ApiUser>().ForMember(it => it.Login, opt => opt.MapFrom(src => src.UserName));
-        cfg.CreateMap<ApiUser, ApplicationUser>().ForMember(it => it.UserName, opt => opt.MapFrom(src => src.Login));
+        cfg.CreateMap<ApplicationUser, ApiUser>()
+          .ForMember(it => it.Login, opt => opt.MapFrom(src => src.UserName))
+          .ForMember(it => it.DiscountMultipliers, opt => opt.Ignore());
+        cfg.CreateMap<ApiUser, ApplicationUser>()
+          .ForMember(it => it.UserName, opt => opt.MapFrom(src => src.Login))
+          .ForMember(it => it.Discounts, opt => opt.Ignore());
         cfg.CreateMap<Category, ApiCategory>();
         cfg.CreateMap<ApiCategory, Category>();
         cfg.CreateMap<Product, ApiProduct>();
