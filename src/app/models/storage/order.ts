@@ -18,9 +18,29 @@ export interface IApiOrderMoveCommand {
     ids: number[];
 }
 
+export interface IClientOrder {
+    id: number;
+    totalPrice?: number;
+    orderNumber?: string;
+    other?: string;
+    status?: OrderStatus;
+    payment?: PaymentKind;
+    openDate?: Date;
+    closeDate?: Date;
+    products?: IClientTransaction[]; // to display for user
+    discountMultiplier?: number;
+
+    // client properties
+    date?: string;
+    sellerShort?: string;
+    itemsName?: string;
+    isChecked?: boolean;
+}
+
 export interface IOrder {
     id: number;
     totalPrice?: number;
+    totalDiscount?: number;
     clientPhone?: string;
     clientName?: string;
     clientAddress?: string;
@@ -65,6 +85,14 @@ export interface ISaleOrder extends IOrder {
 
 export interface IEditSaleOrder {
     productOrders: ISell[];
+    discountMultiplier?: number;
+}
+
+export interface IClientTransaction {
+    product: IProduct;
+    quantity: number;
+    price: number;
+    totalPrice: number;
     discountMultiplier?: number;
 }
 
