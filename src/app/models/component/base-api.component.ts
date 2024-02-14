@@ -26,9 +26,10 @@ export abstract class SecuredComponent {
     this.isAdminAssistant = user.role === UserRoleName.adminAssistant;
     this.isClient = user.role === UserRoleName.client;
     this.isWarehouseManager = user.role === UserRoleName.warehouseManager;
-    this.isAdmin = user.isAdmin;
-    this.canView = user.isAdmin;
-    this.canEdit = user.isAdmin;
+    const isAdmin = user.isAdmin;
+    this.isAdmin = isAdmin;
+    this.canView = isAdmin;
+    this.canEdit = isAdmin;
 
     this.getClientDiscountsInfo(user);
   }
@@ -78,11 +79,15 @@ export abstract class SecuredComponent {
     if (!userDiscount) return;
     if (userDiscount > 1 || userDiscount < 0) return false; // discount has to be between 0 and 1
     this.userDiscountMultiplier = userDiscount;
-    this.userDiscountPercent = (1 - userDiscount) * 100;
+    this.userDiscountPercent = Math.floor((1 - userDiscount) * 100);
   }
 
-  protected getDiscountedPrice(price: number) {
+  public getDiscountedPrice(price: number) {
     return Math.floor(price * this.userDiscountMultiplier)
+  }
+
+  public getDiscount(price: number) {
+    return price - Math.floor(price * this.userDiscountMultiplier)
   }
 
 }

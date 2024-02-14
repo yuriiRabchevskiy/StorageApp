@@ -19,6 +19,9 @@ export class SellComponent implements OnInit {
   selectLocation: IWarehouse;
   sCount: FormControl;
 
+  @Input() discountMultiplier = 1.0;
+  @Input() discountPercent = 0;
+
   private _product: IProduct;
   get product() {
     return this._product;
@@ -91,6 +94,18 @@ export class SellComponent implements OnInit {
   @Output() sale: EventEmitter<ISell> = new EventEmitter<ISell>();
 
   constructor(private apiService: ApiService) {
+  }
+
+  getDiscount() {
+    return this.totalSell - Math.floor(this.totalSell * this.discountMultiplier)
+  }
+
+  getTotalDiscountedPrice() {
+    return this.getDiscountedPrice(this.totalSell)
+  }
+
+  getDiscountedPrice(price: number) {
+    return Math.floor(price * this.discountMultiplier)
   }
 
   ngOnInit() {

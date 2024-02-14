@@ -43,7 +43,7 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
     { title: 'Колір', field: 'color' },
     { title: 'Нотатки', field: 'freeNote', width: 300 },
     { title: 'Ціна покупки', field: 'recommendedBuyPrice', width: 110, hideFilter: true, shouldHideFunc: () => !this.canView },
-    { title: 'Ціна', field: 'recommendedSalePrice', width: 110, hideFilter: true },
+    { title: 'Ціна', field: 'recommendedSalePrice', width: 110, hideFilter: true, shouldHideFunc: () => this.isClient },
     { title: 'Спец-ціна', field: 'discountedPrice', width: 110, hideFilter: true, shouldHideFunc: () => !this.isClient },
     { title: 'Id', field: 'id', width: 46, hideFilter: true, shouldHideFunc: () => !this.canView },
   ];
@@ -329,10 +329,11 @@ export class AppStockComponent extends ApiListComponent<IProduct> implements OnD
   }
 
   showSellDialog() {
-    if (this.isClient || this.isWarehouseManager) return;
+    if (this.isWarehouseManager) return;
     this.sellDialog = true;
     const newSell = new Sell(this.selectedItem.recommendedSalePrice);
     newSell.idProduct = this.selectedItem.id;
+    newSell.discountMultiplier = this.userDiscountMultiplier;
     this.sell = newSell;
   }
 

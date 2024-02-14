@@ -1,0 +1,14 @@
+@import '../../../../assets/css/globals';
+
+.order-editor {
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding: 1px;
+}
+
+.area-wrap {
+    max-width: none;
+    @include customMaxWidth(767px) {
+        max-width: 400px;
+    }
+}
