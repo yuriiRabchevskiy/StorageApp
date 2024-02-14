@@ -132,6 +132,13 @@ export class SaleOrder extends Order implements ISaleOrder {
     productOrders: ISell[] = [];
 }
 
+export class MakeSelfOrderCommand {
+    productOrders: ISell[] = [];
+    other?: string;
+    orderNumber?: string;
+    discountMultiplier?: number = 1.0;
+}
+
 
 export interface ICancelOrder {
     reason: string;

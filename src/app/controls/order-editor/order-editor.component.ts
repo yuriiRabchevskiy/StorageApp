@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IOrder, OrderStatus } from './../../models/storage';
-import { PaymentKind, deliveryTypes } from './../../models/storage/order';
+import { deliveryTypes } from './../../models/storage/order';
 
 
 @Component({
@@ -16,7 +16,6 @@ export class OrderEditorComponent implements OnInit {
   public clientAddress: FormControl;
   public clientPhone: FormControl;
   public status: FormControl;
-  public payment: FormControl;
   public delivery: FormControl;
   public orderOther: FormControl;
 
@@ -26,10 +25,6 @@ export class OrderEditorComponent implements OnInit {
   @Input() item: IOrder = { id: 0 };
   @Input() canEdit: boolean;
 
-  payments = [
-    { label: 'Оплачено', value: PaymentKind.payed },
-    { label: 'Наложений платіж', value: PaymentKind.cashOnDelivery }
-  ];
 
   deliveryTypes = deliveryTypes;
 
@@ -61,10 +56,6 @@ export class OrderEditorComponent implements OnInit {
       value: this.item.status ?? this.statuses[0].value,
       disabled: !this.item.id
     });
-    this.payment = new FormControl({
-      value: this.item.payment ?? this.payments[1].value,
-      disabled: false
-    });
     this.delivery = new FormControl({
       value: this.item.delivery ?? this.deliveryTypes[0].value,
       disabled: false
@@ -79,7 +70,6 @@ export class OrderEditorComponent implements OnInit {
       clientAddress: this.clientAddress,
       clientPhone: this.clientPhone,
       status: this.status,
-      payment: this.payment,
       delivery: this.delivery,
       orderOther: this.orderOther
     });

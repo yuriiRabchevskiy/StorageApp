@@ -9,7 +9,7 @@ import { ICurrentUser, IUser, IUserToEdit, IChangePassword, ILoginCommand, detDi
 import { IProduct } from './../../models/storage/products';
 import { IWarehouse } from '../../models/storage/werehouse';
 import { ICategory } from './../../models/storage/categories';
-import { IOrder, IClientOrder, ISaleOrder, IOrderAction, OrderOperation, DeliveryKind, deliveryTypes, IApiOrderMoveCommand, IEditSaleOrder } from './../../models/storage/order';
+import { IOrder, IClientOrder, ISaleOrder, IOrderAction, OrderOperation, DeliveryKind, deliveryTypes, IApiOrderMoveCommand, IEditSaleOrder, MakeSelfOrderCommand } from './../../models/storage/order';
 import { ICancelOrder } from '../../models/storage/index';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
@@ -155,6 +155,11 @@ export class ApiService extends ApiBase {
     }
 
     // sale method
+
+    selfClientSale(data: MakeSelfOrderCommand) {
+        return this.doPost('product/self-sell/', data);
+    }
+
     sale(data: ISaleOrder) {
         return this.doPost('product/sell/', data);
     }

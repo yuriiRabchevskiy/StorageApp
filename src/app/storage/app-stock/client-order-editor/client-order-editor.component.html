@@ -1,0 +1,21 @@
+<form class="order-editor wh-100 flex-col" [formGroup]="orderEditForm">
+    <div class="flex-row flex-wrap">
+        <mat-form-field class="s-input-wrapper long-input">
+            <input matInput placeholder="Номер накладної" formControlName="orderNumber" required>
+            <mat-error *ngIf="orderNumber.errors && (orderNumber.dirty || orderNumber.touched)">{{getNumberError()}}
+            </mat-error>
+        </mat-form-field>
+        <div>
+            &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+    </div>
+
+    <div class="flex-row flex-wrap flex-area-wrap">
+        <mat-form-field class="s-area-wrapper">
+            <textarea matInput placeholder="Нотатки" formControlName="orderOther"></textarea>
+        </mat-form-field>
+    </div>
+</form>

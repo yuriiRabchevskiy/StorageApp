@@ -36,12 +36,12 @@
                     (iClick)="showTransferDialog()" [disabled]="!selectedItem || !isBalance">
                 </app-i-button>
                 <app-i-button icon="sell-icon" title="Додати до кошика" (iClick)="showSellDialog()"
-                    *ngIf="!isClient && !isWarehouseManager" [disabled]="!selectedItem || !isBalance">
+                    *ngIf="!isWarehouseManager" [disabled]="!selectedItem || !isBalance">
                 </app-i-button>
 
                 <ng-container right>
 
-                    <app-i-button *ngIf="(!isClient && !isWarehouseManager) && basketService.hasItems" icon="i-basket"
+                    <app-i-button *ngIf="(!isWarehouseManager) && basketService.hasItems" icon="i-basket"
                         title="Оформити замовлення" (iClick)="showBasketDialog()">
                     </app-i-button>
                     <button class="i-menu-button" title="Колонки" (click)="showColumnsPicker = true"
@@ -135,12 +135,18 @@
 </app-prod-removal>
 
 <app-sell *ngIf="sellDialog" [product]="selectedItem" [locations]="wareHouses" [sell]="sell"
-    (onCloseDialog)="closeSellDialog($event)" (sale)="sale($event)">
+    (onCloseDialog)="closeSellDialog($event)" (sale)="sale($event)"
+    [discountMultiplier]="userDiscountMultiplier" [discountPercent]="userDiscountPercent">
 </app-sell>
 
-<app-basket *ngIf="basketDialog" [locations]="wareHouses" (onCloseDialog)="closeBasketDialog($event)"
+<app-basket *ngIf="basketDialog && !isClient" [locations]="wareHouses" (onCloseDialog)="closeBasketDialog($event)"
     (removeItem)="turnFromBasket($event)">
 </app-basket>
+
+<app-client-basket *ngIf="basketDialog && isClient" [locations]="wareHouses" 
+    (onCloseDialog)="closeBasketDialog($event)" (removeItem)="turnFromBasket($event)"
+    [discountMultiplier]="userDiscountMultiplier" [discountPercent]="userDiscountPercent">
+</app-client-basket>
 
 <app-confirm [title]="selectedItem.productType" (confirm)="confirmDelete($event)" *ngIf="showConfirm">
     <span header class="confirm-title">Ви впевнені, що бажаєте видалити продукт:

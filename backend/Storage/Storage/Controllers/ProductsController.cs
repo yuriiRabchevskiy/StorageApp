@@ -133,7 +133,7 @@ namespace Storage.Controllers
     }
 
     [HttpPost("self-sell")]
-    [Authorize(Roles = $"{UserRole.Client}")]
+    [Authorize(Roles = $"{UserRole.Client}, {UserRole.Admin}")]
     public async Task<ApiResponseBase> SelfSell([FromBody] MakeSelfOrderCommand command)
     {
       if (!ModelState.IsValid) throw ModelState.ToApiErrorsException();

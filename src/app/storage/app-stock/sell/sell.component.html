@@ -28,28 +28,36 @@
             </div>
             <div class="flex-row flex-wrap">
                 <mat-form-field class="s-input-wrapper">
-                    <input matInput type="number" placeholder="Кількість" [(ngModel)]="sellCount" [formControl]="sCount" min="1" [max]="product.balance[selectedLocation]"
-                        [disableControl]="!product.balance[selectedLocation] || product.balance[selectedLocation] === 0"    
+                    <input matInput type="number" placeholder="Кількість" [(ngModel)]="sellCount" [formControl]="sCount"
+                        min="1" [max]="product.balance[selectedLocation]"
+                        [disableControl]="!product.balance[selectedLocation] || product.balance[selectedLocation] === 0"
                         [customMin]="0" [customMax]="product.balance[selectedLocation]">
-                        <mat-error *ngIf="sCount.invalid">
-                            Некоректне значення
-                        </mat-error>
+                    <mat-error *ngIf="sCount.invalid">
+                        Некоректне значення
+                    </mat-error>
                 </mat-form-field>
                 <mat-form-field class="s-input-wrapper">
-                    <input matInput type="number" placeholder="Ціна за одиницю" [(ngModel)]="sell.price" name="price" #price="ngModel" min="0"
-                        step="0.01" disabled>
+                    <input matInput type="number" placeholder="Ціна за одиницю" 
+                    [value]="getDiscountedPrice(sell.price) " name="price"
+                        min="0" step="0.01" disabled>
                 </mat-form-field>
             </div>
             <div class="flex-wrap flex-row">
+                <!-- <mat-form-field class="s-input-wrapper">
+                    <input matInput type="number" [placeholder]="'Знижка - ' + discountPercent + '%'"
+                        [value]="getDiscount()" name="price" min="0" step="0.01" disabled>
+                </mat-form-field> -->
                 <mat-form-field class="s-input-wrapper">
-                    <input matInput type="number" placeholder="Сума до оплати" [(ngModel)]="totalSell" name="totalPrice" #totalPrice="ngModel" min="0"
-                        step="0.01" disabled>
+                    <input matInput type="number" placeholder="Сума до оплати" [value]="getTotalDiscountedPrice()"
+                        name="totalPrice" min="0" step="0.01" disabled>
                 </mat-form-field>
             </div>
         </div>
     </div>
-    <p-footer class="s-dialog-foot">      
-        <button class="d-s-button" type="button" pButton icon="pi pi-check" (click)="save()" label="До кошика" [disabled]="sellCount <= 0 || sCount.invalid"></button>
-        <button class="d-s-button-cancel" type="button" pButton icon="pi pi-times" label="Закрити" (click)="closeDialog()"></button>
+    <p-footer class="s-dialog-foot">
+        <button class="d-s-button" type="button" pButton icon="pi pi-check" (click)="save()" label="До кошика"
+            [disabled]="sellCount <= 0 || sCount.invalid"></button>
+        <button class="d-s-button-cancel" type="button" pButton icon="pi pi-times" label="Закрити"
+            (click)="closeDialog()"></button>
     </p-footer>
 </p-dialog>

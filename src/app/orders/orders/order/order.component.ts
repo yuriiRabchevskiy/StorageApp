@@ -54,7 +54,6 @@ export class OrderComponent {
         this.order.clientAddress = this.orderEditor.orderEditForm.value.clientAddress;
         this.order.clientPhone = this.orderEditor.orderEditForm.value.clientPhone;
         this.order.status = this.orderEditor.status.value;
-        this.order.payment = this.orderEditor.payment.value;
         this.order.delivery = this.orderEditor.delivery.value;
         this.order.deliveryString = getDeliveryDescriptor(this.orderEditor.delivery.value);
         this.order.other = this.orderEditor.orderEditForm.value.orderOther;
