@@ -54,6 +54,7 @@ export interface IUserToEdit {
     phone: string;
     role: UserRole;
     notes?: string;
+    dropAddress?: string;
     discountMultipliers?: number[];
 }
 
@@ -69,6 +70,7 @@ export interface IUser {
     email: string;
     phone: string;
     notes?: string;
+    dropAddress?: string;
     isAdmin: boolean;
     role: UserRole;
 }
@@ -84,6 +86,7 @@ export class UserToEdit implements IUserToEdit {
     name: string;
     surname: string;
     phone: string;
+    dropAddress?: string;
     notes?: string;
     role: UserRole;
     discountMultipliers: number[] = [1.0];
@@ -97,7 +100,7 @@ export class UserToEdit implements IUserToEdit {
         this.notes = val.notes;
         this.role = val.role;
         this.discountMultipliers = val.discountMultipliers;
-
+        this.dropAddress = val.dropAddress;
     }
 }
 
@@ -110,6 +113,7 @@ export class User implements IUser {
     email: string;
     phone: string;
     notes?: string;
+    dropAddress?: string;
     password: string;
     isActive?: boolean = false;
     isAdmin: boolean = false;

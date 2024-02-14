@@ -31,6 +31,7 @@ export class UserComponent implements OnInit {
   email: FormControl;
   pass: FormGroup;
   password: FormControl;
+  dropAddress: FormControl;
   confirmPassword: FormControl;
   role: FormControl;
   userRoles = UserRoleName.selectionList;
@@ -64,6 +65,7 @@ export class UserComponent implements OnInit {
     this.name = new FormControl('', Validators.required);
     this.surName = new FormControl('', Validators.required);
     this.phone = new FormControl('');
+    this.dropAddress = new FormControl('');
     this.notes = new FormControl('');
     this.email = new FormControl('', [
       Validators.required,
@@ -94,6 +96,7 @@ export class UserComponent implements OnInit {
       phone: this.phone,
       notes: this.notes,
       email: this.email,
+      dropAddress: this.dropAddress,
       pass: new FormGroup({
         password: this.password,
         confirmPassword: this.confirmPassword,
@@ -123,6 +126,7 @@ export class UserComponent implements OnInit {
     newUser.surname = val.surName;
     newUser.phone = val.phone;
     newUser.notes = val.notes;
+    newUser.dropAddress = val.dropAddress;
     this.user = newUser;
 
     return this.user;

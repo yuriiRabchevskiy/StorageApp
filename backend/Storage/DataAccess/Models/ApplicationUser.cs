@@ -11,6 +11,8 @@ namespace DataAccess.Models
     public string Notes { get; set; }
     public bool IsActive { get; set; }
 
+    public string DropAddress { get; set; }
+
     public ICollection<UserDiscount> Discounts { get; set; }
   }
 }

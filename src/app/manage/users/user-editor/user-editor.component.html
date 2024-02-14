@@ -28,12 +28,17 @@
                 <mat-form-field class="s-input-wrapper">
                     <input type="tel" matInput placeholder="Телефон" formControlName="phone">
                 </mat-form-field>
-                <mat-form-field class="s-input-wrapper" *ngIf="role.value === UserRoleName.client" >
+                <mat-form-field class="s-input-wrapper" *ngIf="role.value === UserRoleName.client">
                     <input matInput type="number" placeholder="Знижка %" formControlName="discountPercent" [min]="0"
                         [max]="100" [customMin]="0" [customMax]="100">
                     <mat-error *ngIf="discountPercent.invalid">
                         Некоректне значення
                     </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="flex-row flex-wrap">
+                <mat-form-field class="s-input-wrapper long-input">
+                    <input matInput placeholder="Адреса доставки" formControlName="dropAddress">
                 </mat-form-field>
             </div>
             <div class="flex-row flex-wrap flex-area-wrap">

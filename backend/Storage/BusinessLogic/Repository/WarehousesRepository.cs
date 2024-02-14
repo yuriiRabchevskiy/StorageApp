@@ -29,6 +29,8 @@ namespace BusinessLogic.Repository
     void RemoveProduct(string userId, int productId, ApiProdAction info);
     void AddProduct(string userId, int productId, ApiProdAction info);
     Task SellOrderAsync(string userId, ApiSellOrder command);
+
+    Task SelfSellOrderAsync(string userId, MakeSelfOrderCommand command);
     Task EditSellOrderAsync(string userId, ApiEditSellOrder command);
     Task<bool> CancelOrderAsync(string userId, int id, string reason);
   }
@@ -255,6 +257,70 @@ namespace BusinessLogic.Repository
         order.Delivery = command.Delivery;
         order.ResponsibleUserId = userId;
         order.Transactions = new List<ProductAction>();
+
+        var productOrders = command.ProductOrders.Select(it => new ProductRequest()
+        {
+          ProductId = it.IdProduct,
+          FromId = it.FromId,
+          Description = it.Description,
+          Price = it.Price,
+          DiscountMultiplier = it.DiscountMultiplier,
+          Quantity = it.Quantity
+        }).ToList();
+
+        var (orderTransactions, notes) = createAddOrderProductActions(productOrders, context, userId, date);
+        changesNotes.AddRange(notes);
+        order.Transactions.AddRange(orderTransactions);
+        changesNotes.AddRange(notes);
+        order.Transactions.AddRange(orderTransactions);
+
+        context.Orders.Add(order);
+
+        var revision = await _state.UpdateProductsStateCounterAsync(context);
+
+        await context.SaveChangesAsync();
+        await transaction.CommitAsync();
+        await Informer.ProductsCountChangedAsync(changesNotes, revision).ConfigureAwait(false);
+      }
+      finally
+      {
+        _semaphoreSlim.Release();
+      }
+    }
+
+    public async Task SelfSellOrderAsync(string userId, MakeSelfOrderCommand command)
+    {
+      var changesNotes = new List<ApiProdCountChange>();
+      await _semaphoreSlim.WaitAsync();
+      try
+      {
+        await using var context = _di.GetRequiredService<ApplicationDbContext>();
+        await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+
+
+        var isValid = await verifyOrderIntegrityAsync(context, command.DiscountMultiplier, command.ProductOrders, userId);
+        if (!isValid) throw new ApiException("Зазначена знижка не доступна для користувача");
+
+        var clientInfo = await context.Users.FindAsync(userId);
+        if (clientInfo == null || clientInfo.IsActive == false) throw new ApiException("Не існуючий або деактивований користувач");
+        var date = DateTime.UtcNow;
+        //  _mapper.Map<Order>(command);
+        var order = new Order
+        {
+          OpenDate = date,
+          Status = OrderStatus.Open,
+          Delivery = DeliveryKind.Drop,
+          Payment = PaymentKind.Payed,
+          
+          ResponsibleUserId = userId,
+          ClientAddress = clientInfo.DropAddress ?? $"{clientInfo.Surname} {clientInfo.Name}",
+          ClientName = $"{clientInfo.Surname} {clientInfo.Name}",
+          ClientPhone = clientInfo.Phone,
+          TrackingNumber = command.OrderNumber,
+          Other = command.Other,
+          DiscountMultiplier = command.DiscountMultiplier,
+          Transactions = new List<ProductAction>()
+        };
 
         var productOrders = command.ProductOrders.Select(it => new ProductRequest()
         {

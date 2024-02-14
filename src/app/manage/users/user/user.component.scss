@@ -1,1 +1,6 @@
 @import '../../../../assets/css/globals';
+
+.long-input.s-input-wrapper {
+    width: calc(100% - 40px);
+    max-width: none;
+}

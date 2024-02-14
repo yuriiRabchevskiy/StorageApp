@@ -57,6 +57,7 @@ namespace Storage.Controllers
       user.Notes = model.Notes;
       user.UserName = model.Login;
       user.Phone = model.Phone;
+      user.DropAddress = model.DropAddress;
       var result = await _userManager.UpdateAsync(user);
 
       if (!result.Succeeded) throw new ApiErrorsException(new ApiError("code", "Виникла помилка редагування користувача"));
@@ -107,6 +108,7 @@ namespace Storage.Controllers
         Surname = model.Surname,
         Phone = model.Phone,
         IsActive = true,
+        DropAddress = model.DropAddress,
         Discounts = model.DiscountMultipliers.Select(mul => new UserDiscount { DiscountMultiplier = mul }).ToList(),
       };
       var result = await _userManager.CreateAsync(user, model.Password);
