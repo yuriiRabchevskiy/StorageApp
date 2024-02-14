@@ -14,6 +14,8 @@ namespace BusinessLogic.Models.Api
     public string Email { get; set; }
     public string Phone { get; set; }
     public string Notes { get; set; }
+
+    public string DropAddress { get; set; }
     public string Password { get; set; }
     public bool IsActive { get; set; }
     public bool IsAdmin { get; set; }

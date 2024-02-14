@@ -48,8 +48,10 @@ namespace BusinessLogic.Models.User
     public string Phone { get; set; }
     public bool IsAdmin { get; set; } = false;
     public string Role { get; set; } = User.UserRole.User;
+    
+    public List<double> DiscountMultipliers { get; set; } = new(new[] { 1.0 });
 
-    public List<double> DiscountMultipliers { get; set; }
+    public string DropAddress { get; set; }
   }
 
   public class RegisterUserCommand : UserDto
@@ -57,16 +59,10 @@ namespace BusinessLogic.Models.User
     [Required]
     [StringLength(100, ErrorMessage = "PASSWORD_MIN_LENGTH", MinimumLength = 6)]
     public string Password { get; set; }
-
-    [Range(0.0, 1.0, ErrorMessage = "Множник знижки має бути між 0 і 1 ")]
-    public List<double> DiscountMultipliers { get; set; } = new(new []{ 1.0 });
   }
 
   public class EditUserCommand : UserDto
   {
-
-    [Range(0.0, 1.0, ErrorMessage = "Множник знижки має бути між 0 і 1 ")]
-    public List<double> DiscountMultipliers { get; set; } = new(new[] { 1.0 });
   }
 
   public class LoginResult

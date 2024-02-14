@@ -132,6 +132,17 @@ namespace Storage.Controllers
       return new ApiResponseBase();
     }
 
+    [HttpPost("self-sell")]
+    [Authorize(Roles = $"{UserRole.Client}")]
+    public async Task<ApiResponseBase> SelfSell([FromBody] MakeSelfOrderCommand command)
+    {
+      if (!ModelState.IsValid) throw ModelState.ToApiErrorsException();
+
+      var user = await GetCurrentUserAsync();
+      await _houseRepo.SelfSellOrderAsync(user?.Id, command).ConfigureAwait(false);
+      return new ApiResponseBase();
+    }
+
     [HttpPut("sell/{orderId:int}")]
     [Authorize(Roles = $"{UserRole.Admin}, {UserRole.User}, {UserRole.AdminAssistant}")]
     public async Task<ApiResponseBase> EditSaleAsync(int orderId, [FromBody] ApiEditSellOrder command)

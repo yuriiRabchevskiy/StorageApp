@@ -34,6 +34,15 @@ namespace BusinessLogic.Models.Api
     public IEnumerable<ApiProdSell> ProductOrders { get; set; }
   }
 
+  public class MakeSelfOrderCommand
+  {
+    public double DiscountMultiplier { get; set; }
+    public IEnumerable<ApiProdSell> ProductOrders { get; set; }
+
+    public string Other { get; set; }
+    public string OrderNumber { get; set; }
+  }
+
   [Validator(typeof(ApiEditSellOrderValidation))]
   public class ApiEditSellOrder
   {

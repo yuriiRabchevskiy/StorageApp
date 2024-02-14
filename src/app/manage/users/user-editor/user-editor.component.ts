@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserRoleName, detDiscountPercent } from '@app/models/manage/user';
-import { IUser, IUserToEdit, UserToEdit } from './../../models/manage';
+import { IUser, IUserToEdit, UserToEdit } from '../../../models/manage';
 
 @Component({
   selector: 'app-user-editor',
@@ -16,6 +16,7 @@ export class UserEditorComponent implements OnInit {
   name: FormControl;
   surname: FormControl;
   phone: FormControl;
+  dropAddress: FormControl;
   notes: FormControl;
   role: FormControl;
   discountPercent: FormControl;
@@ -53,6 +54,7 @@ export class UserEditorComponent implements OnInit {
     this.name = new FormControl(this.userToEdit.name);
     this.surname = new FormControl(this.userToEdit.surname);
     this.phone = new FormControl(this.userToEdit.phone);
+    this.dropAddress = new FormControl(this.userToEdit.dropAddress);
     this.role = new FormControl(this.userToEdit.role);
     this.notes = new FormControl(this.userToEdit.notes);
     this.discountPercent = new FormControl(discountPercent);
@@ -64,6 +66,7 @@ export class UserEditorComponent implements OnInit {
       name: this.name,
       surname: this.surname,
       phone: this.phone,
+      dropAddress: this.dropAddress,
       role: this.role,
       notes: this.notes,
       discountPercent: this.discountPercent
