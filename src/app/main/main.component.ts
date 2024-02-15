@@ -51,6 +51,7 @@ export class MainComponent extends SecuredComponent implements OnInit {
     this.canView = user.isAdmin;
     this.pages = [
       { title: 'Склад', url: 'storage', view: true },
+      { title: 'Мої замовлення', url: 'orders/mine', view: this.isClient },
       { title: 'Продажі', url: 'orders', view: !this.isClient },
       { title: 'Продажі (Архів)', url: 'orders/archive', view: user.isAdmin },
       { title: 'Звіти', url: 'reports', view: user.isAdmin },

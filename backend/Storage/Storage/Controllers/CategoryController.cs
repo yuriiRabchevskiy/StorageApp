@@ -14,13 +14,11 @@ namespace Storage.Controllers
   [Authorize]
   public class CategoryController : Controller
   {
-    private ICategoriesRepository _repo;
-    private UserManager<ApplicationUser> _userManager;
+    private readonly ICategoriesRepository _repo;
 
-    public CategoryController(ICategoriesRepository repo, UserManager<ApplicationUser> userManager)
+    public CategoryController(ICategoriesRepository repo)
     {
       _repo = repo;
-      _userManager = userManager;
     }
 
     // GET api/values

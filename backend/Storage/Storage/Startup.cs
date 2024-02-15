@@ -125,6 +125,7 @@ namespace Storage
       services.AddTransient<ICategoriesRepository, CategoriesRepository>();
       services.AddTransient<IWarehouseRepository, WarehousesRepository>();
       services.AddTransient<IOrdersRepository, OrdersRepository>();
+      services.AddTransient<IClientOrdersRepository, ClientOrdersRepository>();
       services.AddTransient<ISalesPerUserRepository, SalesPerUserRepository>();
       services.AddTransient<ISalesPerProductRepository, SalesPerProductRepository>();
       services.AddTransient<IOrdersOverviewRepository, OrdersOverviewRepository>();

@@ -11,7 +11,7 @@ using BusinessLogic.Repository;
 namespace Storage.Controllers
 {
   [Route("api/client/orders")]
-  [Authorize(Roles = $"{UserRole.Client}")]
+  [Authorize(Roles = $"{UserRole.Client}, {UserRole.Admin}")]
   public class ClientOrdersController : SecuredController
   {
     private readonly IClientOrdersRepository _repo;

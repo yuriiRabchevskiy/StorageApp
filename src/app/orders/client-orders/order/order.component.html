@@ -1,0 +1,15 @@
+<p-dialog class="s-dialog" [visible]="true" [responsive]="true" showEffect="fade" [modal]="true" [closable]="false">
+    <p-header>
+        Замовлення {{order.orderNumber}} для {{order.clientName}}
+    </p-header>
+    <div class="dialog-body">
+        <app-order-editor #orderEditor class="d-page-wrap" [item]="order" [canEdit]="canEdit">
+        </app-order-editor>
+    </div>
+    <p-footer class="s-dialog-foot">
+        <button class="d-s-button" type="button" pButton icon="pi pi-check" (click)="save()" label="Зберегти" [disabled]="orderEditor.invalid">
+        </button>
+        <button class="d-s-button-cancel" type="button" pButton icon="pi pi-times" label="Закрити" (click)="closeDialog()">
+        </button>
+    </p-footer>
+</p-dialog>

@@ -1,0 +1,176 @@
+<div class="page-wrap">
+    <div class="page-head">
+        Останні замовлення
+    </div>
+    <div class="page-body">
+      <div class="page-body-actions">
+        <div *ngIf="view.isMobile">
+        </div>
+        <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
+          <app-i-button icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
+            [disabled]="viewData.length < 1 || selectedItems.length > 1">
+          </app-i-button>
+          <app-i-button icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
+            [disabled]="viewData.length < 1 || selectedItems.length > 1">
+          </app-i-button>
+          <ng-container right>
+            <button class="i-menu-button" title="Колонки" (click)="showColumnsPicker = true"
+              [ngClass]="{'i-menu-button-active': hiddenColumns.size}">
+              <i class="dripicons dripicons-toggles"> </i>
+            </button>
+            <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()">
+            </app-i-button>
+  
+          </ng-container>
+  
+  
+        </app-button-group>
+  
+        <div class="button-wrap">
+          <input class="s-serche" type="text" placeholder="Пошук"
+            (input)="dt.filterGlobal($event.target.value, 'contains')">
+        </div>
+      </div>
+  
+      <p-table class="prime-table" [value]="viewData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
+        responsiveLayout="scroll" [resizableColumns]="true" [pageLinks]="4" [rows]="100" [responsive]="true"
+        [scrollable]="false" scrollWidth="100%" scrollHeight="100%" dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
+          'clientPhone', 'clientName', 'clientAddress', 'deliveryString', 'seller', 'canceledBy',
+          'itemsName', 'other', 'totalPrice']" selectionMode="single">
+  
+        <ng-template pTemplate="colgroup">
+  
+          <colgroup *ngIf="view.isMobile">
+            <col />
+          </colgroup>
+  
+          <colgroup *ngIf="!view.isMobile">
+            <col />
+  
+            <!--coll for expand-->
+            <col [width]="50" />
+  
+            <ng-container *ngFor="let column of columns">
+              <col *ngIf="visibleColumn(column)" [style.width]="column.width" />
+            </ng-container>
+          </colgroup>
+        </ng-template>
+  
+        <ng-template pTemplate="header">
+          <tr>
+            <!--cols for expand and id-->
+            <th></th>
+  
+            <th>#</th>
+            <ng-container *ngFor="let column of columns">
+              <th [pSortableColumn]="column?.field" *ngIf="visibleColumn(column)" pResizableColumn>
+                {{column?.title}}
+                <p-sortIcon [field]="column?.field"></p-sortIcon>
+              </th>
+            </ng-container>
+          </tr>
+        </ng-template>
+  
+        <ng-template pTemplate="body" let-expanded="expanded" let-rowData let-rowIndex="rowIndex">
+  
+          <tr (click)="onItemClick(rowData)" [pSelectableRow]="rowData"
+            [ngClass]="{'s-selected-row': rowData.id === selectedItem?.id}">
+  
+            <td class="expanded-cell">
+              <i href="#" [pRowToggler]="rowData" [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+            </td>
+  
+            <td>{{rowData.id}}</td>
+  
+            <ng-container *ngFor="let column of columns">
+              <td *ngIf="visibleColumn(column)">
+                <ng-container *ngIf="!column.template">
+                  {{rowData[column.field]}}
+                </ng-container>
+                <ng-container *ngIf="column.template === 'date'">
+                  {{rowData[column.field] | date: column.format}}
+                </ng-container>
+                <ng-container *ngIf="column.template === 'pageSpecial1'">
+                  <ng-container *ngIf="rowData.orderNumber && rowData.orderNumber.toString().startsWith('050')">
+                    <a href="https://track.ukrposhta.ua/tracking_UA.html?barcode={{rowData.orderNumber}}" target="_blank">
+                      <span>{{rowData.orderNumber}}</span>
+                    </a>
+                  </ng-container>
+                  <ng-container *ngIf="!rowData.orderNumber || !rowData.orderNumber.toString().startsWith('050')">
+                    <a href="https://novaposhta.ua/tracking/?cargo_number={{rowData.orderNumber}}" target="_blank">
+                      <span>{{rowData.orderNumber}}</span>
+                    </a>
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngIf="column.template === 'pageSpecial3'">
+                  <span class="notes" [title]="rowData[column.field]"> {{rowData[column.field]}}</span>
+                </ng-container>
+              </td>
+            </ng-container>
+          </tr>
+        </ng-template>
+  
+        <ng-template let-item pTemplate="rowexpansion">
+          <tr class="expanded-row">
+            <td [attr.colspan]="12">
+              <div class="cancel-reason" *ngIf="item.cancelReason ">
+                Причина відміни:
+                <b> {{ item.cancelReason }} </b>
+              </div>
+              <div class="products-list flex-col">
+                <table class="check-order">
+                  <colgroup>
+                    <col width="360px">
+                    <col>
+                    <col width="110px">
+                    <col width="110px">
+                    <col width="100px">
+                    <col width="100px">
+                  </colgroup>
+                  <thead class="check-head">
+                    <tr class="check-tr">
+                      <th class="check-cell">Назва</th>
+                      <th class="check-cell">Кількість</th>
+                      <th class="check-cell">Ціна продажу</th>
+                      <th class="check-cell">Сума</th>
+                    </tr>
+                  </thead>
+  
+                  <tbody class="check-body">
+                    <tr class="check-tr" *ngFor="let prod of item.products">
+                      <td class="check-td check-item-name-td">
+                        {{buildProductFullName(prod.product)}}
+                        <br *ngIf="prod.product.freeNote" />
+                        <span class="prod-notes">{{prod.product.freeNote}}</span>
+                      </td>
+                      <td class="check-td"><b>{{prod.quantity}} шт</b></td>
+                      <td class="check-td">{{prod.price}}</td>
+                      <td class="check-td">{{prod.totalPrice}}</td>
+                    </tr>
+                  </tbody>
+  
+  
+                  <tfoot class="check-foot">
+                    <tr class="check-tr">
+                      <td class="check-cell"></td>
+                      <td class="check-cell"></td>
+                      <td class="check-cell total-cell">Вартість:</td>
+                      <td class="check-cell total-cell">{{item.totalPrice}}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  
+  
+  </div>
+  <app-spinner *ngIf="showSpinner">
+  </app-spinner>
+  
+  <app-columns-picker *ngIf="showColumnsPicker" [columns]="columns" [hiddenColumns]="hiddenColumns"
+    (closeDialog)="onColumnsPickerClosed($event)">
+  </app-columns-picker>
