@@ -1,0 +1,29 @@
+@import '../../../../assets/css/globals';
+
+.notes {
+    max-width: 280px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.check-order {
+    background-color: #fff;
+    border: 1px solid black;
+    colgroup {
+        @include customMaxWidth(35em) {
+            display: table-column-group !important;
+        }
+        col {
+            @include customMaxWidth(35em) {
+                width: 64px !important;
+            }
+        }
+        col:nth-child(2) {
+            @include customMaxWidth(35em) {
+                width: auto !important;
+            }
+        }
+    }
+}

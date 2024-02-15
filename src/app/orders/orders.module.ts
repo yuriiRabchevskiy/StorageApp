@@ -1,3 +1,4 @@
+import { ClientOrdersComponent } from './orders/client-orders/client-orders.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ShareModule } from './../shared/share.module';
@@ -16,7 +17,7 @@ import { ArchiveComponent } from './orders/archive/archive/archive.component';
     ControlsModule,
     ShareModule
   ],
-  declarations: [OrdersComponent, OrderComponent, OrderHistoryComponent, ArchiveComponent],
+  declarations: [OrdersComponent, OrderComponent, OrderHistoryComponent, ArchiveComponent, ClientOrdersComponent],
   providers: []
 })
 export class OrdersModule { }

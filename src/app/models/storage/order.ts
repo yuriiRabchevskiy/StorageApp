@@ -32,7 +32,7 @@ export interface IClientOrder {
 
     // client properties
     date?: string;
-    sellerShort?: string;
+    statusStr?: string;
     itemsName?: string;
     isChecked?: boolean;
 }

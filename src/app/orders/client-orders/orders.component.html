@@ -1,0 +1,269 @@
+<div class="page-wrap">
+  <div class="page-head">
+    <mat-tab-group class="storage-tab" (selectedIndexChange)="selectTab($event)">
+      <mat-tab class="tab" *ngFor="let tab of tabs" [label]="tab.label">
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <div class="page-body">
+    <div class="page-body-actions">
+      <div *ngIf="view.isMobile">
+      </div>
+      <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
+        <app-i-button [useSprite]="false" icon="pencil" *ngIf="
+        (selectedTab.value !== 1 && !isCancelTab && !isWarehouseManager)"
+          [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Редагувати продажу"
+          (iClick)="showToEdit()">
+        </app-i-button>
+        <app-i-button *ngIf="(canView || isAdminAssistant) && !isCancelTab" [useSprite]="false" icon="return"
+          title="Повернути замовлення" (iClick)="confCancel()"
+          [disabled]="viewData.length < 1 || selectedItems.length > 1">
+        </app-i-button>
+        <app-i-button [useSprite]="false" icon="rocket" *ngIf="canViewMassActions"
+          [disabled]="!chosenVisibleOrders.length" title="Перемістити {{moveToInfo.title}}"
+          (iClick)="showConfirmMoveTo = true">
+        </app-i-button>
+        <app-i-button [useSprite]="false" icon="broadcast" *ngIf="isProcessingTab && canView"
+          [disabled]="!chosenVisibleOrders.length" title="Відправити смс" (iClick)="showConfirmMassSms = true">
+        </app-i-button>
+        <app-i-button [useSprite]="false" icon="lock" *ngIf="(selectedTab.value !== 1 && !isCancelTab) && canView"
+          [disabled]="viewData.length < 1 || selectedItems.length > 1" title="Закрити продажу"
+          (iClick)="confirmation()">
+        </app-i-button>
+        <app-i-button [useSprite]="false" icon="hourglass" title="Історія замовлення" (iClick)="showHistory()"
+          [disabled]="viewData.length < 1 || selectedItems.length > 1">
+        </app-i-button>
+        <app-i-button icon="i-expand" title="Розкрити усі продажі" (iClick)="expandOrders()"
+          [disabled]="viewData.length < 1 || selectedItems.length > 1">
+        </app-i-button>
+        <app-i-button icon="i-collapse" title="Згорнути усі продажі" (iClick)="collapseOrders()"
+          [disabled]="viewData.length < 1 || selectedItems.length > 1">
+        </app-i-button>
+        <app-i-button *ngIf="selectedTab.value === 0 && (!isClient && !isWarehouseManager)" icon="i-basket" title="Редагувати товари"
+          (iClick)="restoreBasket()" [disabled]="viewData.length < 1 || selectedItems.length > 1 || basketService.hasItems">
+        </app-i-button>
+
+
+        <!-- <app-i-button *ngIf="canView" icon="i-export-one" title="Зберегти вибрані"
+          (iClick)="saveToExcel(selectedItems)" [disabled]="viewData.length < 1 || selectedItems.length < 1">
+        </app-i-button> -->
+        <!-- <app-i-button *ngIf="canView" icon="i-export-all" title="Зберегти всі дані" (iClick)="saveToExcel(viewData)"
+          [disabled]="viewData.length < 1"></app-i-button> -->
+        <ng-container right>
+          <button class="i-menu-button" title="Колонки" (click)="showColumnsPicker = true"
+            [ngClass]="{'i-menu-button-active': hiddenColumns.size}">
+            <i class="dripicons dripicons-toggles"> </i>
+          </button>
+          <app-i-button icon="i-refresh" title="Оновити дані" (iClick)="refresh()">
+          </app-i-button>
+
+        </ng-container>
+
+
+      </app-button-group>
+
+      <div class="button-wrap">
+        <input class="s-serche" type="text" placeholder="Пошук"
+          (input)="dt.filterGlobal($event.target.value, 'contains')">
+      </div>
+    </div>
+
+    <p-table class="prime-table" [value]="viewData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
+      responsiveLayout="scroll" [resizableColumns]="true" [pageLinks]="4" [rows]="100" [responsive]="true"
+      [scrollable]="false" scrollWidth="100%" scrollHeight="100%" dataKey="id" #dt [globalFilterFields]="['openDate', 'closeDate', 'cancelDate', 'orderNumber',
+        'clientPhone', 'clientName', 'clientAddress', 'deliveryString', 'seller', 'canceledBy',
+        'itemsName', 'other', 'totalPrice']" (onSort)="onSort()" selectionMode="single">
+
+      <ng-template pTemplate="colgroup">
+
+        <colgroup *ngIf="view.isMobile">
+          <col />
+        </colgroup>
+
+        <colgroup *ngIf="!view.isMobile">
+          <col [width]="50" *ngIf="canViewMassActions" />
+          <col />
+
+          <!--coll for expand-->
+          <col [width]="50" />
+
+          <ng-container *ngFor="let column of columns">
+            <col *ngIf="visibleColumn(column)" [style.width]="column.width" />
+          </ng-container>
+        </colgroup>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <!--cols for expand and id-->
+          <th>
+            <input [checked]="isMoveToAllCbChecked" type="checkbox" [indeterminate]="isMoveToAllIndeterminate"
+              (change)="onMoveToAllChange($event)" *ngIf="canViewMassActions" />
+          </th>
+          <th></th>
+
+          <th>#</th>
+          <ng-container *ngFor="let column of columns">
+            <th [pSortableColumn]="column?.field" *ngIf="visibleColumn(column)" pResizableColumn>
+              {{column?.title}}
+              <p-sortIcon [field]="column?.field"></p-sortIcon>
+            </th>
+          </ng-container>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-expanded="expanded" let-rowData let-rowIndex="rowIndex">
+
+        <tr class="ui-widget-header" *ngIf="rowMetadata[getDateKey(rowData.openDate)].index === rowIndex">
+          <td colspan="3">
+            <span style="font-weight:bold">{{rowData.openDate | date: 'dd/MM/yy'}}</span>
+          </td>
+        </tr>
+
+        <tr (click)="onItemClick(rowData)" [pSelectableRow]="rowData"
+          [ngClass]="{'s-selected-row': rowData.id === selectedItem?.id}">
+
+          <td><input type="checkbox" [checked]="rowData.isChecked" (change)="onCheckedChange(rowData, $event)"
+              *ngIf="canViewMassActions" /></td>
+
+          <td class="expanded-cell">
+            <i href="#" [pRowToggler]="rowData" [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+          </td>
+
+          <td>{{rowData.id}}</td>
+
+          <ng-container *ngFor="let column of columns">
+            <td *ngIf="visibleColumn(column)">
+              <ng-container *ngIf="!column.template">
+                {{rowData[column.field]}}
+              </ng-container>
+              <ng-container *ngIf="column.template === 'date'">
+                {{rowData[column.field] | date: column.format}}
+              </ng-container>
+              <ng-container *ngIf="column.template === 'pageSpecial1'">
+                <ng-container *ngIf="rowData.orderNumber && rowData.orderNumber.toString().startsWith('050')">
+                  <a href="https://track.ukrposhta.ua/tracking_UA.html?barcode={{rowData.orderNumber}}" target="_blank">
+                    <span>{{rowData.orderNumber}}</span>
+                  </a>
+                </ng-container>
+                <ng-container *ngIf="!rowData.orderNumber || !rowData.orderNumber.toString().startsWith('050')">
+                  <a href="https://novaposhta.ua/tracking/?cargo_number={{rowData.orderNumber}}" target="_blank">
+                    <span>{{rowData.orderNumber}}</span>
+                  </a>
+                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="column.template === 'pageSpecial3'">
+                <span class="notes" [title]="rowData[column.field]"> {{rowData[column.field]}}</span>
+              </ng-container>
+              <ng-container *ngIf="column.template === 'actions'">
+                <button (click)="sentSms(rowData)"> Sms </button>
+              </ng-container>
+
+            </td>
+          </ng-container>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['date']}}</ng-template>
+
+      <ng-template let-item pTemplate="rowexpansion">
+        <tr class="expanded-row">
+          <td [attr.colspan]="12">
+            <div class="cancel-reason" *ngIf="isCancelTab">
+              Причина відміни:
+              <b> {{ item.cancelReason }} </b>
+            </div>
+            <div class="products-list flex-col">
+              <table class="check-order">
+                <colgroup>
+                  <col width="360px">
+                  <col>
+                  <col width="110px">
+                  <col width="110px">
+                  <col width="100px">
+                  <col width="100px">
+                </colgroup>
+                <thead class="check-head">
+                  <tr class="check-tr">
+                    <th class="check-cell">Назва</th>
+                    <th class="check-cell">Кількість</th>
+                    <th class="check-cell" *ngIf="canView">Ціна покупки</th>
+                    <th class="check-cell">Ціна продажу</th>
+                    <th class="check-cell" *ngIf="canView">Різниця</th>
+                    <th class="check-cell">Сума</th>
+                  </tr>
+                </thead>
+
+                <tbody class="check-body">
+                  <tr class="check-tr" *ngFor="let prod of item.products">
+                    <td class="check-td check-item-name-td">
+                      {{buildProductFullName(prod.product)}}
+                      <br *ngIf="prod.product.freeNote" />
+                      <span class="prod-notes">{{prod.product.freeNote}}</span>
+                    </td>
+                    <td class="check-td"><b>{{prod.quantity}} шт</b></td>
+                    <td class="check-td" *ngIf="canView">{{prod.buyPrice}} </td>
+                    <td class="check-td">{{prod.price}}</td>
+                    <td class="check-td" *ngIf="canView">{{getDifference(prod)}}</td>
+                    <td class="check-td">{{prod.totalPrice}}</td>
+                  </tr>
+                </tbody>
+
+
+                <tfoot class="check-foot">
+                  <tr class="check-tr">
+                    <td class="check-cell"></td>
+                    <td class="check-cell"></td>
+                    <td class="check-cell total-cell" *ngIf="canView">Прибуток:</td>
+                    <td class="check-cell total-cell" *ngIf="canView">{{getProfit(item)}}</td>
+                    <td class="check-cell total-cell">До оплати:</td>
+                    <td class="check-cell total-cell">{{item.totalPrice}}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+
+</div>
+<app-spinner *ngIf="showSpinner">
+</app-spinner>
+
+<app-order *ngIf="orderDialog" [order]="selectedItem" (iSave)="save($event)" (onCloseDialog)="closeEditDialog($event)"
+  [canEdit]="(canEdit || isAdminAssistant)">
+</app-order>
+
+<app-confirm (confirm)="confirmCloseOrder($event)" *ngIf="showConfirm" [yesHeader]="'Закрити продажу'">
+  <span header class="confirm-title">Ви впевнені, що бажаєте закрити продажу №:
+    <b>{{selectedItem.orderNumber}} для {{selectedItem.clientName}}</b> ?
+  </span>
+</app-confirm>
+
+<app-confirm (confirm)="confirmMoveTo($event)" *ngIf="showConfirmMoveTo"
+  yesHeader="Перемістити {{chosenVisibleOrders?.length}}">
+  <span header class="confirm-title">Перемістити усі
+    (<b>{{chosenVisibleOrders?.length}}</b>) замовленя {{moveToInfo.title}}?
+  </span>
+</app-confirm>
+
+<app-confirm (confirm)="confirmMassSms($event)" *ngIf="showConfirmMassSms"
+  yesHeader="Відправити {{chosenVisibleOrders?.length}} смс">
+  <span header class="confirm-title">Відправити
+    (<b>{{chosenVisibleOrders?.length}}</b>) смс?
+  </span>
+</app-confirm>
+
+<app-return (confirm)="closeCancelOrder($event)" [order]="selectedItem" *ngIf="showConfirmCancel">
+</app-return>
+
+<app-order-history [order]="selectedItem" [orderHistory]="orderHistory" *ngIf="showOrderHistory"
+  (onCloseDialog)="showOrderHistory=$event">
+</app-order-history>
+
+<app-columns-picker *ngIf="showColumnsPicker" [columns]="columns" [hiddenColumns]="hiddenColumns"
+  (closeDialog)="onColumnsPickerClosed($event)">
+</app-columns-picker>
