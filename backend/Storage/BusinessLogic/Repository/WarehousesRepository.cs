@@ -311,7 +311,7 @@ namespace BusinessLogic.Repository
           Status = OrderStatus.Open,
           Delivery = DeliveryKind.Drop,
           Payment = PaymentKind.Payed,
-          
+
           ResponsibleUserId = userId,
           ClientAddress = clientInfo.DropAddress ?? $"{clientInfo.Surname} {clientInfo.Name}",
           ClientName = $"{clientInfo.Surname} {clientInfo.Name}",
@@ -387,11 +387,12 @@ namespace BusinessLogic.Repository
 
         // I assume that 99% of time there is going to be just a single item per product
         // only possible case is when we already have removed some items and re-added those, or when we were already changing quantities
-        var existingProducts = existingOrder.Transactions.GroupBy(it => new { it.WarehouseId, it.ProductId, it.Price })
+        var existingProducts = existingOrder.Transactions.GroupBy(it => new { it.WarehouseId, it.ProductId, it.Price, it.DiscountMultiplier })
           .Select(it => new ProductRequest()
           {
             FromId = it.Key.WarehouseId,
             ProductId = it.Key.ProductId,
+            DiscountMultiplier = it.Key.DiscountMultiplier,
             Price = it.Key.Price,
             Quantity = it.Sum(p => p.Quantity),
             Description = null, // we do not modify existing records, so we are not interested in this field
