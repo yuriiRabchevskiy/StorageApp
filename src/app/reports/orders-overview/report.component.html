@@ -3,7 +3,14 @@
     <div *ngIf="view.isMobile">
     </div>
     <app-button-group [class.t-i-button-group]="view.isMobile" [minimized]="view.isMobile">
-        <app-i-button right icon="i-refresh" title="Оновити дані" (iClick)="refresh()"></app-i-button>
+        <ng-container right>
+            <button class="i-menu-button" title="Колонки" (click)="showColumnsPicker = true"
+                [ngClass]="{'i-menu-button-active': hiddenColumns.size}">
+                <i class="dripicons dripicons-toggles"> </i>
+            </button>
+            <app-i-button right icon="i-refresh" title="Оновити дані" (iClick)="refresh()">
+            </app-i-button>
+        </ng-container>
     </app-button-group>
 
     <div class="button-wrap">
@@ -12,8 +19,8 @@
     </div>
 </div>
 <p-table class="prime-table report-table" [value]="filteredData" [paginator]="true" [rowsPerPageOptions]="[100,50,30]"
-    [pageLinks]="4" [rows]="100" [responsive]="true" scrollWidth="100%"
-    scrollHeight="calc(100% - 54px)" #dt dataKey="id" selectionMode="single"
+    [pageLinks]="4" [rows]="100" [responsive]="true" scrollWidth="100%" scrollHeight="calc(100% - 54px)" #dt
+    dataKey="id" selectionMode="single"
     [globalFilterFields]="['category', 'ordersCount', 'sales', 'closedCount', 'closedPrice', 'openCount', 'openPrice', 'canceledCount']">
     <ng-template pTemplate="colgroup">
         <colgroup *ngIf="view.isMobile">
@@ -33,66 +40,35 @@
     </ng-template>
     <ng-template pTemplate="header">
         <tr>
-            <th pSortableColumn="category">
-                Користувач
-                <p-sortIcon field="category"></p-sortIcon>
-            </th>
-            <th pSortableColumn="ordersCount">
-                Замовлень
-                <p-sortIcon field="ordersCount"></p-sortIcon>
-            </th>
-            <th pSortableColumn="sales">
-                Ціна продажі
-                <p-sortIcon field="sales"></p-sortIcon>
-            </th>
-            <th pSortableColumn="closedCount">
-                Закритих
-                <p-sortIcon field="closedCount"></p-sortIcon>
-            </th>
-            <th pSortableColumn="closedPrice">
-                Ціна закритих
-                <p-sortIcon field="closedPrice"></p-sortIcon>
-            </th>
-            <th pSortableColumn="openCount">
-                Відкритих
-                <p-sortIcon field="openCount"></p-sortIcon>
-            </th>
-            <th pSortableColumn="openPrice">
-                Ціна відкритих
-                <p-sortIcon field="openPrice"></p-sortIcon>
-            </th>
-            <th pSortableColumn="canceledCount">
-                Скасованих
-                <p-sortIcon field="canceledCount"></p-sortIcon>
-            </th>
+            <ng-container *ngFor="let column of columns">
+                <th *ngIf="visibleColumn(column)" pSortableColumn="{{column.field}}">
+                    {{column.title}}
+                    <p-sortIcon field="{{column.field}}"></p-sortIcon>
+                </th>
+            </ng-container>
+
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-rowData>
+
         <tr (click)="onRowClick(rowData)" [pSelectableRow]="rowData"
             [ngClass]="{'s-selected-row': rowData.id === selectedItem?.id}">
-            <td>{{rowData.category}}</td>
-            <td>{{rowData.ordersCount}}</td>
-            <td>{{rowData.sales}}</td>
-            <td>{{rowData.closedCount}}</td>
-            <td>{{rowData.closedPrice}}</td>
-
-            <td>{{rowData.openCount}}</td>
-            <td>{{rowData.openPrice}}</td>
-            <td>{{rowData.canceledCount}}</td>
+            <ng-container *ngFor="let column of columns">
+                <td *ngIf="visibleColumn(column)">{{rowData[column.field]}}</td>
+            </ng-container>
         </tr>
     </ng-template>
     <ng-template pTemplate="footer">
         <tr>
-            <td># {{filteredData?.length}}</td>
-            <td>{{totals?.ordersCount}}</td>
-            <td>{{totals?.sales}}</td>
-            <td>{{totals?.closedCount}}</td>
-            <td>{{totals?.closedPrice}}</td>
-
-            <td>{{totals?.openCount}}</td>
-            <td>{{totals?.openPrice}}</td>
-            <td>{{totals?.canceledCount}}</td>
+            <ng-container *ngFor="let column of columns">
+                <td *ngIf="visibleColumn(column)">{{totals && totals[column.field]}}</td>
+            </ng-container>        
         </tr>
     </ng-template>
 </p-table>
+
 <app-spinner *ngIf="showSpinner"></app-spinner>
+
+<app-columns-picker *ngIf="showColumnsPicker" [columns]="columns" [hiddenColumns]="hiddenColumns"
+    (closeDialog)="onColumnsPickerClosed($event)">
+</app-columns-picker>

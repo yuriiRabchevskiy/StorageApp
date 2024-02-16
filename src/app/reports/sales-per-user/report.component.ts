@@ -51,13 +51,14 @@ export class SalesPerUsersComponent extends ApiListComponent<IApiSalePerUser> {
   onFiltered() {
     super.onFiltered();
     const filtered = this.filteredData;
-    const newTotals: IApiSalePerUser = <any>{ sales: 0, quantity: 0, ordersCount: 0, buyPrice: 0, profit: 0 };
+    const newTotals: any = <any>{ sales: 0, quantity: 0, ordersCount: 0, buyPrice: 0, profit: 0, discount: 0 };
     filtered.reduce((sum, it) => {
       newTotals.sales += it.sales;
       newTotals.quantity += it.quantity;
       newTotals.profit += it.profit;
       newTotals.buyPrice += it.buyPrice;
       newTotals.ordersCount += it.ordersCount;
+      newTotals.discount += it.discount
       return newTotals;
     }, newTotals);
     this.totals = newTotals;

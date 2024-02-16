@@ -60,10 +60,10 @@ namespace BusinessLogic.Repository.Reports
           CanceledPrice = canceled.Sum(trn => trn.TotalPrice),
           OpenCount = open.Count,
           OpenPrice = open.Sum(trn => trn.TotalPrice),
-          OpenDiscount = open.Sum(trn => trn.TotalDiscount),
+          OpenDiscount = Math.Floor(open.Sum(trn => trn.TotalDiscount) ?? 0),
           ClosedCount = closed.Count,
           ClosedPrice = closed.Sum(trn => trn.TotalPrice),
-          CloseDiscount = closed.Sum(trn => trn.TotalDiscount),
+          CloseDiscount = Math.Floor(closed.Sum(trn => trn.TotalDiscount) ?? 0),
           BuyPrice = it.Sum(trn => trn.TotalBuyPrice),
           Quantity = it.Sum(trn => trn.Products.Sum(prod => prod.Quantity))
         };

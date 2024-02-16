@@ -51,6 +51,10 @@
                 Ціна закупки
                 <p-sortIcon field="buyPrice"></p-sortIcon>
             </th>
+            <th pSortableColumn="discount">
+                Знижка
+                <p-sortIcon field="discount"></p-sortIcon>
+            </th>
             <th pSortableColumn="profit">
                 Прибуток
                 <p-sortIcon field="profit"></p-sortIcon>
@@ -65,6 +69,7 @@
             <td>{{rowData.quantity}}</td>
             <td>{{rowData.sales}}</td>
             <td>{{rowData.buyPrice}}</td>
+            <td>{{rowData.discount}}</td>
             <td>{{rowData.profit}}</td>
         </tr>
     </ng-template>
@@ -75,6 +80,7 @@
             <td>{{totals?.quantity}}</td>
             <td>{{totals?.sales}}</td>
             <td>{{totals?.buyPrice}}</td>
+            <td>{{totals?.discount}}</td>
             <td>{{totals?.profit}}</td>
         </tr>
     </ng-template>

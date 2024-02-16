@@ -19,7 +19,7 @@ namespace BusinessLogic.Repository.Reports
   public class SalesPerProductRepository : ISalesPerProductRepository
   {
 
-    private IServiceProvider _di;
+    private readonly IServiceProvider _di;
 
     public SalesPerProductRepository(IServiceProvider serviceProvider)
     {

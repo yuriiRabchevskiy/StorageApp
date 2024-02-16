@@ -1,3 +1,5 @@
+using System;
+
 namespace BusinessLogic.Models.Api.Client
 {
   public class ApiClientProdOrder
@@ -7,6 +9,8 @@ namespace BusinessLogic.Models.Api.Client
     public double Price { get; set; }
     public double DiscountMultiplier { get; set; }
     public double TotalPrice { get; set; }
+
+    public double DiscountedPrice => Math.Floor(Price * DiscountMultiplier);
 
   }
 }
