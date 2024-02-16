@@ -9,6 +9,7 @@ export interface IApiSale {
 
 export interface IApiSalePerUser extends IApiSale {
     ordersCount: number;
+    discount?: number;
 }
 
 export interface IApiOrdersOverview extends IApiSalePerUser {
@@ -16,8 +17,10 @@ export interface IApiOrdersOverview extends IApiSalePerUser {
     closedPrice: number;
     openCount: number;
     openPrice: number;
+    openDiscount?: number;
     canceledCount: number;
     canceledPrice: number;
+    closeDiscount?: number;
 }
 
 

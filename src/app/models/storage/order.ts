@@ -94,6 +94,7 @@ export interface IClientTransaction {
     price: number;
     totalPrice: number;
     discountMultiplier?: number;
+    discountedPrice?: number;
 }
 
 export interface ITransaction {

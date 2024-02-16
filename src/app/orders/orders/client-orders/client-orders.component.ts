@@ -1,6 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { BasketService } from '@app/shared/services/basket.service';
 import { PreferenceService } from '@app/shared/services/preference.service';
 import { UserService } from '@app/shared/services/user.service';
 import { groupBy } from 'lodash';
@@ -33,10 +31,10 @@ export class ClientOrdersComponent extends ApiListComponent<IClientOrder>{
     }
   );
 
-  public selectedItem: IOrder;
+  public selectedItem: IClientOrder;
   public stringFilters: StringFilter<IClientOrder> = new StringFilter<IClientOrder>();
 
-  public get visibleOrders(): IOrder[] {
+  public get visibleOrders(): IClientOrder[] {
     return (this.dataTable.filteredValue ?? this.dataTable.value ?? []);
   }
 
@@ -72,10 +70,9 @@ export class ClientOrdersComponent extends ApiListComponent<IClientOrder>{
   itemsFormatted = [];
 
   constructor(userService: UserService, private apiService: ApiService,
-    public router: Router, public basketService: BasketService,
     notify: MessageService, preferences: PreferenceService) {
     super(userService, notify, preferences);
-    this.initHiddenColumns('ordersColumns');
+    this.initHiddenColumns('clientOrdersColumns');
   }
 
   onItemClick(event: IOrder) {
@@ -120,15 +117,10 @@ export class ClientOrdersComponent extends ApiListComponent<IClientOrder>{
     return unique.concat(duplicates).sort().join(',');
   }
 
-  orderByDate(a, b) {
+  orderByDate(a: IClientOrder, b: IClientOrder) {
     const dateA = new Date(a.date).getFullYear();
     const dateB = new Date(b.date).getFullYear();
     return dateA - dateB;
-  }
-
-  restoreBasket() {
-    this.basketService.restore(this.selectedItem);
-    this.showInfoMessage("Замовлення відновлено і може бути редаговане на сторінці Складу");
   }
 
   expandOrders() {
@@ -153,10 +145,6 @@ export class ClientOrdersComponent extends ApiListComponent<IClientOrder>{
       str += (color || '') + ' ' + (model || '') + ' ' + (type || '');
     }
     return str;
-  }
-
-  getDateKey(d: Date) {
-    return `${d.getDate()}`;
   }
 
 

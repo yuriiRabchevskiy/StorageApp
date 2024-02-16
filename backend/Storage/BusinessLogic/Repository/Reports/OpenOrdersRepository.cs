@@ -34,7 +34,7 @@ namespace BusinessLogic.Repository.Reports
     public async Task<string> GetAsync(string userId, bool isAdmin, DateTime from, DateTime till)
     {
       List<Order> orders;
-      await using (var context = _di.GetService<ApplicationDbContext>())
+      await using (var context = _di.GetRequiredService<ApplicationDbContext>())
       {
         orders = await context.Orders
         .Where(it => isAdmin || it.ResponsibleUserId == userId)
