@@ -271,12 +271,11 @@ namespace BusinessLogic.Repository
         var (orderTransactions, notes) = createAddOrderProductActions(productOrders, context, userId, date);
         changesNotes.AddRange(notes);
         order.Transactions.AddRange(orderTransactions);
-        changesNotes.AddRange(notes);
-        order.Transactions.AddRange(orderTransactions);
 
         context.Orders.Add(order);
 
-        var revision = await _state.UpdateProductsStateCounterAsync(context);
+        var productIds = orderTransactions.Select(it => it.ProductId).ToList();
+        var revision = await _state.UpdateProductsStateCounterAsync(context, productIds);
 
         await context.SaveChangesAsync();
         await transaction.CommitAsync();
@@ -335,12 +334,11 @@ namespace BusinessLogic.Repository
         var (orderTransactions, notes) = createAddOrderProductActions(productOrders, context, userId, date);
         changesNotes.AddRange(notes);
         order.Transactions.AddRange(orderTransactions);
-        changesNotes.AddRange(notes);
-        order.Transactions.AddRange(orderTransactions);
 
         context.Orders.Add(order);
 
-        var revision = await _state.UpdateProductsStateCounterAsync(context);
+        var productIds = orderTransactions.Select(it => it.ProductId).ToList();
+        var revision = await _state.UpdateProductsStateCounterAsync(context, productIds);
 
         await context.SaveChangesAsync();
         await transaction.CommitAsync();
@@ -470,7 +468,9 @@ namespace BusinessLogic.Repository
         changesNotes.AddRange(addNotes);
         changesNotes.AddRange(removeNotes);
 
-        var revision = await _state.UpdateProductsStateCounterAsync(context);
+        var combinedTransactions = addTransactions.Concat(removeTransactions);
+        var productIds = combinedTransactions.Select(it => it.ProductId).ToList();
+        var revision = await _state.UpdateProductsStateCounterAsync(context, productIds);
 
         await context.SaveChangesAsync();
         await transaction.CommitAsync();
@@ -518,7 +518,8 @@ namespace BusinessLogic.Repository
       order.Transactions.AddRange(revertActions);
       changesNotes.AddRange(notes);
 
-      var revision = await _state.UpdateProductsStateCounterAsync(context);
+      var productIds = revertActions.Select(it => it.ProductId).ToList();
+      var revision = await _state.UpdateProductsStateCounterAsync(context, productIds);
 
       await context.SaveChangesAsync();
       await transaction.CommitAsync();

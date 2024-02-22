@@ -195,7 +195,7 @@ namespace DataAccess.Repository
         });
       }
 
-      var revision = await _state.UpdateProductsStateCounterAsync(context);
+      var revision = await _state.UpdateOrdersStateCounterAsync(context);
       await context.SaveChangesAsync().ConfigureAwait(false);
 
       foreach (var order in orders)

@@ -9,7 +9,7 @@ namespace BusinessLogic.Abstractions
 {
   public interface IStateService
   {
-    Task<int> UpdateProductsStateCounterAsync(ApplicationDbContext context);
+    Task<int> UpdateProductsStateCounterAsync(ApplicationDbContext context, ICollection<int> productIds);
     Task<int> UpdateOrdersStateCounterAsync(ApplicationDbContext context);
   }
 }
