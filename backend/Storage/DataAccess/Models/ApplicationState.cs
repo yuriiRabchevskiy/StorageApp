@@ -6,5 +6,7 @@ namespace DataAccess.Models
     public int Id { get; set; }
     public int ProductsRevision { get; set; }
     public int OrdersRevision { get; set; }
+
+    public int HoroshopSyncRevision { get; set; }
   }
 }

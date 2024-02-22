@@ -19,6 +19,8 @@ namespace DataAccess
     public DbSet<ApplicationState> AppState { get; set; }
     public DbSet<UserDiscount> UserDiscounts { get; set; }
 
+    public DbSet<ProductCountChange> ProductCountChanges { get; set; }
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
