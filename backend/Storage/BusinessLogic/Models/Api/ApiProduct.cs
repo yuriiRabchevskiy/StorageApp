@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DataAccess.Models;
 
 namespace BusinessLogic.Models.Api
 {
@@ -15,6 +16,8 @@ namespace BusinessLogic.Models.Api
     public string FreeNote { get; set; }
     public double RecommendedBuyPrice { get; set; }
     public double RecommendedSalePrice { get; set; }
+
+    public Availability ZeroAvailabilityMarker { get; set; }
     public bool IsActive { get; set; }
 
     public Dictionary<string, int> Balance { get; set; }

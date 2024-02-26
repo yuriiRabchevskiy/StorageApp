@@ -52,6 +52,13 @@
                         #freeNote="ngModel">
                     </textarea>
                 </mat-form-field>
+                <mat-form-field class="s-input-wrapper">
+                    <mat-select placeholder="Статус без наявності" [(ngModel)]="product.zeroAvailabilityMarker" name="category">
+                        <mat-option *ngFor="let item of availabilities" [value]="item.id">
+                            {{item.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
         </div>
         <div class="d-cb-wrap flex-row" *ngIf="product.isNew">

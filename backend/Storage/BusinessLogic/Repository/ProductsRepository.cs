@@ -73,6 +73,7 @@ namespace DataAccess.Repository
         real.ProductCode = it.ProductCode;
         real.RecommendedBuyPrice = it.RecommendedBuyPrice;
         real.RecommendedSalePrice = it.RecommendedSalePrice;
+        real.ZeroAvailabilityMarker = it.ZeroAvailabilityMarker;
         real.Size = it.Size;
       }
       context.SaveChanges();

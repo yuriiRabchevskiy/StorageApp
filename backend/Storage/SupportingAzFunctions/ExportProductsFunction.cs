@@ -12,7 +12,8 @@ namespace SupportingAzFunctions
   {
     private const string HookUrl = "https://sweetkeys.azurewebsites.net/api/product/export/generate";
 
-    public static async Task Run([TimerTrigger("0 */1 * * * *")] TimerInfo myTimer, ILogger log)
+    [FunctionName("ExportProductsFunction")]
+    public static async Task Run([TimerTrigger("0 0 * * * *")] TimerInfo myTimer, ILogger log)
     {
       log.LogInformation($"Triggering status at: {DateTime.Now}");
       var formContent = new object();

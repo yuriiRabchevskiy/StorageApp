@@ -6,6 +6,8 @@ export function buildProductFullName(p: IProduct) {
     return `${codeStr}${p.size ?? ''} ${p.color ?? ''} ${p.productType ?? ''} - ${p.model ?? ''} ${p.producer ?? ''}`;
 }
 
+export enum Availability { NotSet = 0, Present = 1, NotPresent = 2, Expected = 3 }
+
 export interface IProdOrder {
     /**
      * Used to show description only
@@ -30,6 +32,7 @@ export interface IProduct {
     recommendedBuyPrice?: number;
     recommendedSalePrice?: number;
     discountedPrice?: number;
+    zeroAvailabilityMarker: Availability;
     balance?: INDictionary<number>;
     isNew?: boolean;
     isActive?: boolean;
@@ -49,6 +52,7 @@ export class Product implements IProduct {
     discountedPrice?: number;
     isNew: boolean = false;
     isActive: boolean = false;
+    zeroAvailabilityMarker: Availability = Availability.NotPresent;
     balance = {};
 
     public constructor() {}

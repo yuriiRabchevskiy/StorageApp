@@ -1,10 +1,12 @@
 using BusinessLogic.Helpers.Http;
+using DataAccess.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.Services;
 
 public interface IHoroshopService
 {
+  public bool SyncOn { get; }
   Task SyncProductsPresenceAsync(List<HProductPresence> products);
 }
 
@@ -13,14 +15,14 @@ public class HoroshopService : IHoroshopService
   private readonly string _apiClient;
   private readonly string _apiSecret;
   private readonly string _apiUrl;
-  private readonly bool _syncOn = false;
+  public bool SyncOn { get; private set; }
   public IConfiguration Configuration { get; }
 
   public HoroshopService(IConfiguration configuration)
   {
     Configuration = configuration;
     var horoshopConfig = Configuration.GetRequiredSection("Horoshop");
-    _syncOn = horoshopConfig.GetValue<bool>("SyncOn");
+    SyncOn = horoshopConfig.GetValue<bool>("SyncOn");
     _apiClient = horoshopConfig.GetValue<string>("ApiClient")!;
     _apiSecret = horoshopConfig.GetValue<string>("ApiSecret")!;
     _apiUrl = horoshopConfig.GetValue<string>("ApiUrl")!;
@@ -28,6 +30,7 @@ public class HoroshopService : IHoroshopService
 
   public async Task SyncProductsPresenceAsync(List<HProductPresence> products)
   {
+    if (!SyncOn) throw new Exception("Sync with horoshop is disabled for this environment");
     var client = new HoroshopClient(_apiUrl, false);
     var token = await client.LoginAsync(_apiClient, _apiSecret);
     await client.UpdateProductPresenceAsync(token, products);
@@ -77,7 +80,6 @@ public class HoroshopService : IHoroshopService
         Token = token,
         Products = products
       });
-      return;
     }
 
     #region Private Methods
@@ -126,15 +128,29 @@ public class HoroshopService : IHoroshopService
 
 }
 
-public enum HPresense { NotSet = 0, Present = 1, NotPresent = 2, Expected = 3 }
-
 public class HPresenseDto
 {
-  public HPresense Id { get; set; }
+
+  private readonly int _quantity;
+  private readonly Availability _nonePresence;
+  public int Id
+  {
+    get
+    {
+      if (_quantity > 0) return (int)Availability.Present;
+      return (int)_nonePresence;
+    }
+  }
+
+  public HPresenseDto(int quantity, Availability prodNonePresence)
+  {
+    _nonePresence = prodNonePresence;
+    _quantity = quantity;
+  }
 }
 public class HProductPresence
 {
-  public string Article { get; set; }
-  public HPresenseDto Presence { get; set; }
+  public string? Article { get; set; }
+  public HPresenseDto? Presence { get; set; }
 
 }

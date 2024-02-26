@@ -11,6 +11,12 @@ export interface ISaveResult {
   copy: boolean;
 }
 
+export interface IAvailabilityStatus {
+  id: number;
+  name: string;
+}
+
+
 @Component({
   selector: 'app-product',
   templateUrl: './product.component.html',
@@ -31,6 +37,17 @@ export class ProductComponent extends SecuredComponent {
     if (!this.categories || !value) return; // no yet loaded
     this.selectedCategory = value.categoryId;
   }
+
+  availabilities: IAvailabilityStatus[] = [
+    {
+      id: 2,
+      name: "Немає в наявності"
+    },
+    {
+      id: 3,
+      name: "Очікується"
+    }];
+
 
   _categories: ICategory[] = [];
   @Input() set categories(val: ICategory[]) {

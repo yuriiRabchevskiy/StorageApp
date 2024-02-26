@@ -30,6 +30,9 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("HoroshopSyncRevision")
+                        .HasColumnType("int");
+
                     b.Property<int>("OrdersRevision")
                         .HasColumnType("int");
 
@@ -311,6 +314,9 @@ namespace DataAccess.Migrations
                     b.Property<int?>("WarehouseId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ZeroAvailabilityMarker")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
@@ -372,6 +378,25 @@ namespace DataAccess.Migrations
                     b.HasIndex("WarehouseId");
 
                     b.ToTable("ProductsTrqansactions");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.ProductCountChange", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RevisionNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductCountChanges");
                 });
 
             modelBuilder.Entity("DataAccess.Models.UserDiscount", b =>

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace DataAccess.Models
 {
+
+  public enum Availability { NotSet = 0, Present = 1, NotPresent = 2, Expected = 3 }
   public class Product
   {
     public int Id { get; set; }
@@ -17,6 +19,8 @@ namespace DataAccess.Models
     public double RecommendedBuyPrice { get; set; }
     public double RecommendedSalePrice { get; set; }
     public bool IsActive { get; set; }
+
+    public Availability ZeroAvailabilityMarker { get; set; }
 
     public Category Category { get; set; }
     public ICollection<ProductAction> Transactions { get; set; }
