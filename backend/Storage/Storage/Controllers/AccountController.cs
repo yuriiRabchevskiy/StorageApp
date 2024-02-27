@@ -79,8 +79,9 @@ namespace Storage.Controllers
     }
 
     [HttpPost("auth")]
-    public async Task<ApiResponse<bool>> Auth([FromBody] LoginDto model)
+    public async Task<ApiResponse<bool>> Auth()
     {
+
       var result = await GetCurrentUserAsync().ConfigureAwait(false);
       if (result == null) return new ApiResponse<bool>(false);
       if (!result.IsActive) throw new AuthenticationException("User is deactivated");
@@ -147,29 +148,37 @@ namespace Storage.Controllers
     {
       var claims = new List<Claim>
           {
-            new Claim(JwtRegisteredClaimNames.Sub, email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new(JwtRegisteredClaimNames.Name, email),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(ClaimTypes.NameIdentifier, user.Id),
           };
 
       // Get User roles and add them to claims
       var roles = _userManager.GetRolesAsync(user).Result;
       addRolesToClaims(claims, roles);
 
-
-      var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
+      var issuer = _configuration["JwtIssuer"];
+      var audience = _configuration["JwtIssuer"];
+      var expireDays = Convert.ToDouble(_configuration["JwtExpireDays"]);
+      var keyBytes = Encoding.UTF8.GetBytes(_configuration["JwtKey"]);
+      var key = new SymmetricSecurityKey(keyBytes);
       var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-      var expires = DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["JwtExpireDays"]));
 
-      var token = new JwtSecurityToken(
-        _configuration["JwtIssuer"],
-        _configuration["JwtIssuer"],
-        claims,
-        expires: expires,
-        signingCredentials: creds
-      );
+      var tokenDescriptor = new SecurityTokenDescriptor
+      {
+        Subject = new ClaimsIdentity(claims),
+        Expires = DateTime.UtcNow.AddDays(expireDays),
+        Issuer = issuer,
+        Audience = audience,
+        SigningCredentials = creds,
+      };
 
-      return new JwtSecurityTokenHandler().WriteToken(token);
+
+      var tokenHandler = new JwtSecurityTokenHandler();
+      var token = tokenHandler.CreateToken(tokenDescriptor) as JwtSecurityToken;
+      var jwtToken = tokenHandler.WriteToken(token);
+
+      return jwtToken;
     }
 
     private void addRolesToClaims(List<Claim> claims, IEnumerable<string> roles)

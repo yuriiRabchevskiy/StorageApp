@@ -24,13 +24,12 @@ using BusinessLogic.Models.User;
 using Storage.Code.Services;
 using BusinessLogic.Repository.Reports;
 using BusinessLogic.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Storage.Code.Hubs;
 using Storage.Middleware;
-
+using Microsoft.IdentityModel.Logging;
 namespace Storage
 {
   public class Startup
@@ -69,17 +68,19 @@ namespace Storage
         {
           cfg.RequireHttpsMetadata = false;
           cfg.SaveToken = true;
+          var keyBytes = Encoding.UTF8.GetBytes(Configuration["JwtKey"]);
           cfg.TokenValidationParameters = new TokenValidationParameters
           {
             ValidIssuer = Configuration["JwtIssuer"],
             ValidAudience = Configuration["JwtIssuer"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
             ClockSkew = TimeSpan.Zero // remove delay of token when expire
           };
           cfg.Events = new JwtBearerEvents
           {
             OnMessageReceived = context =>
             {
+
               // we need to extract token for signalR servcie/
               if (context.Request.Path.Value.StartsWith("/tracker"))
               {
@@ -100,9 +101,8 @@ namespace Storage
       services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
       services.AddCors();
-      services.AddControllers(cfg =>
-      {
-      }).AddFluentValidation()
+      services.AddControllers(cfg => { })
+        .AddFluentValidation()
         .AddJsonOptions(opt => opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
 
       services.AddAuthorization(options =>
