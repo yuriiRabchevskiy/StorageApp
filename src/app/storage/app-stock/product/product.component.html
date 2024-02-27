@@ -45,19 +45,19 @@
                     <input matInput type="text" placeholder="Код" [(ngModel)]="product.productCode" 
                        name="productCode" #productCode="ngModel">
                 </mat-form-field>
-            </div>
-            <div class="flex-row flex-wrap flex-area-wrap" [class.area-xs]="product.isNew">
-                <mat-form-field class="s-area-wrapper" id="freeNoteWrap">
-                    <textarea id="freeNote" matInput placeholder="Нотатки" [(ngModel)]="product.freeNote" name="freeNote" 
-                        #freeNote="ngModel">
-                    </textarea>
-                </mat-form-field>
                 <mat-form-field class="s-input-wrapper">
                     <mat-select placeholder="Статус без наявності" [(ngModel)]="product.zeroAvailabilityMarker" name="category">
                         <mat-option *ngFor="let item of availabilities" [value]="item.id">
                             {{item.name}}
                         </mat-option>
                     </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="flex-row flex-wrap flex-area-wrap" [class.area-xs]="product.isNew">
+                <mat-form-field class="s-area-wrapper" id="freeNoteWrap">
+                    <textarea id="freeNote" matInput placeholder="Нотатки" [(ngModel)]="product.freeNote" name="freeNote" 
+                        #freeNote="ngModel">
+                    </textarea>
                 </mat-form-field>
             </div>
         </div>

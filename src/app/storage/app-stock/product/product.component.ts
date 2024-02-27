@@ -101,11 +101,11 @@ export class ProductComponent extends SecuredComponent {
     this.onCloseDialog.emit(false);
   }
 
-  addMore(event) {
+  addMore(event: boolean) {
     this.addNext = event;
   }
 
-  addMoreCopy(event) {
+  addMoreCopy(event: boolean) {
     this.addCopy = event;
   }
 
